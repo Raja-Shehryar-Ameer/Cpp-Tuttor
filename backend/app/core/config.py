@@ -7,14 +7,14 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     max_steps: int = 1000
-    wall_timeout_s: int = 10
+    wall_timeout_s: int = 25
     output_limit_bytes: int = 64 * 1024
     max_source_bytes: int = 20 * 1024
 
     docker_image: str = "cpptutor-tracer"
     docker_memory: str = "256m"
     docker_pids_limit: int = 64
-    docker_cpus: str = "0.5"
+    docker_cpus: str = "1.0"
 
     rate_limit: str = "10/minute"
     trace_store_dir: Path = Path("trace_store")
