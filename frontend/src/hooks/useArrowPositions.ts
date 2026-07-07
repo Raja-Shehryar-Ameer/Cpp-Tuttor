@@ -12,9 +12,7 @@ export interface Arrow {
   y2: number;
   /** x of the vertical gutter lane this arrow travels through */
   laneX: number;
-  /** target missing entirely — draw a stub */
-  stub: boolean;
-  /** target freed or missing — render red with a warning marker */
+  /** target freed — render red with a warning marker */
   danger: boolean;
   /** pointer belongs to a frame other than the active one — dim it */
   faded: boolean;
@@ -30,7 +28,6 @@ interface Measured {
   y2: number;
   danger: boolean;
   faded: boolean;
-  stub: boolean;
 }
 
 /**
@@ -46,7 +43,11 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
   const activeFrameId = step.stack[0]?.frameId ?? null;
 
   const measured: Measured[] = [];
+  // Lanes must clear the full card widths, not just the measured value cells.
   let contentRight = 0;
+  for (const card of container.querySelectorAll(".stack-frame, .heap-object")) {
+    contentRight = Math.max(contentRight, card.getBoundingClientRect().right - origin.left);
+  }
   for (const pointer of collectPointers(step)) {
     if (!pointer.address) continue;
     const fromEl = getBox(pointer.address);
@@ -58,12 +59,10 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       pointer.sourceFrameId !== null &&
       activeFrameId !== null &&
       pointer.sourceFrameId !== activeFrameId;
+    // No box for the target (garbage or out-of-scope address): draw nothing.
+    // Freed heap objects keep their boxes, so real dangling pointers still show.
     const toEl = getBox(pointer.target);
-    if (!toEl) {
-      measured.push({ x1, y1, x2: x1 + 30, y2: y1, danger: true, faded, stub: true });
-      contentRight = Math.max(contentRight, x1 + 30);
-      continue;
-    }
+    if (!toEl) continue;
     const to = toEl.getBoundingClientRect();
     measured.push({
       x1,
@@ -72,7 +71,6 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       y2: to.top + to.height / 2 - origin.top,
       danger: freed.has(pointer.target),
       faded,
-      stub: false,
     });
     contentRight = Math.max(contentRight, x1, to.right - origin.left);
   }
@@ -86,7 +84,6 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
   const laneBase = contentRight + 22;
   const laneOf = new Map<number, number>();
   for (const { m, index } of order) {
-    if (m.stub) continue;
     const top = Math.min(m.y1, m.y2) - LANE_PAD;
     const bottom = Math.max(m.y1, m.y2) + LANE_PAD;
     let lane = lanes.findIndex((slots) =>
@@ -103,7 +100,7 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
   return measured.map((m, index) => ({
     key: `a${index}`,
     ...m,
-    laneX: m.stub ? m.x2 : laneBase + (laneOf.get(index) ?? 0) * LANE_GAP,
+    laneX: laneBase + (laneOf.get(index) ?? 0) * LANE_GAP,
   }));
 }
 

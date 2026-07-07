@@ -6,7 +6,6 @@ import type { Step } from "../../types/trace";
 // Rounded orthogonal route: out of the pointer cell, through the arrow's
 // gutter lane, then back into the target's right edge.
 function path(a: Arrow): string {
-  if (a.stub) return `M ${a.x1} ${a.y1} L ${a.x2} ${a.y2}`;
   const dy = a.y2 - a.y1;
   const dir = dy >= 0 ? 1 : -1;
   const r = Math.min(12, Math.abs(dy) / 2);
@@ -51,7 +50,7 @@ export function ArrowLayer({
             <TriangleAlert
               className="arrow-warning-icon"
               size={12}
-              x={arrow.stub ? arrow.x2 + 4 : arrow.laneX + 5}
+              x={arrow.laneX + 5}
               y={arrow.y2 - 6}
             />
           )}

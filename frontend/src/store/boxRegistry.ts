@@ -36,7 +36,8 @@ export interface PointerRef {
 export function collectPointers(step: Step): PointerRef[] {
   const found: PointerRef[] = [];
   const walk = (value: Value, sourceFrameId: string | null): void => {
-    if (value.kind === "pointer" && value.target) {
+    // Uninitialized pointers hold garbage — drawing arrows for them is noise.
+    if (value.kind === "pointer" && value.target && value.isInitialized) {
       found.push({ address: value.address, target: value.target, sourceFrameId });
     }
     value.elements?.forEach((element) => walk(element, sourceFrameId));
