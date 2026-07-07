@@ -7,9 +7,10 @@ from collections.abc import Callable
 from pathlib import Path
 
 from app.core.config import Settings
-from app.models.trace import Frame, HeapObject, Step, StepEvent, Trace, TraceStatus
+from app.models.trace import Frame, Step, StepEvent, Trace, TraceStatus
 from app.services.compile_service import CompileError, CompileService
 from app.services.gdb_driver import GdbSession, GdbSessionError, GdbTimeout, StopInfo
+from app.services.heap_tracker import HeapTracker
 from app.services.value_parser import parse_value
 
 _SIGNAL_MESSAGES = {
@@ -104,6 +105,8 @@ class TraceService:
         session.start()
         session.set_breakpoint("main")
         stop = session.run(str(work_dir / "stdin.txt"), str(stdout_path))
+        heap = HeapTracker(source_path)
+        heap.install(session)
 
         prev_depth = 0
         prev_line: int | None = None
@@ -111,12 +114,13 @@ class TraceService:
         while True:
             if time.monotonic() > deadline:
                 raise GdbTimeout("wall-clock limit reached")
+            stop = heap.resolve(session, stop)
 
             if stop.reason == "exited":
                 self._append_exit(builder, stdout_path)
                 return
             if stop.reason == "signal":
-                self._append_crash(session, builder, stop, source_path, stdout_path)
+                self._append_crash(session, builder, heap, stop, source_path, stdout_path)
                 return
 
             if stop.file != str(source_path):
@@ -133,13 +137,14 @@ class TraceService:
             # Re-stops on the same line mid-statement add noise, not information.
             if stop.line != prev_line or depth != prev_depth:
                 event = self._classify(builder, depth, prev_depth)
+                stack = self._snapshot_stack(session, frames, source_path)
                 step = Step(
                     line=stop.line or 0,
                     event=event,
                     functionName=stop.function or "?",
                     stdout=self._read_stdout(stdout_path),
-                    stack=self._snapshot_stack(session, frames, source_path),
-                    heap=self._snapshot_heap(),
+                    stack=stack,
+                    heap=heap.snapshot(session, stack),
                 )
                 if not builder.add(step):
                     return
@@ -186,10 +191,6 @@ class TraceService:
             )
         return stack
 
-    def _snapshot_heap(self) -> list[HeapObject]:
-        # Heap tracking arrives with Phase 2 (allocator breakpoints).
-        return []
-
     def _read_stdout(self, stdout_path: Path) -> str:
         try:
             data = stdout_path.read_bytes()
@@ -212,7 +213,7 @@ class TraceService:
                 functionName=last.functionName if last else "main",
                 stdout=self._read_stdout(stdout_path),
                 stack=[],
-                heap=self._snapshot_heap(),
+                heap=last.heap if last else [],
             )
         )
 
@@ -220,14 +221,16 @@ class TraceService:
         self,
         session: GdbSession,
         builder: TraceBuilder,
+        heap: HeapTracker,
         stop: StopInfo,
         source_path: Path,
         stdout_path: Path,
     ) -> None:
         try:
             stack = self._snapshot_stack(session, session.get_stack(), source_path)
+            heap_objects = heap.snapshot(session, stack)
         except GdbSessionError:
-            stack = []
+            stack, heap_objects = [], []
         builder.add(
             Step(
                 line=stop.line or (builder.last_step.line if builder.last_step else 0),
@@ -235,7 +238,7 @@ class TraceService:
                 functionName=stop.function or "?",
                 stdout=self._read_stdout(stdout_path),
                 stack=stack,
-                heap=self._snapshot_heap(),
+                heap=heap_objects,
             )
         )
         detail = _SIGNAL_MESSAGES.get(stop.signal_name or "", stop.signal_name or "a fatal signal")

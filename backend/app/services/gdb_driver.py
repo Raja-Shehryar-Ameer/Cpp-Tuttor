@@ -32,6 +32,8 @@ class StopInfo:
     file: str | None = None
     exit_code: int | None = None
     signal_name: str | None = None
+    # populated when reason == "function-finished" and the callee returned a value
+    return_value: str | None = None
 
 
 class GdbSession:
@@ -55,9 +57,12 @@ class GdbSession:
         self._cmd("-enable-pretty-printing")
         # Never step into system headers/libraries; keeps the loop in user code.
         self._cmd('-interpreter-exec console "skip -gfi /usr/**/*"')
+        # Line-buffer the inferior's stdout so cout shows up step by step.
+        self._cmd('-interpreter-exec console "set exec-wrapper stdbuf -oL"')
 
     def set_breakpoint(self, location: str) -> None:
-        self._cmd(f"-break-insert {location}")
+        # -f: allow pending breakpoints (e.g. allocator symbols in libstdc++).
+        self._cmd(f'-break-insert -f "{location}"')
 
     def run(self, stdin_path: str, stdout_path: str) -> StopInfo:
         # Redirection is a shell feature, so it must go through the console interpreter.
@@ -194,6 +199,7 @@ def _parse_stop(payload: dict) -> StopInfo:
         line=int(frame["line"]) if "line" in frame else None,
         function=frame.get("func"),
         file=frame.get("fullname") or frame.get("file"),
+        return_value=payload.get("return-value"),
     )
     if reason.startswith("exited"):
         info.reason = "exited"
