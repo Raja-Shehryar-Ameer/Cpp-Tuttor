@@ -1,3 +1,4 @@
+import { Ban } from "lucide-react";
 import { useCallback } from "react";
 import { registerBox } from "../../store/boxRegistry";
 import type { HeapObject } from "../../types/trace";
@@ -13,8 +14,12 @@ function HeapBox({ object }: { object: HeapObject }) {
   return (
     <div ref={ref} className={`heap-object ${object.freed ? "freed" : ""}`}>
       <div className="heap-label">
-        {object.label}
-        {object.freed && <span className="freed-tag">freed</span>}
+        <span className="heap-label-text">{object.label}</span>
+        {object.freed && (
+          <span className="freed-tag">
+            <Ban size={10} aria-hidden="true" /> freed
+          </span>
+        )}
       </div>
       {object.elements.map((value, i) => (
         <ValueBox key={`${value.name}-${i}`} value={value} />
@@ -23,6 +28,8 @@ function HeapBox({ object }: { object: HeapObject }) {
   );
 }
 
+// Rendered column-reverse: the first allocation sits lowest and newer
+// objects appear above it, so the heap visually grows upward.
 export function HeapRegion({ objects }: { objects: HeapObject[] }) {
   return (
     <div className="heap-region">
