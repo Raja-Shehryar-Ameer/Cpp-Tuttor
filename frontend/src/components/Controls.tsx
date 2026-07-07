@@ -1,3 +1,12 @@
+import {
+  ChevronFirst,
+  ChevronLast,
+  MapPin,
+  Pause,
+  Play,
+  StepBack,
+  StepForward,
+} from "lucide-react";
 import { useEffect } from "react";
 import { useTraceStore } from "../store/traceStore";
 
@@ -29,39 +38,71 @@ export function Controls() {
       if (!trace || isTypingTarget(event.target)) return;
       if (event.key === "ArrowRight") stepForward();
       else if (event.key === "ArrowLeft") stepBack();
+      else if (event.key === "Home") setStep(0);
+      else if (event.key === "End") setStep(Number.MAX_SAFE_INTEGER);
       else if (event.key === " ") setPlaying(!useTraceStore.getState().playing);
       else return;
       event.preventDefault();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [trace, stepForward, stepBack, setPlaying]);
+  }, [trace, stepForward, stepBack, setPlaying, setStep]);
 
   if (!trace || total === 0) return null;
 
+  const atStart = currentStep === 0;
+  const atEnd = currentStep >= total - 1;
+
   return (
     <div className="controls">
-      <button onClick={() => setPlaying(!playing)} title="space">
-        {playing ? "⏸" : "▶"}
-      </button>
-      <button onClick={stepBack} disabled={currentStep === 0} title="←">
-        ◀ prev
-      </button>
-      <button onClick={stepForward} disabled={currentStep >= total - 1} title="→">
-        next ▶
-      </button>
+      <div className="transport">
+        <button onClick={() => setStep(0)} disabled={atStart} title="First step (Home)">
+          <ChevronFirst size={16} />
+        </button>
+        <button onClick={stepBack} disabled={atStart} title="Previous step (←)">
+          <StepBack size={16} />
+        </button>
+        <button
+          className="play-btn"
+          onClick={() => setPlaying(!playing)}
+          title="Play / pause (space)"
+        >
+          {playing ? <Pause size={16} /> : <Play size={16} />}
+        </button>
+        <button onClick={stepForward} disabled={atEnd} title="Next step (→)">
+          <StepForward size={16} />
+        </button>
+        <button
+          onClick={() => setStep(Number.MAX_SAFE_INTEGER)}
+          disabled={atEnd}
+          title="Last step (End)"
+        >
+          <ChevronLast size={16} />
+        </button>
+      </div>
       <input
         type="range"
         min={0}
         max={total - 1}
         value={currentStep}
         onChange={(e) => setStep(Number(e.target.value))}
+        aria-label="step slider"
       />
       <span className="step-counter">
         step {currentStep + 1} / {total}
       </span>
       {step && <span className={`event-badge event-${step.event}`}>{step.event}</span>}
-      <select value={speedMs} onChange={(e) => setSpeedMs(Number(e.target.value))}>
+      {step && (
+        <span className="location">
+          <MapPin size={12} aria-hidden="true" />
+          <code>{step.functionName}()</code> · line {step.line}
+        </span>
+      )}
+      <select
+        value={speedMs}
+        onChange={(e) => setSpeedMs(Number(e.target.value))}
+        title="playback speed"
+      >
         {SPEEDS.map(([label, ms]) => (
           <option key={ms} value={ms}>
             {label}

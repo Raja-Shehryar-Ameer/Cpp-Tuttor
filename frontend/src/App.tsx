@@ -1,3 +1,4 @@
+import { Braces, Check, CircleAlert, Link2, Pencil, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchSharedTrace, requestTrace } from "./api/client";
 import { Controls } from "./components/Controls";
@@ -73,6 +74,9 @@ export default function App() {
     <div className="app">
       <header>
         <h1>
+          <span className="logo-mark">
+            <Braces size={15} aria-hidden="true" />
+          </span>
           CppTutor <span className="tagline">step-by-step C++ visualizer</span>
         </h1>
         <div className="header-actions">
@@ -89,21 +93,36 @@ export default function App() {
           )}
           {trace === null ? (
             <button className="primary" onClick={visualize} disabled={loading}>
-              {loading ? "Tracing…" : "Visualize ▶"}
+              <Play size={14} aria-hidden="true" />
+              {loading ? "Tracing…" : "Visualize"}
             </button>
           ) : (
             <>
               {traceId && (
-                <button onClick={copyLink}>{copied ? "✓ copied" : "🔗 Copy link"}</button>
+                <button onClick={copyLink}>
+                  {copied ? <Check size={14} aria-hidden="true" /> : <Link2 size={14} aria-hidden="true" />}
+                  {copied ? "Copied" : "Copy link"}
+                </button>
               )}
-              <button onClick={stopPlayback}>✎ Edit code</button>
+              <button onClick={stopPlayback}>
+                <Pencil size={14} aria-hidden="true" />
+                Edit code
+              </button>
             </>
           )}
         </div>
       </header>
-      {requestError && <div className="request-error">{requestError}</div>}
+      {requestError && (
+        <div className="request-error">
+          <CircleAlert size={15} aria-hidden="true" />
+          {requestError}
+        </div>
+      )}
       {trace && trace.status !== "ok" && trace.steps.length === 0 && (
-        <div className="request-error">{trace.error}</div>
+        <div className="request-error">
+          <CircleAlert size={15} aria-hidden="true" />
+          {trace.error}
+        </div>
       )}
       <main>
         <section className="editor-pane">

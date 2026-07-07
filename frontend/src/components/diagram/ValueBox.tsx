@@ -1,8 +1,11 @@
+import { Circle } from "lucide-react";
 import { useCallback } from "react";
 import { registerBox } from "../../store/boxRegistry";
 import type { Value, ValueKind } from "../../types/trace";
 
 // ONE recursive component renders every Value kind; dispatch is kind-driven.
+// The inner .flash span is keyed by the displayed value: when the value
+// changes between steps the span remounts and replays the flash animation.
 
 function useRegister(address: string | null) {
   return useCallback(
@@ -15,23 +18,33 @@ function useRegister(address: string | null) {
 
 function Scalar({ value, className }: { value: Value; className: string }) {
   const ref = useRegister(value.address);
+  const uninit = !value.isInitialized;
+  const shown = uninit ? "?" : (value.value ?? "?");
   return (
-    <span ref={ref} className={`value-cell ${className}`} title={value.type}>
-      {value.value ?? "?"}
+    <span
+      ref={ref}
+      className={`value-cell ${className}${uninit ? " uninit" : ""}`}
+      title={uninit ? `${value.type} (uninitialized)` : value.type}
+    >
+      <span key={shown} className="flash">
+        {shown}
+      </span>
     </span>
   );
 }
 
 function PointerCell({ value }: { value: Value }) {
   const ref = useRegister(value.address);
-  const label = value.target === null ? "null" : "●";
+  const isNull = value.target === null;
   return (
     <span
       ref={ref}
-      className={`value-cell pointer ${value.target === null ? "null-pointer" : ""}`}
+      className={`value-cell pointer${isNull ? " null-pointer" : ""}`}
       title={`${value.type} = ${value.value ?? "?"}`}
     >
-      {label}
+      <span key={value.target ?? "null"} className="flash">
+        {isNull ? "null" : <Circle size={8} strokeWidth={0} fill="currentColor" aria-label="pointer" />}
+      </span>
     </span>
   );
 }
