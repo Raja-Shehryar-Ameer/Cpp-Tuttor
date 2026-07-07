@@ -1,0 +1,974 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 9,
+   "event": "call",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A1",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A3",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 10,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A6",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A3",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A6",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 11,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A6",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A8",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A6",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "address": "A8",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A8",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A8",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A9",
+         "target": null,
+         "elements": null
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 12,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A6",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A8",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A6",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A7",
+         "target": "A8",
+         "elements": null
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "address": "A8",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A8",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A8",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A9",
+         "target": null,
+         "elements": null
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 13,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "b holds 20\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A6",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A8",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A6",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A7",
+         "target": "A8",
+         "elements": null
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "address": "A8",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A8",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A8",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A9",
+         "target": null,
+         "elements": null
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 15,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "b holds 20\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A6",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A8",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A6",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A7",
+         "target": "A8",
+         "elements": null
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "address": "A8",
+     "label": "Node",
+     "kind": "struct",
+     "freed": true,
+     "elements": "<freed>"
+    }
+   ]
+  },
+  {
+   "line": 16,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "b holds 20\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A6",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A8",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A6",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A7",
+         "target": "A8",
+         "elements": null
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "address": "A8",
+     "label": "Node",
+     "kind": "struct",
+     "freed": true,
+     "elements": "<freed>"
+    }
+   ]
+  },
+  {
+   "line": 17,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "b holds 20\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A6",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A8",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A6",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A7",
+         "target": "A8",
+         "elements": null
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "address": "A8",
+     "label": "Node",
+     "kind": "struct",
+     "freed": true,
+     "elements": "<freed>"
+    }
+   ]
+  },
+  {
+   "line": 18,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "b holds 20\nfreed read corrupted? yes\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A6",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A8",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "*",
+       "type": "Node",
+       "kind": "struct",
+       "address": "A6",
+       "target": null,
+       "elements": [
+        {
+         "name": "value",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "next",
+         "type": "Node *",
+         "kind": "pointer",
+         "address": "A7",
+         "target": "A8",
+         "elements": null
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "address": "A8",
+     "label": "Node",
+     "kind": "struct",
+     "freed": true,
+     "elements": "<freed>"
+    }
+   ]
+  },
+  {
+   "line": 19,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "b holds 20\nfreed read corrupted? yes\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A6",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A8",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": true,
+     "elements": "<freed>"
+    },
+    {
+     "address": "A8",
+     "label": "Node",
+     "kind": "struct",
+     "freed": true,
+     "elements": "<freed>"
+    }
+   ]
+  },
+  {
+   "line": 20,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "b holds 20\nfreed read corrupted? yes\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A0",
+       "target": "A6",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "Node *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A8",
+       "elements": null
+      },
+      {
+       "name": "leaked",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "corrupted",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": true,
+     "elements": "<freed>"
+    },
+    {
+     "address": "A8",
+     "label": "Node",
+     "kind": "struct",
+     "freed": true,
+     "elements": "<freed>"
+    }
+   ]
+  },
+  {
+   "line": 20,
+   "event": "exit",
+   "functionName": "main",
+   "stdout": "b holds 20\nfreed read corrupted? yes\n",
+   "stack": [],
+   "heap": [
+    {
+     "address": "A6",
+     "label": "Node",
+     "kind": "struct",
+     "freed": true,
+     "elements": "<freed>"
+    },
+    {
+     "address": "A8",
+     "label": "Node",
+     "kind": "struct",
+     "freed": true,
+     "elements": "<freed>"
+    }
+   ]
+  }
+ ]
+}

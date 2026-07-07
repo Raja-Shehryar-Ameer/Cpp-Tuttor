@@ -1,0 +1,706 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 4,
+   "event": "call",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 6,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 9,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 10,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 11,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "sum = 7\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 12,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "sum = 7\nratio = 0.75\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 13,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "sum = 7\nratio = 0.75\ngrade = A bigger = 1\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 14,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "sum = 7\nratio = 0.75\ngrade = A bigger = 1\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "bigger",
+       "type": "bool",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "grade",
+       "type": "char",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 14,
+   "event": "exit",
+   "functionName": "main",
+   "stdout": "sum = 7\nratio = 0.75\ngrade = A bigger = 1\n",
+   "stack": [],
+   "heap": []
+  }
+ ]
+}

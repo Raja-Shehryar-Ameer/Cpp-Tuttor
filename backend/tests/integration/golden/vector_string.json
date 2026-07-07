@@ -1,0 +1,1351 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 6,
+   "event": "call",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 9,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": []
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 10,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 11,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A5",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 12,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 13,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_range",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A9",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_begin",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A10",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_end",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A11",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 14,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_range",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "__for_begin",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A10",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_end",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A11",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 13,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_range",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "__for_begin",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A10",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_end",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A11",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 14,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_range",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "__for_begin",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A10",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_end",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A11",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 13,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_range",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "__for_begin",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A10",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_end",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A11",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 14,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_range",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "__for_begin",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A10",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_end",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A11",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 13,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_range",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "__for_begin",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A10",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_end",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
+       "kind": "vector",
+       "address": "A11",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 16,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 17,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "hi there: 27\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 18,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "hi there: 27\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "greeting",
+       "type": "std::string",
+       "kind": "string",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A1",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A6",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 18,
+   "event": "exit",
+   "functionName": "main",
+   "stdout": "hi there: 27\n",
+   "stack": [],
+   "heap": []
+  }
+ ]
+}

@@ -13,7 +13,8 @@ int main() {
     delete b;
     // BUG: a->next still points at the freed node (use-after-free).
     int leaked = a->next->value;
-    std::cout << "read from freed node: " << leaked << "\n";
+    bool corrupted = leaked != 20;
+    std::cout << "freed read corrupted? " << (corrupted ? "yes" : "maybe not yet") << "\n";
     delete a;
     return 0;
 }

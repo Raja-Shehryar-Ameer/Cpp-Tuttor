@@ -1,0 +1,791 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 10,
+   "event": "call",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A3",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A5",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 11,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A3",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A5",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 12,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A3",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A5",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 13,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A5",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 14,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 15,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 16,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 4,
+   "event": "call",
+   "functionName": "swap",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "swap",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A6",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A7",
+       "target": "A1",
+       "elements": null
+      },
+      {
+       "name": "tmp",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "swap",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "swap",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A6",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A7",
+       "target": "A1",
+       "elements": null
+      },
+      {
+       "name": "tmp",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 6,
+   "event": "step",
+   "functionName": "swap",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "swap",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A6",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A7",
+       "target": "A1",
+       "elements": null
+      },
+      {
+       "name": "tmp",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "swap",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "swap",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A6",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A7",
+       "target": "A1",
+       "elements": null
+      },
+      {
+       "name": "tmp",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 17,
+   "event": "return",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 18,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "x = 20, y = 15\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 19,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "x = 20, y = 15\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "p",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A2",
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "q",
+       "type": "int *",
+       "kind": "pointer",
+       "address": "A4",
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 19,
+   "event": "exit",
+   "functionName": "main",
+   "stdout": "x = 20, y = 15\n",
+   "stack": [],
+   "heap": []
+  }
+ ]
+}

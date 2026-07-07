@@ -5,7 +5,9 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-GXX_FLAGS = ["-g", "-O0", "-fno-omit-frame-pointer", "-std=c++17"]
+# zero-init makes not-yet-assigned locals render as 0 instead of random garbage,
+# which also keeps traces deterministic for golden tests.
+GXX_FLAGS = ["-g", "-O0", "-fno-omit-frame-pointer", "-std=c++17", "-ftrivial-auto-var-init=zero"]
 
 
 class CompileError(Exception):

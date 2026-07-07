@@ -67,6 +67,9 @@ class VectorParser(ValueParser):
         except (EvalError, ValueError):
             # Unexpected layout: fall back to GDB's own rendering.
             return {"value": ctx.evaluate(expr)}
+        if length < 0 or length > MAX_ELEMENTS:
+            # A not-yet-constructed vector holds garbage; don't render it.
+            return {"value": "?"}
         element_type = _vector_element_type(type_str)
         elements = [
             parse_value(f"[{i}]", element_type, f"*({start} + {i})", ctx, depth + 1)
