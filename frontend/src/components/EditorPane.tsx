@@ -56,7 +56,7 @@ export function EditorPane({
       readOnly={playbackActive}
       extensions={extensions}
       basicSetup={{ foldGutter: false, autocompletion: false }}
-      theme="dark"
+      theme="light"
     />
   );
 }
