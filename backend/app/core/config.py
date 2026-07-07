@@ -1,5 +1,7 @@
 """All limits, paths, and flags live in this single Settings object."""
 
+from pathlib import Path
+
 from pydantic_settings import BaseSettings
 
 
@@ -15,5 +17,6 @@ class Settings(BaseSettings):
     docker_cpus: str = "0.5"
 
     rate_limit: str = "10/minute"
+    trace_store_dir: Path = Path("trace_store")
 
     model_config = {"env_prefix": "CPPTUTOR_"}

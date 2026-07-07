@@ -2,7 +2,12 @@ import type { Trace } from "../types/trace";
 
 const BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 
-export async function requestTrace(code: string, stdin: string): Promise<Trace> {
+export interface TraceResult {
+  trace: Trace;
+  traceId: string | null;
+}
+
+export async function requestTrace(code: string, stdin: string): Promise<TraceResult> {
   const response = await fetch(`${BASE}/api/trace`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -15,11 +20,14 @@ export async function requestTrace(code: string, stdin: string): Promise<Trace> 
       .catch(() => null);
     throw new Error(detail ?? `Request failed (${response.status})`);
   }
-  return (await response.json()) as Trace;
+  return {
+    trace: (await response.json()) as Trace,
+    traceId: response.headers.get("X-Trace-Id"),
+  };
 }
 
-export async function fetchStaticTrace(url: string): Promise<Trace> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Could not load ${url}`);
+export async function fetchSharedTrace(traceId: string): Promise<Trace> {
+  const response = await fetch(`${BASE}/api/trace/${encodeURIComponent(traceId)}`);
+  if (!response.ok) throw new Error("This share link has no stored trace.");
   return (await response.json()) as Trace;
 }

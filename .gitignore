@@ -14,3 +14,4 @@ frontend/dist/
 trace.json
 *.out
 .env
+trace_store/
