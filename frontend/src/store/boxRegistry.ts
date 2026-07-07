@@ -28,18 +28,20 @@ export function purgeDisconnected(): void {
 export interface PointerRef {
   address: string | null;
   target: string;
+  /** Frame the pointer lives in, or null when it lives on the heap. */
+  sourceFrameId: string | null;
 }
 
 /** Every pointer with a target in the step, however deeply nested. */
 export function collectPointers(step: Step): PointerRef[] {
   const found: PointerRef[] = [];
-  const walk = (value: Value): void => {
+  const walk = (value: Value, sourceFrameId: string | null): void => {
     if (value.kind === "pointer" && value.target) {
-      found.push({ address: value.address, target: value.target });
+      found.push({ address: value.address, target: value.target, sourceFrameId });
     }
-    value.elements?.forEach(walk);
+    value.elements?.forEach((element) => walk(element, sourceFrameId));
   };
-  step.stack.forEach((frame) => frame.locals.forEach(walk));
-  step.heap.forEach((object) => object.elements.forEach(walk));
+  step.stack.forEach((frame) => frame.locals.forEach((v) => walk(v, frame.frameId)));
+  step.heap.forEach((object) => object.elements.forEach((v) => walk(v, null)));
   return found;
 }
