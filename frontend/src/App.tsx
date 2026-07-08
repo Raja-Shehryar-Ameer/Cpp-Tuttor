@@ -1,9 +1,10 @@
-import { Braces, Check, CircleAlert, Link2, Pencil, Play } from "lucide-react";
+import { Braces, Check, CircleAlert, Link2, Pencil, Play, Shapes, SquareCode } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchSharedTrace, requestTrace } from "./api/client";
 import { Controls } from "./components/Controls";
 import { EditorPane } from "./components/EditorPane";
 import { StdoutPane } from "./components/StdoutPane";
+import { DSPage } from "./components/ds/DSPage";
 import { MemoryDiagram } from "./components/diagram/MemoryDiagram";
 import { usePlayback } from "./hooks/usePlayback";
 import { SAMPLES } from "./samples";
@@ -19,6 +20,7 @@ function updatePermalink(traceId: string | null): void {
 }
 
 export default function App() {
+  const [mode, setMode] = useState<"code" | "ds">("code");
   const [code, setCode] = useState(SAMPLES[DEFAULT_SAMPLE]);
   const [stdin, setStdin] = useState("");
   const [traceId, setTraceId] = useState<string | null>(null);
@@ -80,7 +82,15 @@ export default function App() {
           CppTutor <span className="tagline">step-by-step C++ visualizer</span>
         </h1>
         <div className="header-actions">
-          {trace === null && (
+          <div className="mode-switch" role="tablist" aria-label="mode">
+            <button className={mode === "code" ? "active" : ""} onClick={() => setMode("code")}>
+              <SquareCode size={13} aria-hidden="true" /> C++ Tracer
+            </button>
+            <button className={mode === "ds" ? "active" : ""} onClick={() => setMode("ds")}>
+              <Shapes size={13} aria-hidden="true" /> Data Structures
+            </button>
+          </div>
+          {mode === "code" && trace === null && (
             <select
               defaultValue={DEFAULT_SAMPLE}
               onChange={(e) => setCode(SAMPLES[e.target.value])}
@@ -91,25 +101,26 @@ export default function App() {
               ))}
             </select>
           )}
-          {trace === null ? (
-            <button className="primary" onClick={visualize} disabled={loading}>
-              <Play size={14} aria-hidden="true" />
-              {loading ? "Tracing…" : "Visualize"}
-            </button>
-          ) : (
-            <>
-              {traceId && (
-                <button onClick={copyLink}>
-                  {copied ? <Check size={14} aria-hidden="true" /> : <Link2 size={14} aria-hidden="true" />}
-                  {copied ? "Copied" : "Copy link"}
-                </button>
-              )}
-              <button onClick={stopPlayback}>
-                <Pencil size={14} aria-hidden="true" />
-                Edit code
+          {mode === "code" &&
+            (trace === null ? (
+              <button className="primary" onClick={visualize} disabled={loading}>
+                <Play size={14} aria-hidden="true" />
+                {loading ? "Tracing…" : "Visualize"}
               </button>
-            </>
-          )}
+            ) : (
+              <>
+                {traceId && (
+                  <button onClick={copyLink}>
+                    {copied ? <Check size={14} aria-hidden="true" /> : <Link2 size={14} aria-hidden="true" />}
+                    {copied ? "Copied" : "Copy link"}
+                  </button>
+                )}
+                <button onClick={stopPlayback}>
+                  <Pencil size={14} aria-hidden="true" />
+                  Edit code
+                </button>
+              </>
+            ))}
         </div>
       </header>
       {requestError && (
@@ -124,26 +135,32 @@ export default function App() {
           {trace.error}
         </div>
       )}
-      <main>
-        <section className="editor-pane">
-          <EditorPane code={code} onChange={setCode} />
-          {trace === null && (
-            <textarea
-              className="stdin-box"
-              placeholder="stdin for the program (optional)"
-              value={stdin}
-              onChange={(e) => setStdin(e.target.value)}
-            />
-          )}
-        </section>
-        <section className="diagram-pane">
-          <MemoryDiagram />
-        </section>
-      </main>
-      <footer>
-        <Controls />
-        <StdoutPane />
-      </footer>
+      {mode === "ds" ? (
+        <DSPage />
+      ) : (
+        <>
+          <main>
+            <section className="editor-pane">
+              <EditorPane code={code} onChange={setCode} />
+              {trace === null && (
+                <textarea
+                  className="stdin-box"
+                  placeholder="stdin for the program (optional)"
+                  value={stdin}
+                  onChange={(e) => setStdin(e.target.value)}
+                />
+              )}
+            </section>
+            <section className="diagram-pane">
+              <MemoryDiagram />
+            </section>
+          </main>
+          <footer>
+            <Controls />
+            <StdoutPane />
+          </footer>
+        </>
+      )}
     </div>
   );
 }
