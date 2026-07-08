@@ -10,32 +10,7 @@
     {
      "frameId": "f0",
      "functionName": "main",
-     "locals": [
-      {
-       "name": "greeting",
-       "type": "std::string",
-       "kind": "string",
-       "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "nums",
-       "type": "std::vector<int, std::allocator<int> >",
-       "kind": "vector",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      }
-     ]
+     "locals": []
     }
    ],
    "heap": []
@@ -55,22 +30,6 @@
        "type": "std::string",
        "kind": "string",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "nums",
-       "type": "std::vector<int, std::allocator<int> >",
-       "kind": "vector",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
        "target": null,
        "elements": null
       }
@@ -94,22 +53,6 @@
        "type": "std::string",
        "kind": "string",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "nums",
-       "type": "std::vector<int, std::allocator<int> >",
-       "kind": "vector",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
        "target": null,
        "elements": null
       }
@@ -143,14 +86,6 @@
        "address": "A1",
        "target": null,
        "elements": []
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
       }
      ]
     }
@@ -186,19 +121,11 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         }
        ]
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
       }
      ]
     }
@@ -234,7 +161,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A4",
+         "address": "A3",
          "target": null,
          "elements": null
         },
@@ -242,19 +169,11 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A5",
+         "address": "A4",
          "target": null,
          "elements": null
         }
        ]
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
       }
      ]
     }
@@ -290,7 +209,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -298,7 +217,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -306,19 +225,11 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
        ]
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
       }
      ]
     }
@@ -339,31 +250,31 @@
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A8",
+       "address": "A7",
        "target": null,
        "elements": null
       },
       {
        "name": "__for_range",
        "type": "std::vector<int, std::allocator<int> >",
+       "kind": "vector",
+       "address": "A8",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "__for_begin",
+       "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
        "address": "A9",
        "target": null,
        "elements": null
       },
       {
-       "name": "__for_begin",
-       "type": "std::vector<int, std::allocator<int> >::iterator",
-       "kind": "vector",
-       "address": "A10",
-       "target": null,
-       "elements": null
-      },
-      {
        "name": "__for_end",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A11",
+       "address": "A10",
        "target": null,
        "elements": null
       },
@@ -386,7 +297,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -394,7 +305,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -402,7 +313,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -412,7 +323,7 @@
        "name": "total",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
+       "address": "A11",
        "target": null,
        "elements": null
       }
@@ -435,7 +346,7 @@
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A8",
+       "address": "A7",
        "target": null,
        "elements": null
       },
@@ -450,7 +361,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -458,7 +369,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -466,7 +377,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -476,7 +387,7 @@
        "name": "__for_begin",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A10",
+       "address": "A9",
        "target": null,
        "elements": null
       },
@@ -484,7 +395,7 @@
        "name": "__for_end",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A11",
+       "address": "A10",
        "target": null,
        "elements": null
       },
@@ -507,7 +418,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -515,7 +426,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -523,7 +434,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -533,7 +444,7 @@
        "name": "total",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
+       "address": "A11",
        "target": null,
        "elements": null
       }
@@ -556,7 +467,7 @@
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A8",
+       "address": "A7",
        "target": null,
        "elements": null
       },
@@ -571,7 +482,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -579,7 +490,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -587,7 +498,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -597,7 +508,7 @@
        "name": "__for_begin",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A10",
+       "address": "A9",
        "target": null,
        "elements": null
       },
@@ -605,7 +516,7 @@
        "name": "__for_end",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A11",
+       "address": "A10",
        "target": null,
        "elements": null
       },
@@ -628,7 +539,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -636,7 +547,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -644,7 +555,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -654,7 +565,7 @@
        "name": "total",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
+       "address": "A11",
        "target": null,
        "elements": null
       }
@@ -677,7 +588,7 @@
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A8",
+       "address": "A7",
        "target": null,
        "elements": null
       },
@@ -692,7 +603,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -700,7 +611,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -708,7 +619,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -718,7 +629,7 @@
        "name": "__for_begin",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A10",
+       "address": "A9",
        "target": null,
        "elements": null
       },
@@ -726,7 +637,7 @@
        "name": "__for_end",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A11",
+       "address": "A10",
        "target": null,
        "elements": null
       },
@@ -749,7 +660,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -757,7 +668,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -765,7 +676,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -775,7 +686,7 @@
        "name": "total",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
+       "address": "A11",
        "target": null,
        "elements": null
       }
@@ -798,7 +709,7 @@
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A8",
+       "address": "A7",
        "target": null,
        "elements": null
       },
@@ -813,7 +724,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -821,7 +732,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -829,7 +740,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -839,7 +750,7 @@
        "name": "__for_begin",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A10",
+       "address": "A9",
        "target": null,
        "elements": null
       },
@@ -847,7 +758,7 @@
        "name": "__for_end",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A11",
+       "address": "A10",
        "target": null,
        "elements": null
       },
@@ -870,7 +781,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -878,7 +789,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -886,7 +797,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -896,7 +807,7 @@
        "name": "total",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
+       "address": "A11",
        "target": null,
        "elements": null
       }
@@ -919,7 +830,7 @@
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A8",
+       "address": "A7",
        "target": null,
        "elements": null
       },
@@ -934,7 +845,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -942,7 +853,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -950,7 +861,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -960,7 +871,7 @@
        "name": "__for_begin",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A10",
+       "address": "A9",
        "target": null,
        "elements": null
       },
@@ -968,7 +879,7 @@
        "name": "__for_end",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A11",
+       "address": "A10",
        "target": null,
        "elements": null
       },
@@ -991,7 +902,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -999,7 +910,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -1007,7 +918,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -1017,7 +928,7 @@
        "name": "total",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
+       "address": "A11",
        "target": null,
        "elements": null
       }
@@ -1040,7 +951,7 @@
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A8",
+       "address": "A7",
        "target": null,
        "elements": null
       },
@@ -1055,7 +966,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -1063,7 +974,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -1071,7 +982,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -1081,7 +992,7 @@
        "name": "__for_begin",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A10",
+       "address": "A9",
        "target": null,
        "elements": null
       },
@@ -1089,7 +1000,7 @@
        "name": "__for_end",
        "type": "std::vector<int, std::allocator<int> >::iterator",
        "kind": "vector",
-       "address": "A11",
+       "address": "A10",
        "target": null,
        "elements": null
       },
@@ -1112,7 +1023,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -1120,7 +1031,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -1128,7 +1039,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -1138,7 +1049,7 @@
        "name": "total",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
+       "address": "A11",
        "target": null,
        "elements": null
       }
@@ -1176,7 +1087,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -1184,7 +1095,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -1192,7 +1103,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -1202,7 +1113,7 @@
        "name": "total",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
+       "address": "A11",
        "target": null,
        "elements": null
       }
@@ -1240,7 +1151,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -1248,7 +1159,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -1256,7 +1167,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -1266,7 +1177,7 @@
        "name": "total",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
+       "address": "A11",
        "target": null,
        "elements": null
       }
@@ -1304,7 +1215,7 @@
          "name": "[0]",
          "type": "int",
          "kind": "primitive",
-         "address": "A3",
+         "address": "A2",
          "target": null,
          "elements": null
         },
@@ -1312,7 +1223,7 @@
          "name": "[1]",
          "type": "int",
          "kind": "primitive",
-         "address": "A6",
+         "address": "A5",
          "target": null,
          "elements": null
         },
@@ -1320,7 +1231,7 @@
          "name": "[2]",
          "type": "int",
          "kind": "primitive",
-         "address": "A7",
+         "address": "A6",
          "target": null,
          "elements": null
         }
@@ -1330,7 +1241,7 @@
        "name": "total",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
+       "address": "A11",
        "target": null,
        "elements": null
       }

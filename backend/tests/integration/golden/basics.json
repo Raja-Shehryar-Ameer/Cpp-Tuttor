@@ -10,56 +10,7 @@
     {
      "frameId": "f0",
      "functionName": "main",
-     "locals": [
-      {
-       "name": "x",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "y",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "sum",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "ratio",
-       "type": "double",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "bigger",
-       "type": "bool",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "grade",
-       "type": "char",
-       "kind": "primitive",
-       "address": "A5",
-       "target": null,
-       "elements": null
-      }
-     ]
+     "locals": []
     }
    ],
    "heap": []
@@ -79,46 +30,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "y",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "sum",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "ratio",
-       "type": "double",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "bigger",
-       "type": "bool",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "grade",
-       "type": "char",
-       "kind": "primitive",
-       "address": "A5",
        "target": null,
        "elements": null
       }
@@ -150,38 +61,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A1",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "sum",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "ratio",
-       "type": "double",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "bigger",
-       "type": "bool",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "grade",
-       "type": "char",
-       "kind": "primitive",
-       "address": "A5",
        "target": null,
        "elements": null
       }
@@ -221,30 +100,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "ratio",
-       "type": "double",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "bigger",
-       "type": "bool",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "grade",
-       "type": "char",
-       "kind": "primitive",
-       "address": "A5",
        "target": null,
        "elements": null
       }
@@ -292,22 +147,6 @@
        "type": "double",
        "kind": "primitive",
        "address": "A3",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "bigger",
-       "type": "bool",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "grade",
-       "type": "char",
-       "kind": "primitive",
-       "address": "A5",
        "target": null,
        "elements": null
       }
@@ -363,14 +202,6 @@
        "type": "bool",
        "kind": "primitive",
        "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "grade",
-       "type": "char",
-       "kind": "primitive",
-       "address": "A5",
        "target": null,
        "elements": null
       }

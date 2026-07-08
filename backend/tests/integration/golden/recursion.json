@@ -10,24 +10,7 @@
     {
      "frameId": "f0",
      "functionName": "main",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      }
-     ]
+     "locals": []
     }
    ],
    "heap": []
@@ -49,14 +32,6 @@
        "address": "A0",
        "target": null,
        "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
-       "target": null,
-       "elements": null
       }
      ]
     }
@@ -70,29 +45,21 @@
    "stdout": "",
    "stack": [
     {
-     "frameId": "f0",
+     "frameId": "f1",
      "functionName": "factorial",
      "locals": [
       {
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
+       "address": "A1",
        "target": null,
        "elements": null
       }
      ]
     },
     {
-     "frameId": "f1",
+     "frameId": "f0",
      "functionName": "main",
      "locals": [
       {
@@ -100,14 +67,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
        "target": null,
        "elements": null
       }
@@ -123,29 +82,21 @@
    "stdout": "",
    "stack": [
     {
-     "frameId": "f0",
+     "frameId": "f1",
      "functionName": "factorial",
      "locals": [
       {
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
+       "address": "A1",
        "target": null,
        "elements": null
       }
      ]
     },
     {
-     "frameId": "f1",
+     "frameId": "f0",
      "functionName": "main",
      "locals": [
       {
@@ -153,14 +104,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
        "target": null,
        "elements": null
       }
@@ -176,22 +119,14 @@
    "stdout": "",
    "stack": [
     {
-     "frameId": "f0",
+     "frameId": "f2",
      "functionName": "factorial",
      "locals": [
       {
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
+       "address": "A2",
        "target": null,
        "elements": null
       }
@@ -205,22 +140,14 @@
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
+       "address": "A1",
        "target": null,
        "elements": null
       }
      ]
     },
     {
-     "frameId": "f2",
+     "frameId": "f0",
      "functionName": "main",
      "locals": [
       {
@@ -228,14 +155,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
        "target": null,
        "elements": null
       }
@@ -251,22 +170,14 @@
    "stdout": "",
    "stack": [
     {
-     "frameId": "f0",
+     "frameId": "f2",
      "functionName": "factorial",
      "locals": [
       {
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
+       "address": "A2",
        "target": null,
        "elements": null
       }
@@ -280,22 +191,14 @@
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
+       "address": "A1",
        "target": null,
        "elements": null
       }
      ]
     },
     {
-     "frameId": "f2",
+     "frameId": "f0",
      "functionName": "main",
      "locals": [
       {
@@ -303,14 +206,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
        "target": null,
        "elements": null
       }
@@ -326,44 +221,14 @@
    "stdout": "",
    "stack": [
     {
-     "frameId": "f0",
+     "frameId": "f3",
      "functionName": "factorial",
      "locals": [
       {
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A6",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A7",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f1",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
+       "address": "A3",
        "target": null,
        "elements": null
       }
@@ -380,19 +245,25 @@
        "address": "A2",
        "target": null,
        "elements": null
-      },
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
       {
-       "name": "rest",
+       "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A3",
+       "address": "A1",
        "target": null,
        "elements": null
       }
      ]
     },
     {
-     "frameId": "f3",
+     "frameId": "f0",
      "functionName": "main",
      "locals": [
       {
@@ -400,14 +271,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
        "target": null,
        "elements": null
       }
@@ -423,44 +286,14 @@
    "stdout": "",
    "stack": [
     {
-     "frameId": "f0",
+     "frameId": "f3",
      "functionName": "factorial",
      "locals": [
       {
        "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A6",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A7",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f1",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
+       "address": "A3",
        "target": null,
        "elements": null
       }
@@ -477,19 +310,25 @@
        "address": "A2",
        "target": null,
        "elements": null
-      },
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
       {
-       "name": "rest",
+       "name": "n",
        "type": "int",
        "kind": "primitive",
-       "address": "A3",
+       "address": "A1",
        "target": null,
        "elements": null
       }
      ]
     },
     {
-     "frameId": "f3",
+     "frameId": "f0",
      "functionName": "main",
      "locals": [
       {
@@ -497,14 +336,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
        "target": null,
        "elements": null
       }
@@ -519,96 +350,64 @@
    "functionName": "factorial",
    "stdout": "",
    "stack": [
-    {
-     "frameId": "f0",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A8",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A9",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f1",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A6",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A7",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f2",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f3",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
     {
      "frameId": "f4",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
      "functionName": "main",
      "locals": [
       {
@@ -616,14 +415,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
        "target": null,
        "elements": null
       }
@@ -639,95 +430,459 @@
    "stdout": "",
    "stack": [
     {
-     "frameId": "f0",
+     "frameId": "f4",
      "functionName": "factorial",
      "locals": [
       {
        "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 9,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f4",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "rest",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "return",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "rest",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 9,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "rest",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "return",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "rest",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A7",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 9,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "rest",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A7",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "return",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "rest",
        "type": "int",
        "kind": "primitive",
        "address": "A8",
        "target": null,
        "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A9",
-       "target": null,
-       "elements": null
       }
      ]
     },
     {
-     "frameId": "f1",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A6",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A7",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f2",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f3",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f4",
+     "frameId": "f0",
      "functionName": "main",
      "locals": [
       {
@@ -735,14 +890,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
        "target": null,
        "elements": null
       }
@@ -758,192 +905,29 @@
    "stdout": "",
    "stack": [
     {
-     "frameId": "f0",
+     "frameId": "f1",
      "functionName": "factorial",
      "locals": [
       {
        "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "rest",
        "type": "int",
        "kind": "primitive",
        "address": "A8",
        "target": null,
        "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A9",
-       "target": null,
-       "elements": null
       }
      ]
     },
-    {
-     "frameId": "f1",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A6",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A7",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f2",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f3",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f4",
-     "functionName": "main",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      }
-     ]
-    }
-   ],
-   "heap": []
-  },
-  {
-   "line": 8,
-   "event": "return",
-   "functionName": "factorial",
-   "stdout": "",
-   "stack": [
     {
      "frameId": "f0",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A6",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A7",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f1",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f2",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f3",
      "functionName": "main",
      "locals": [
       {
@@ -951,367 +935,6 @@
        "type": "int",
        "kind": "primitive",
        "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      }
-     ]
-    }
-   ],
-   "heap": []
-  },
-  {
-   "line": 9,
-   "event": "step",
-   "functionName": "factorial",
-   "stdout": "",
-   "stack": [
-    {
-     "frameId": "f0",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A6",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A7",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f1",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f2",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f3",
-     "functionName": "main",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      }
-     ]
-    }
-   ],
-   "heap": []
-  },
-  {
-   "line": 8,
-   "event": "return",
-   "functionName": "factorial",
-   "stdout": "",
-   "stack": [
-    {
-     "frameId": "f0",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f1",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f2",
-     "functionName": "main",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      }
-     ]
-    }
-   ],
-   "heap": []
-  },
-  {
-   "line": 9,
-   "event": "step",
-   "functionName": "factorial",
-   "stdout": "",
-   "stack": [
-    {
-     "frameId": "f0",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A4",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A5",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f1",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f2",
-     "functionName": "main",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      }
-     ]
-    }
-   ],
-   "heap": []
-  },
-  {
-   "line": 8,
-   "event": "return",
-   "functionName": "factorial",
-   "stdout": "",
-   "stack": [
-    {
-     "frameId": "f0",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f1",
-     "functionName": "main",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
-       "target": null,
-       "elements": null
-      }
-     ]
-    }
-   ],
-   "heap": []
-  },
-  {
-   "line": 9,
-   "event": "step",
-   "functionName": "factorial",
-   "stdout": "",
-   "stack": [
-    {
-     "frameId": "f0",
-     "functionName": "factorial",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A2",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "rest",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A3",
-       "target": null,
-       "elements": null
-      }
-     ]
-    },
-    {
-     "frameId": "f1",
-     "functionName": "main",
-     "locals": [
-      {
-       "name": "n",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A0",
-       "target": null,
-       "elements": null
-      },
-      {
-       "name": "result",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A1",
        "target": null,
        "elements": null
       }
@@ -1342,7 +965,7 @@
        "name": "result",
        "type": "int",
        "kind": "primitive",
-       "address": "A1",
+       "address": "A9",
        "target": null,
        "elements": null
       }
@@ -1373,7 +996,7 @@
        "name": "result",
        "type": "int",
        "kind": "primitive",
-       "address": "A1",
+       "address": "A9",
        "target": null,
        "elements": null
       }
@@ -1404,7 +1027,7 @@
        "name": "result",
        "type": "int",
        "kind": "primitive",
-       "address": "A1",
+       "address": "A9",
        "target": null,
        "elements": null
       }

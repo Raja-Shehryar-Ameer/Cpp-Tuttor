@@ -7,12 +7,45 @@ expressions without knowing GDB exists.
 from __future__ import annotations
 
 import contextlib
+import json
+import tempfile
 import time
 from dataclasses import dataclass
+from pathlib import Path
 
 from pygdbmi.gdbcontroller import GdbController
 
 from app.services.value_parser.base import EvalError, extract_address
+
+# GDB user command printing {name: declaration line} for every symbol in
+# scope of the selected frame. MI has no such query; the Python API does.
+_DECL_HELPER = """\
+import gdb, json
+
+
+class CppTutorDecl(gdb.Command):
+    def __init__(self):
+        super().__init__("cpptutor-decl", gdb.COMMAND_USER)
+
+    def invoke(self, arg, from_tty):
+        decls = {}
+        try:
+            block = gdb.selected_frame().block()
+        except Exception:
+            block = None
+        while block is not None and not block.is_global and not block.is_static:
+            for sym in block:
+                if sym.is_argument and sym.name not in decls:
+                    decls[sym.name] = 0  # arguments are live from function entry
+                elif sym.is_variable and sym.name not in decls:
+                    decls[sym.name] = sym.line
+            block = block.superblock
+        print("CPPTUTOR_DECL " + json.dumps(decls))
+
+
+CppTutorDecl()
+"""
+_DECL_MARKER = "CPPTUTOR_DECL "
 
 
 class GdbSessionError(EvalError):
@@ -59,6 +92,9 @@ class GdbSession:
         self._cmd('-interpreter-exec console "skip -gfi /usr/**/*"')
         # Line-buffer the inferior's stdout so cout shows up step by step.
         self._cmd('-interpreter-exec console "set exec-wrapper stdbuf -oL"')
+        helper = Path(tempfile.gettempdir()) / "cpptutor_decl.py"
+        helper.write_text(_DECL_HELPER)
+        self._cmd(f'-interpreter-exec console "source {helper}"')
 
     def set_breakpoint(self, location: str) -> None:
         # -f: allow pending breakpoints (e.g. allocator symbols in libstdc++).
@@ -101,6 +137,23 @@ class GdbSession:
         self.select_frame(level)
         payload = self._cmd("-stack-list-variables --simple-values")
         return _as_list(payload.get("variables", []))
+
+    def get_decl_lines(self) -> dict[str, int]:
+        """{variable: declaration line} for the currently selected frame."""
+        records = self._write('-interpreter-exec console "cpptutor-decl"')
+        deadline = time.monotonic() + self._timeout
+        decls: dict[str, int] = {}
+        while True:
+            for rec in records:
+                payload = rec.get("payload") or ""
+                if rec["type"] == "console" and _DECL_MARKER in payload:
+                    with contextlib.suppress(ValueError):
+                        decls = json.loads(payload.split(_DECL_MARKER, 1)[1])
+                if rec["type"] == "result":
+                    return decls  # tolerate errors: no decls just means "show all"
+            if time.monotonic() > deadline:
+                return decls
+            records = self._read_more()
 
     # ---- EvalContext implementation --------------------------------------
 

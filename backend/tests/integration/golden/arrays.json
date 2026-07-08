@@ -10,122 +10,7 @@
     {
      "frameId": "f0",
      "functionName": "main",
-     "locals": [
-      {
-       "name": "nums",
-       "type": "int [4]",
-       "kind": "array",
-       "address": "A0",
-       "target": null,
-       "elements": [
-        {
-         "name": "[0]",
-         "type": "int",
-         "kind": "primitive",
-         "address": "A0",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[1]",
-         "type": "int",
-         "kind": "primitive",
-         "address": "A1",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[2]",
-         "type": "int",
-         "kind": "primitive",
-         "address": "A2",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[3]",
-         "type": "int",
-         "kind": "primitive",
-         "address": "A3",
-         "target": null,
-         "elements": null
-        }
-       ]
-      },
-      {
-       "name": "word",
-       "type": "char [6]",
-       "kind": "array",
-       "address": "A4",
-       "target": null,
-       "elements": [
-        {
-         "name": "[0]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A4",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[1]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A5",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[2]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A6",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[3]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A7",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[4]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A8",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[5]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A9",
-         "target": null,
-         "elements": null
-        }
-       ]
-      },
-      {
-       "name": "cursor",
-       "type": "int *",
-       "kind": "pointer",
-       "address": "A10",
-       "target": "A11",
-       "elements": null
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A12",
-       "target": null,
-       "elements": null
-      }
-     ]
+     "locals": []
     }
    ],
    "heap": []
@@ -180,79 +65,6 @@
          "elements": null
         }
        ]
-      },
-      {
-       "name": "word",
-       "type": "char [6]",
-       "kind": "array",
-       "address": "A4",
-       "target": null,
-       "elements": [
-        {
-         "name": "[0]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A4",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[1]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A5",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[2]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A6",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[3]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A7",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[4]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A8",
-         "target": null,
-         "elements": null
-        },
-        {
-         "name": "[5]",
-         "type": "char",
-         "kind": "primitive",
-         "address": "A9",
-         "target": null,
-         "elements": null
-        }
-       ]
-      },
-      {
-       "name": "cursor",
-       "type": "int *",
-       "kind": "pointer",
-       "address": "A10",
-       "target": "A11",
-       "elements": null
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A12",
-       "target": null,
-       "elements": null
       }
      ]
     }
@@ -366,22 +178,6 @@
          "elements": null
         }
        ]
-      },
-      {
-       "name": "cursor",
-       "type": "int *",
-       "kind": "pointer",
-       "address": "A10",
-       "target": "A11",
-       "elements": null
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A12",
-       "target": null,
-       "elements": null
       }
      ]
     }
@@ -503,14 +299,6 @@
        "address": "A10",
        "target": "A0",
        "elements": null
-      },
-      {
-       "name": "total",
-       "type": "int",
-       "kind": "primitive",
-       "address": "A12",
-       "target": null,
-       "elements": null
       }
      ]
     }
@@ -531,7 +319,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -668,7 +456,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -805,7 +593,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -942,7 +730,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -1079,7 +867,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -1216,7 +1004,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -1353,7 +1141,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -1490,7 +1278,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -1627,7 +1415,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -1764,7 +1552,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -1901,7 +1689,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -2038,7 +1826,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },
@@ -2175,7 +1963,7 @@
        "name": "i",
        "type": "int",
        "kind": "primitive",
-       "address": "A13",
+       "address": "A11",
        "target": null,
        "elements": null
       },

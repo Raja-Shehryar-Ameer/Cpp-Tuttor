@@ -72,6 +72,9 @@ class TraceService:
 
     def trace(self, work_dir: Path) -> Trace:
         source_path = work_dir / "main.cpp"
+        # Per-trace state for declaration-gated variable visibility.
+        self._decl_cache: dict[str, dict[str, int]] = {}
+        self._progress: list[list] = []  # bottom-up [functionName, max executed line]
         builder = TraceBuilder(source_path.read_text(), self._settings.max_steps)
         try:
             binary = self._compiler.compile(source_path, work_dir)
@@ -172,24 +175,48 @@ class TraceService:
     def _snapshot_stack(
         self, session: GdbSession, frames: list[dict], source_path: Path
     ) -> list[Frame]:
+        user = [raw for raw in frames if raw.get("fullname") == str(source_path)]
+        self._update_progress(user)
         stack: list[Frame] = []
-        for raw in frames:
-            if raw.get("fullname") != str(source_path):
-                continue
+        for i, raw in enumerate(user):  # innermost first
             level = int(raw["level"])
+            func = raw.get("func", "?")
+            variables = session.get_locals(level)
+            if func not in self._decl_cache:
+                self._decl_cache[func] = session.get_decl_lines()
+            decls = self._decl_cache[func]
+            reached = self._progress[len(user) - 1 - i][1]
             locals_ = [
                 parse_value(var["name"], var.get("type", ""), var["name"], session)
-                for var in session.get_locals(level)
+                for var in variables
+                # A variable exists for the diagram only once execution has
+                # moved past its declaration line in this frame instance.
+                if reached > decls.get(var["name"], 0)
             ]
             stack.append(
                 Frame(
-                    frameId=f"f{len(stack)}",
-                    functionName=raw.get("func", "?"),
+                    # Numbered from the bottom so main is always f0: keys stay
+                    # stable across steps and the UI animates only real calls.
+                    frameId=f"f{len(user) - 1 - i}",
+                    functionName=func,
                     line=int(raw.get("line", 0)),
                     locals=locals_,
                 )
             )
         return stack
+
+    def _update_progress(self, user_frames: list[dict]) -> None:
+        """Track the deepest line each live frame has executed (bottom-up)."""
+        bottom_up = list(reversed(user_frames))
+        del self._progress[len(bottom_up):]
+        for i, raw in enumerate(bottom_up):
+            func, line = raw.get("func", "?"), int(raw.get("line", 0))
+            if i < len(self._progress) and self._progress[i][0] == func:
+                self._progress[i][1] = max(self._progress[i][1], line)
+            elif i < len(self._progress):
+                self._progress[i] = [func, line]
+            else:
+                self._progress.append([func, line])
 
     def _read_stdout(self, stdout_path: Path) -> str:
         try:
