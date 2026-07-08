@@ -3,14 +3,32 @@ import type { CSSProperties, RefObject } from "react";
 import { useArrowPositions, type Arrow } from "../../hooks/useArrowPositions";
 import type { Step } from "../../types/trace";
 
-// "forward": plain bezier into the target's left edge (linked-list look).
+// "forward": plain bezier into the target's left edge (chain look).
+// "down": drop corridor just past the source, along the gap above the
+// target's row, into its top edge — heap targets below the source.
 // "lane": rounded orthogonal via a gutter lane into the target's right edge.
 // "laneTop": gutter lane, then along the gap above the target's row and down
-// into its top edge — used for backward/cross-row heap pointers.
+// into its top edge — used for backward heap pointers.
 function path(a: Arrow): string {
   if (a.kind === "forward") {
     const bend = Math.max(22, (a.x2 - a.x1) / 2);
     return `M ${a.x1} ${a.y1} C ${a.x1 + bend} ${a.y1}, ${a.x2 - bend} ${a.y2}, ${a.x2} ${a.y2}`;
+  }
+  if (a.kind === "down") {
+    const r = Math.min(12, Math.max(1, (a.gapY - a.y1) / 2), Math.max(1, a.laneX - a.x1));
+    const dirH = a.x2 >= a.laneX ? 1 : -1; // which way the gap run heads
+    const r2 = Math.min(10, Math.abs(a.x2 - a.laneX) / 2);
+    const yIn = Math.min(a.gapY + r2, a.y2);
+    return [
+      `M ${a.x1} ${a.y1}`,
+      `L ${a.laneX - r} ${a.y1}`,
+      `Q ${a.laneX} ${a.y1} ${a.laneX} ${a.y1 + r}`,
+      `L ${a.laneX} ${a.gapY - r2}`,
+      `Q ${a.laneX} ${a.gapY} ${a.laneX + dirH * r2} ${a.gapY}`,
+      `L ${a.x2 - dirH * r2} ${a.gapY}`,
+      `Q ${a.x2} ${a.gapY} ${a.x2} ${yIn}`,
+      `L ${a.x2} ${a.y2}`,
+    ].join(" ");
   }
   if (a.kind === "lane") {
     const dy = a.y2 - a.y1;

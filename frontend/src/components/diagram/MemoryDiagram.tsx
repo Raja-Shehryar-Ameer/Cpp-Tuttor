@@ -1,13 +1,13 @@
-import { ArrowDown, ArrowUp, Layers, MemoryStick } from "lucide-react";
+import { ArrowDown, ArrowRight, Layers, MemoryStick } from "lucide-react";
 import { useRef } from "react";
 import { useCurrentStep } from "../../store/traceStore";
 import { ArrowLayer } from "./ArrowLayer";
 import { HeapRegion } from "./HeapRegion";
 import { StackFrame } from "./StackFrame";
 
-// One memory column, mirroring a process address space: the stack sits at the
-// top and grows downward as calls deepen; the heap is anchored to the bottom
-// and grows upward as objects are allocated.
+// One memory column: the stack sits at the top and grows downward as calls
+// deepen; the heap fills the bottom in allocation order, flowing forward and
+// wrapping to a new row below — so any linked structure reads left-to-right.
 export function MemoryDiagram() {
   const step = useCurrentStep();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -35,14 +35,14 @@ export function MemoryDiagram() {
       </div>
       <div className="region-spacer" aria-hidden="true" />
       <div className="memory-region heap-region-wrap">
-        <HeapRegion objects={step?.heap ?? []} />
         <div className="region-header">
           <MemoryStick size={13} aria-hidden="true" />
           <span>Heap</span>
           <span className="grow-hint">
-            grows <ArrowUp size={11} aria-label="upward" />
+            chains read <ArrowRight size={11} aria-label="forward" />
           </span>
         </div>
+        <HeapRegion step={step} />
       </div>
       <ArrowLayer containerRef={containerRef} step={step} />
     </div>

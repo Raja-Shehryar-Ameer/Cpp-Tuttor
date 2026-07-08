@@ -2,7 +2,7 @@ import { useLayoutEffect, useState, type RefObject } from "react";
 import { collectPointers, getBox, purgeDisconnected } from "../store/boxRegistry";
 import type { Step } from "../types/trace";
 
-export type ArrowKind = "forward" | "lane" | "laneTop";
+export type ArrowKind = "forward" | "lane" | "laneTop" | "down";
 
 export interface Arrow {
   key: string;
@@ -10,12 +10,12 @@ export interface Arrow {
   /** source anchor: right edge of the pointer cell */
   x1: number;
   y1: number;
-  /** entry point on the target: left edge (forward), right edge (lane), or top (laneTop) */
+  /** entry point on the target: left edge (forward), right edge (lane), or top (laneTop/down) */
   x2: number;
   y2: number;
-  /** x of the vertical gutter lane (lane kinds only) */
+  /** x of the vertical run: gutter lane (lane kinds) or drop corridor (down) */
   laneX: number;
-  /** y of the horizontal approach run above the target row (laneTop only) */
+  /** y of the horizontal approach run above the target row (laneTop/down only) */
   gapY: number;
   /** target freed — render red with a warning marker */
   danger: boolean;
@@ -27,17 +27,29 @@ const LANE_GAP = 13; // px between adjacent gutter lanes
 const LANE_PAD = 10; // min vertical clearance between arrows sharing a lane
 const FORWARD_MAX_DY = 70; // beyond this a same-direction target is not "in the row"
 
-type Measured = Omit<Arrow, "key" | "laneX">;
+type Measured = Omit<Arrow, "key" | "laneX"> & { laneX?: number };
+
+interface Rect {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
 
 /**
- * Routing rules, all collision-free with boxes:
+ * Routing rules, all collision-free with boxes and independent of what the
+ * data structure is — only geometry decides:
  * - "forward": target sits to the right in (roughly) the same row — a plain
- *   bezier into its LEFT edge, the natural linked-list look.
+ *   bezier into its LEFT edge, the natural chain look.
+ * - "down": target sits below (stack pointer into the heap, or a chain that
+ *   wrapped to the next row) — drop through the nearest clear vertical
+ *   corridor, run along the gap above the target's row, enter its TOP edge.
  * - "lane": target in the stack — out to a right-hand gutter lane, back into
  *   the target's RIGHT edge (nothing sits right of a stack frame).
- * - "laneTop": target in the heap but not forward — gutter lane, then along
- *   the empty gap above the target's row, entering its TOP edge.
- * Lanes are packed greedily (shortest spans first) so arrows never overlap.
+ * - "laneTop": target in the heap but ABOVE the source (a back-pointer) —
+ *   gutter lane, then along the gap above the target's row into its TOP.
+ * Gutter lanes are packed greedily (shortest spans first); drop corridors
+ * slide right past any card or other corridor they would hit.
  */
 function measure(container: HTMLElement, step: Step): Arrow[] {
   purgeDisconnected();
@@ -45,13 +57,22 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
   const freed = new Set(step.heap.filter((h) => h.freed).map((h) => h.address));
   const activeFrameId = step.stack[0]?.frameId ?? null;
 
-  // Lanes must clear the full card widths, not just the measured value cells.
+  // Card rectangles double as the obstacle map for drop corridors.
+  const cards: Rect[] = [];
   let contentRight = 0;
   for (const card of container.querySelectorAll(".stack-frame, .heap-object")) {
-    contentRight = Math.max(contentRight, card.getBoundingClientRect().right - origin.left);
+    const r = card.getBoundingClientRect();
+    cards.push({
+      left: r.left - origin.left,
+      right: r.right - origin.left,
+      top: r.top - origin.top,
+      bottom: r.bottom - origin.top,
+    });
+    contentRight = Math.max(contentRight, r.right - origin.left);
   }
 
   const measured: Measured[] = [];
+  const entrySeen = new Map<string, number>(); // arrows already entering a target's top
   for (const pointer of collectPointers(step)) {
     if (!pointer.address) continue;
     const fromEl = getBox(pointer.address);
@@ -80,14 +101,18 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     } else if (!toEl.closest(".heap-region")) {
       measured.push({ kind: "lane", x1, y1, x2: toRight + 2, y2: toCy, gapY: 0, danger, faded });
     } else {
-      const entryX = toLeft + Math.min(22, to.width / 2);
+      // Top entry: stagger arrows sharing a target so heads don't stack.
+      const seen = entrySeen.get(pointer.target) ?? 0;
+      entrySeen.set(pointer.target, seen + 1);
+      const entryX = toLeft + Math.min(18, to.width / 2) + Math.min(seen * 12, to.width - 30);
+      const below = toTop > y1 + 16;
       measured.push({
-        kind: "laneTop",
+        kind: below ? "down" : "laneTop",
         x1,
         y1,
         x2: entryX,
         y2: toTop - 2,
-        gapY: toTop - 12,
+        gapY: toTop - 10,
         danger,
         faded,
       });
@@ -95,16 +120,15 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     contentRight = Math.max(contentRight, x1, toRight);
   }
 
-  // Assign gutter lanes: shortest vertical spans first so they hug the
-  // content; longer arrows take outer lanes and never cross the short ones.
+  // Gutter lanes (lane + laneTop): shortest vertical spans first so they hug
+  // the content; longer arrows take outer lanes and never cross the short ones.
   const order = measured
     .map((m, index) => ({ m, index }))
-    .filter(({ m }) => m.kind !== "forward")
+    .filter(({ m }) => m.kind === "lane" || m.kind === "laneTop")
     .sort((a, b) => laneSpan(a.m) - laneSpan(b.m));
   const lanes: { top: number; bottom: number }[][] = [];
   const laneBase = contentRight + 22;
-  const laneOf = new Map<number, number>();
-  for (const { m, index } of order) {
+  for (const { m } of order) {
     const end = m.kind === "laneTop" ? m.gapY : m.y2;
     const top = Math.min(m.y1, end) - LANE_PAD;
     const bottom = Math.max(m.y1, end) + LANE_PAD;
@@ -114,18 +138,43 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       lanes.push([]);
     }
     lanes[lane].push({ top, bottom });
-    laneOf.set(index, lane);
+    m.laneX = laneBase + lane * LANE_GAP;
   }
 
-  return measured.map((m, index) => ({
-    key: `a${index}`,
-    ...m,
-    laneX: laneBase + (laneOf.get(index) ?? 0) * LANE_GAP,
-  }));
+  // Drop corridors (down): start just right of the pointer cell and slide
+  // right past any card or already-placed corridor in the way, so the drop
+  // stays as close to the source as the layout allows.
+  const drops: { x: number; top: number; bottom: number }[] = [];
+  for (const m of measured.filter((m) => m.kind === "down").sort((a, b) => laneSpan(a) - laneSpan(b))) {
+    let dropX = m.x1 + 12;
+    const top = m.y1 - 4;
+    const bottom = m.gapY;
+    for (let guard = 0; guard < 40; guard++) {
+      const card = cards.find(
+        (c) => c.top < bottom && c.bottom > top && dropX > c.left + 4 && dropX < c.right + 12,
+      );
+      if (card) {
+        dropX = card.right + 14;
+        continue;
+      }
+      const other = drops.find(
+        (d) => d.top < bottom && d.bottom > top && Math.abs(d.x - dropX) < 11,
+      );
+      if (other) {
+        dropX = other.x + LANE_GAP;
+        continue;
+      }
+      break;
+    }
+    drops.push({ x: dropX, top, bottom });
+    m.laneX = dropX;
+  }
+
+  return measured.map((m, index) => ({ key: `a${index}`, ...m, laneX: m.laneX ?? 0 }));
 }
 
 function laneSpan(m: Measured): number {
-  const end = m.kind === "laneTop" ? m.gapY : m.y2;
+  const end = m.kind === "laneTop" || m.kind === "down" ? m.gapY : m.y2;
   return Math.abs(end - m.y1);
 }
 

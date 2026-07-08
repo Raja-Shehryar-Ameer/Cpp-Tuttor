@@ -87,6 +87,12 @@ export function Controls() {
         value={currentStep}
         onChange={(e) => setStep(Number(e.target.value))}
         aria-label="step slider"
+        // Fill the track up to the thumb so progress reads at a glance.
+        style={{
+          background: `linear-gradient(to right, var(--accent) ${
+            total > 1 ? (currentStep / (total - 1)) * 100 : 0
+          }%, var(--border) 0)`,
+        }}
       />
       <span className="step-counter">
         step {currentStep + 1} / {total}

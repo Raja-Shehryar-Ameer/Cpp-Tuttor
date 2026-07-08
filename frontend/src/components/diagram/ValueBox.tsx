@@ -16,6 +16,12 @@ function useRegister(address: string | null) {
   );
 }
 
+// Tooltips carry the type plus the variable's actual address — real memory
+// is the point of a C++ visualizer.
+function describe(value: Value, note = ""): string {
+  return `${value.type}${note}${value.address ? ` @ ${value.address}` : ""}`;
+}
+
 function Scalar({ value, className }: { value: Value; className: string }) {
   const ref = useRegister(value.address);
   const uninit = !value.isInitialized;
@@ -24,7 +30,7 @@ function Scalar({ value, className }: { value: Value; className: string }) {
     <span
       ref={ref}
       className={`value-cell ${className}${uninit ? " uninit" : ""}`}
-      title={uninit ? `${value.type} (uninitialized)` : value.type}
+      title={describe(value, uninit ? " (uninitialized)" : "")}
     >
       <span key={shown} className="flash">
         {shown}
@@ -40,7 +46,7 @@ function PointerCell({ value }: { value: Value }) {
     <span
       ref={ref}
       className={`value-cell pointer${isNull ? " null-pointer" : ""}`}
-      title={`${value.type} = ${value.value ?? "?"}`}
+      title={`${describe(value)} → ${value.value ?? "?"}`}
     >
       <span key={value.target ?? "null"} className="flash">
         {isNull ? "null" : <Circle size={8} strokeWidth={0} fill="currentColor" aria-label="pointer" />}
@@ -53,7 +59,7 @@ function Aggregate({ value, depth }: { value: Value; depth: number }) {
   const ref = useRegister(value.address);
   const kindClass = value.kind === "struct" ? "struct-box" : "array-box";
   return (
-    <span ref={ref} className={`aggregate ${kindClass}`} title={value.type}>
+    <span ref={ref} className={`aggregate ${kindClass}`} title={describe(value)}>
       {(value.elements ?? []).map((element, i) => (
         <span className="aggregate-item" key={`${element.name}-${i}`}>
           <span className="element-name">{element.name}</span>
