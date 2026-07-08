@@ -5,9 +5,9 @@ import { ArrowLayer } from "./ArrowLayer";
 import { HeapRegion } from "./HeapRegion";
 import { StackFrame } from "./StackFrame";
 
-// One memory column: the stack sits at the top and grows downward as calls
-// deepen; the heap fills the bottom in allocation order, flowing forward and
-// wrapping to a new row below — so any linked structure reads left-to-right.
+// Python-Tutor-style split: the stack (frames) is the blue column on the
+// left, the heap (objects) the amber column on the right, so pointers flow
+// naturally left-to-right from variables into the objects they own.
 export function MemoryDiagram() {
   const step = useCurrentStep();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,7 +33,6 @@ export function MemoryDiagram() {
         ))}
         {frames.length === 0 && <div className="empty-note">no active frames</div>}
       </div>
-      <div className="region-spacer" aria-hidden="true" />
       <div className="memory-region heap-region-wrap">
         <div className="region-header">
           <MemoryStick size={13} aria-hidden="true" />

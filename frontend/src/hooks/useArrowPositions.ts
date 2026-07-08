@@ -96,7 +96,11 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       activeFrameId !== null &&
       pointer.sourceFrameId !== activeFrameId;
 
-    if (toLeft > x1 + 14 && Math.abs(toCy - y1) < FORWARD_MAX_DY) {
+    // Stack cells always enter heap targets from the left (the heap is the
+    // right-hand column); within the heap, forward means "same row".
+    const stackToHeap =
+      !!fromEl.closest(".stack-region") && !!toEl.closest(".heap-region");
+    if (toLeft > x1 + 14 && (stackToHeap || Math.abs(toCy - y1) < FORWARD_MAX_DY)) {
       measured.push({ kind: "forward", x1, y1, x2: toLeft - 2, y2: toCy, gapY: 0, danger, faded });
     } else if (!toEl.closest(".heap-region")) {
       measured.push({ kind: "lane", x1, y1, x2: toRight + 2, y2: toCy, gapY: 0, danger, faded });

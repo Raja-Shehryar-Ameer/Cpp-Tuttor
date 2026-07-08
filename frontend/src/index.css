@@ -84,12 +84,17 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 
 /* ---------- memory diagram: one column, stack grows down, heap grows up ---------- */
 
+/* Python-Tutor split: blue stack column left, amber heap column right. */
 .memory-diagram {
-  position: relative; display: flex; flex-direction: column;
-  min-height: 100%; padding: 1rem 110px 1rem 1.25rem;
+  position: relative; display: grid;
+  grid-template-columns: minmax(230px, 36%) 1fr; gap: 1rem;
+  align-items: stretch; min-height: 100%; padding: 1rem 84px 1rem 1rem;
 }
-.memory-region { width: 100%; }
-.region-spacer { flex: 1 1 auto; min-height: 2.5rem; }
+.memory-region { border-radius: 12px; padding: 0.7rem 0.8rem; min-width: 0; }
+.stack-region { background: #eef3fb; border: 1px solid #dbe6f7; }
+.stack-region .region-header { color: #4a6fa5; }
+.heap-region-wrap { background: #fbf6ea; border: 1px solid #f0e6cd; }
+.heap-region-wrap .region-header { color: #a07d2a; }
 
 .region-header {
   display: flex; align-items: center; gap: 0.4rem;
@@ -134,7 +139,7 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 }
 
 .heap-object {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+  background: #fffdf6; border: 1px solid #e9dfc4; border-radius: 10px;
   padding: 0.55rem 0.75rem; box-shadow: var(--shadow);
   width: fit-content; min-width: 90px; max-width: 100%;
   animation: pop-in 0.25s ease-out;
@@ -300,19 +305,98 @@ footer { border-top: 1px solid var(--border); background: var(--panel); }
   from { opacity: 0; }
 }
 
+/* ---------- data-structure playground ---------- */
+
+.mode-switch {
+  display: inline-flex; background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 9px; padding: 2px; gap: 2px; margin-right: 0.4rem;
+}
+.mode-switch button {
+  border: none; background: transparent; padding: 0.3rem 0.7rem; font-size: 0.8rem;
+  border-radius: 7px; color: var(--muted);
+}
+.mode-switch button.active { background: var(--panel); color: var(--text); box-shadow: var(--shadow); }
+
+.ds-page { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+
+.ds-tabs {
+  display: flex; gap: 0.35rem; padding: 0.6rem 1.1rem 0; flex-wrap: wrap;
+  border-bottom: 1px solid var(--border); background: var(--panel);
+}
+.ds-tab {
+  border: 1px solid transparent; border-bottom: none; background: transparent;
+  border-radius: 9px 9px 0 0; color: var(--muted); padding: 0.45rem 0.9rem;
+}
+.ds-tab.active {
+  background: var(--bg); border-color: var(--border); color: var(--text); font-weight: 600;
+}
+
+.ds-opbar {
+  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+  padding: 0.7rem 1.1rem; background: var(--panel); border-bottom: 1px solid var(--border);
+}
+.ds-input {
+  background: var(--panel); color: var(--text); border: 1px solid var(--border-strong);
+  border-radius: 8px; padding: 0.42rem 0.6rem; font-size: 0.875rem; font-family: var(--mono);
+  width: 200px;
+}
+.ds-input.small { width: 52px; text-align: center; }
+.ds-input:focus { outline: none; border-color: var(--accent); }
+.ds-edge-inputs { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--muted); }
+
+.ds-canvas { flex: 1; overflow: auto; padding: 1.4rem; }
+.ds-svg { overflow: visible; }
+
+.ds-node { transition: transform 0.45s cubic-bezier(0.25, 0.8, 0.3, 1); }
+.ds-box, .ds-circle {
+  fill: var(--panel); stroke: var(--border-strong); stroke-width: 1.6;
+  transition: fill 0.3s ease, stroke 0.3s ease;
+}
+.ds-value {
+  font-family: var(--mono); font-size: 0.9rem; fill: var(--text); text-anchor: middle;
+  transition: fill 0.3s ease;
+}
+.ds-node.hl .ds-box, .ds-node.hl .ds-circle { stroke: var(--accent); stroke-width: 2.4; fill: var(--accent-soft); }
+.ds-node.ok .ds-box, .ds-node.ok .ds-circle { stroke: var(--ok); stroke-width: 2.4; fill: #e9f7f0; }
+.ds-node.bad .ds-box, .ds-node.bad .ds-circle { stroke: var(--danger); stroke-width: 2.4; fill: var(--danger-soft); }
+.ds-node.rb-red .ds-circle { fill: #d64545; stroke: #b23636; }
+.ds-node.rb-red .ds-value { fill: #fff; }
+.ds-node.rb-black .ds-circle { fill: #2c3140; stroke: #1c202b; }
+.ds-node.rb-black .ds-value { fill: #fff; }
+.ds-node.rb-red.hl .ds-circle, .ds-node.rb-black.hl .ds-circle { stroke: var(--accent); stroke-width: 3; }
+.ds-link, .ds-edge, .ds-floor { stroke: var(--border-strong); stroke-width: 1.7; fill: none; }
+.ds-link { stroke: var(--accent); }
+.ds-arrow-head { fill: var(--accent); }
+.ds-link, .ds-edge { transition: d 0.45s cubic-bezier(0.25, 0.8, 0.3, 1), stroke 0.3s ease; }
+.ds-floor { stroke-width: 3; stroke-linecap: round; }
+.ds-tag { font-size: 0.72rem; fill: var(--muted); font-family: var(--mono); }
+
+.ds-caption {
+  display: flex; align-items: center; gap: 0.7rem;
+  border-top: 1px solid var(--border); background: var(--panel);
+  padding: 0.7rem 1.1rem; min-height: 3.4rem;
+}
+.ds-teacher {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent);
+}
+.ds-note { margin: 0; font-size: 0.92rem; flex: 1; animation: var-in 0.3s ease-out; }
+.ds-transport { flex: none; }
+
 /* ---------- responsive ---------- */
 
 /* Narrow window: editor stacks above the diagram instead of beside it. */
 @media (max-width: 900px) {
   main { grid-template-columns: 1fr; grid-template-rows: minmax(200px, 38vh) 1fr; }
   .editor-pane { border-right: none; border-bottom: 1px solid var(--border); }
-  .memory-diagram { padding: 0.8rem 84px 0.8rem 0.9rem; }
+  .memory-diagram { grid-template-columns: 1fr; padding: 0.8rem 64px 0.8rem 0.9rem; }
   .tagline { display: none; }
 }
 
 @media (max-width: 560px) {
   .location { display: none; }
   .controls { gap: 0.5rem; padding: 0.5rem 0.7rem; }
-  .memory-diagram { padding-right: 64px; }
+  .memory-diagram { padding-right: 48px; }
   .stack-frame { min-width: 160px; }
 }

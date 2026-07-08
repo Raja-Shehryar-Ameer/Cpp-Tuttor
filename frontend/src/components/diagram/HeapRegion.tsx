@@ -45,8 +45,12 @@ function HeapBox({ object, leaked }: { object: HeapObject; leaked: boolean }) {
  * unreachable keeps allocation order.
  */
 function chainOrder(step: Step): HeapObject[] {
-  const byAddr = new Map(step.heap.map((o) => [o.address, o]));
   const pointers = collectPointers(step);
+  // Freed objects stay visible only while some live pointer still dangles at
+  // them (the teachable moment); once nothing references them they are gone.
+  const referenced = new Set(pointers.map((p) => p.target));
+  const live = step.heap.filter((o) => !o.freed || referenced.has(o.address));
+  const byAddr = new Map(live.map((o) => [o.address, o]));
   const heapInDegree = new Set(
     pointers.filter((p) => p.sourceFrameId === null).map((p) => p.target),
   );
@@ -69,10 +73,10 @@ function chainOrder(step: Step): HeapObject[] {
   roots.forEach((p) => visit(p.target));
   // No stack root (e.g. after exit): chains still start at their heads —
   // objects no other heap object points at — before plain allocation order.
-  step.heap.forEach((o) => {
+  live.forEach((o) => {
     if (!heapInDegree.has(o.address)) visit(o.address);
   });
-  step.heap.forEach((o) => visit(o.address));
+  live.forEach((o) => visit(o.address));
   return ordered;
 }
 
