@@ -2,10 +2,13 @@ import {
   ArrowLeftRight,
   ArrowUpDown,
   ChevronFirst,
+  Eye,
   GraduationCap,
   Pause,
+  Pencil,
   Play,
   Plus,
+  Route,
   Search,
   Shuffle,
   StepBack,
@@ -16,32 +19,56 @@ import {
 import { useEffect, useRef, useState } from "react";
 import {
   arrayPush,
+  arrayRemove,
+  arrayUpdate,
   avlInsert,
+  avlRemove,
+  avlUpdate,
   bstInsert,
   bstRemove,
   bstSearch,
+  bstUpdate,
   graphAddEdge,
   graphAddNode,
+  graphPath,
+  graphRemoveEdge,
+  graphRemoveNode,
   graphTraverse,
+  graphUpdateNode,
   HASH_BUCKETS,
   hashInsert,
   hashRemove,
   hashSearch,
+  hashUpdate,
   heapExtract,
   heapInsert,
+  heapRemove,
+  heapUpdate,
   listInsertBack,
   listInsertFront,
   listRemove,
   listSearch,
+  listUpdate,
   queueDequeue,
   queueEnqueue,
+  queuePeek,
+  queueUpdateFront,
   rbInsert,
+  rbRemove,
+  rbUpdate,
+  searchBinary,
+  searchLinear,
   sortBubble,
+  sortHeap,
   sortInsertion,
+  sortMerge,
   sortQuick,
   sortSelection,
+  stackPeek,
   stackPop,
   stackPush,
+  stackUpdateTop,
+  treeTraverse,
   type DSData,
   type Frame,
   type TreeNode,
@@ -149,6 +176,19 @@ export function DSPage() {
     setValue("");
   };
 
+  /** Ops that need an (old, new) pair, typed as "old, new" in the value box. */
+  const runPair = (op: (d: DSData, a: number, b: number) => Frame[]) => {
+    const values = parseValues(value);
+    if (values.length < 2) {
+      setFrames([{ data: dataRef.current[structure], hl: [], bad: [], note: "Update needs two numbers in the box — old value, new value — e.g. 10, 25." }]);
+      setIdx(0);
+      setPlaying(false);
+      return;
+    }
+    run((d) => op(d, values[0], values[1]));
+    setValue("");
+  };
+
   const randomFill = () => {
     const pool = new Set<number>();
     while (pool.size < 6) pool.add(1 + Math.floor(Math.random() * 99));
@@ -215,45 +255,102 @@ export function DSPage() {
             <button onClick={() => runEach((d, v) => listRemove(d as never, v))}>
               <Trash2 size={13} /> Remove
             </button>
+            <button onClick={() => runPair((d, a, b) => listUpdate(d as never, a, b))} title="type: old, new">
+              <Pencil size={13} /> Update
+            </button>
             <button onClick={() => runEach((d, v) => listSearch(d as never, v))}>
               <Search size={13} /> Search
             </button>
           </>
         )}
         {structure === "stack" && (
-          <button onClick={() => run((d) => stackPop(d as never))}>
-            <Trash2 size={13} /> Pop
-          </button>
+          <>
+            <button onClick={() => run((d) => stackPop(d as never))}>
+              <Trash2 size={13} /> Pop
+            </button>
+            <button onClick={() => runEach((d, v) => stackUpdateTop(d as never, v))} title="overwrite the top with the typed value">
+              <Pencil size={13} /> Update top
+            </button>
+            <button onClick={() => run((d) => stackPeek(d as never))}>
+              <Eye size={13} /> Peek
+            </button>
+          </>
         )}
         {structure === "queue" && (
-          <button onClick={() => run((d) => queueDequeue(d as never))}>
-            <Trash2 size={13} /> Dequeue
-          </button>
+          <>
+            <button onClick={() => run((d) => queueDequeue(d as never))}>
+              <Trash2 size={13} /> Dequeue
+            </button>
+            <button onClick={() => runEach((d, v) => queueUpdateFront(d as never, v))} title="overwrite the front with the typed value">
+              <Pencil size={13} /> Update front
+            </button>
+            <button onClick={() => run((d) => queuePeek(d as never))}>
+              <Eye size={13} /> Peek
+            </button>
+          </>
         )}
         {structure === "bst" && (
           <>
             <button onClick={() => runEach((d, v) => bstRemove(rootOf(d), v))}>
               <Trash2 size={13} /> Remove
             </button>
+            <button onClick={() => runPair((d, a, b) => bstUpdate(rootOf(d), a, b))} title="type: old, new">
+              <Pencil size={13} /> Update
+            </button>
+            <button onClick={() => runEach((d, v) => bstSearch(rootOf(d), v))}>
+              <Search size={13} /> Search
+            </button>
+            <button onClick={() => run((d) => treeTraverse(rootOf(d), "in"))}>Inorder</button>
+            <button onClick={() => run((d) => treeTraverse(rootOf(d), "pre"))}>Preorder</button>
+            <button onClick={() => run((d) => treeTraverse(rootOf(d), "post"))}>Postorder</button>
+          </>
+        )}
+        {structure === "avl" && (
+          <>
+            <button onClick={() => runEach((d, v) => avlRemove(rootOf(d), v))}>
+              <Trash2 size={13} /> Remove
+            </button>
+            <button onClick={() => runPair((d, a, b) => avlUpdate(rootOf(d), a, b))} title="type: old, new">
+              <Pencil size={13} /> Update
+            </button>
             <button onClick={() => runEach((d, v) => bstSearch(rootOf(d), v))}>
               <Search size={13} /> Search
             </button>
           </>
         )}
-        {(structure === "avl" || structure === "rb") && (
-          <button onClick={() => runEach((d, v) => bstSearch(rootOf(d), v))}>
-            <Search size={13} /> Search
-          </button>
+        {structure === "rb" && (
+          <>
+            <button onClick={() => runEach((d, v) => rbRemove(rootOf(d), v))}>
+              <Trash2 size={13} /> Remove
+            </button>
+            <button onClick={() => runPair((d, a, b) => rbUpdate(rootOf(d), a, b))} title="type: old, new">
+              <Pencil size={13} /> Update
+            </button>
+            <button onClick={() => runEach((d, v) => bstSearch(rootOf(d), v))}>
+              <Search size={13} /> Search
+            </button>
+          </>
         )}
         {structure === "heap" && (
-          <button onClick={() => run((d) => heapExtract(d as never))}>
-            <Trash2 size={13} /> Extract min
-          </button>
+          <>
+            <button onClick={() => run((d) => heapExtract(d as never))}>
+              <Trash2 size={13} /> Extract min
+            </button>
+            <button onClick={() => runEach((d, v) => heapRemove(d as never, v))}>
+              <Trash2 size={13} /> Remove
+            </button>
+            <button onClick={() => runPair((d, a, b) => heapUpdate(d as never, a, b))} title="type: old, new">
+              <Pencil size={13} /> Update key
+            </button>
+          </>
         )}
         {structure === "hash" && (
           <>
             <button onClick={() => runEach((d, v) => hashRemove(d as never, v))}>
               <Trash2 size={13} /> Remove
+            </button>
+            <button onClick={() => runPair((d, a, b) => hashUpdate(d as never, a, b))} title="type: old, new">
+              <Pencil size={13} /> Update
             </button>
             <button onClick={() => runEach((d, v) => hashSearch(d as never, v))}>
               <Search size={13} /> Search
@@ -262,6 +359,12 @@ export function DSPage() {
         )}
         {structure === "array" && (
           <>
+            <button onClick={() => runEach((d, v) => arrayRemove(d as never, v))}>
+              <Trash2 size={13} /> Remove
+            </button>
+            <button onClick={() => runPair((d, a, b) => arrayUpdate(d as never, a, b))} title="type: old, new">
+              <Pencil size={13} /> Update
+            </button>
             <button onClick={() => run((d) => sortBubble(d as never))}>
               <ArrowUpDown size={13} /> Bubble
             </button>
@@ -271,20 +374,44 @@ export function DSPage() {
             <button onClick={() => run((d) => sortSelection(d as never))}>
               <ArrowUpDown size={13} /> Selection
             </button>
+            <button onClick={() => run((d) => sortMerge(d as never))}>
+              <ArrowUpDown size={13} /> Merge
+            </button>
             <button onClick={() => run((d) => sortQuick(d as never))}>
               <ArrowUpDown size={13} /> Quick
+            </button>
+            <button onClick={() => run((d) => sortHeap(d as never))}>
+              <ArrowUpDown size={13} /> Heap
+            </button>
+            <button onClick={() => runEach((d, v) => searchLinear(d as never, v))}>
+              <Search size={13} /> Linear
+            </button>
+            <button onClick={() => runEach((d, v) => searchBinary(d as never, v))}>
+              <Search size={13} /> Binary
             </button>
           </>
         )}
         {structure === "graph" && (
-          <span className="ds-edge-inputs">
-            <input className="ds-input small" value={edgeA} placeholder="A" onChange={(e) => setEdgeA(e.target.value)} />
-            <ArrowLeftRight size={12} aria-hidden="true" />
-            <input className="ds-input small" value={edgeB} placeholder="B" onChange={(e) => setEdgeB(e.target.value)} />
-            <button onClick={() => run((d) => graphAddEdge(d as never, Number(edgeA), Number(edgeB)))}>Add edge</button>
-            <button onClick={() => run((d) => graphTraverse(d as never, Number(edgeA), "bfs"))}>BFS from A</button>
-            <button onClick={() => run((d) => graphTraverse(d as never, Number(edgeA), "dfs"))}>DFS from A</button>
-          </span>
+          <>
+            <button onClick={() => runEach((d, v) => graphRemoveNode(d as never, v))}>
+              <Trash2 size={13} /> Remove vertex
+            </button>
+            <button onClick={() => runPair((d, a, b) => graphUpdateNode(d as never, a, b))} title="type: old, new">
+              <Pencil size={13} /> Rename
+            </button>
+            <span className="ds-edge-inputs">
+              <input className="ds-input small" value={edgeA} placeholder="A" onChange={(e) => setEdgeA(e.target.value)} />
+              <ArrowLeftRight size={12} aria-hidden="true" />
+              <input className="ds-input small" value={edgeB} placeholder="B" onChange={(e) => setEdgeB(e.target.value)} />
+              <button onClick={() => run((d) => graphAddEdge(d as never, Number(edgeA), Number(edgeB)))}>Add edge</button>
+              <button onClick={() => run((d) => graphRemoveEdge(d as never, Number(edgeA), Number(edgeB)))}>Remove edge</button>
+              <button onClick={() => run((d) => graphTraverse(d as never, Number(edgeA), "bfs"))}>BFS from A</button>
+              <button onClick={() => run((d) => graphTraverse(d as never, Number(edgeA), "dfs"))}>DFS from A</button>
+              <button onClick={() => run((d) => graphPath(d as never, Number(edgeA), Number(edgeB)))}>
+                <Route size={13} /> Path A→B
+              </button>
+            </span>
+          </>
         )}
         <button onClick={randomFill} title="fill the input with random values">
           <Shuffle size={13} /> Random

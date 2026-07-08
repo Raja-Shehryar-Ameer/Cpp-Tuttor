@@ -113,6 +113,22 @@ export function listSearch(d: { nodes: ListNode[] }, value: number): Frame[] {
   return frames;
 }
 
+export function listUpdate(d: { nodes: ListNode[] }, from: number, to: number): Frame[] {
+  const frames: Frame[] = [];
+  const data: DSData = { kind: "list", nodes: clone(d.nodes) };
+  for (const node of data.nodes) {
+    if (node.value === from) {
+      frames.push(snap(data, `Found ${from} — overwrite its data field with ${to}.`, { hl: [node.id], bad: [node.id] }));
+      node.value = to;
+      frames.push(snap(data, `Done: the node keeps its links, only the payload changed — updating never rewires a list.`, { hl: [node.id], ok: [node.id] }));
+      return frames;
+    }
+    frames.push(snap(data, `Node holds ${node.value}, not ${from} — follow next.`, { hl: [node.id] }));
+  }
+  frames.push(snap(data, `Reached null — ${from} is not in the list, nothing to update.`, { bad: [] }));
+  return frames;
+}
+
 // ---------- stack / queue ----------
 
 export function stackPush(d: { items: ListNode[] }, value: number): Frame[] {
@@ -154,6 +170,40 @@ export function queueDequeue(d: { items: ListNode[] }): Frame[] {
   const frames = [snap(data, `The FRONT holds ${front.value} — it waited longest, so it leaves first.`, { hl: [front.id], bad: [front.id] })];
   data.items.shift();
   frames.push(snap(data, `Dequeued ${front.value}. Everyone else moves one place closer to the front.`, {}));
+  return frames;
+}
+
+export function stackPeek(d: { items: ListNode[] }): Frame[] {
+  const data: DSData = { kind: "stack", items: clone(d.items) };
+  if (data.items.length === 0) return [snap(data, `The stack is empty — nothing to peek at.`, { bad: [] })];
+  const top = data.items[data.items.length - 1];
+  return [snap(data, `Peek: the top holds ${top.value}. Reading it does NOT remove it.`, { hl: [top.id], ok: [top.id] })];
+}
+
+export function stackUpdateTop(d: { items: ListNode[] }, value: number): Frame[] {
+  const data: DSData = { kind: "stack", items: clone(d.items) };
+  if (data.items.length === 0) return [snap(data, `The stack is empty — there is no top to update.`, { bad: [] })];
+  const top = data.items[data.items.length - 1];
+  const frames = [snap(data, `A stack only exposes its TOP (${top.value}) — that is the only element you may change.`, { hl: [top.id] })];
+  top.value = value;
+  frames.push(snap(data, `Top overwritten with ${value}. Everything underneath stays untouched.`, { hl: [top.id], ok: [top.id] }));
+  return frames;
+}
+
+export function queuePeek(d: { items: ListNode[] }): Frame[] {
+  const data: DSData = { kind: "queue", items: clone(d.items) };
+  if (data.items.length === 0) return [snap(data, `The queue is empty — nothing at the front.`, { bad: [] })];
+  const front = data.items[0];
+  return [snap(data, `Peek: the front holds ${front.value} — the next element to leave. Reading it does NOT remove it.`, { hl: [front.id], ok: [front.id] })];
+}
+
+export function queueUpdateFront(d: { items: ListNode[] }, value: number): Frame[] {
+  const data: DSData = { kind: "queue", items: clone(d.items) };
+  if (data.items.length === 0) return [snap(data, `The queue is empty — there is no front to update.`, { bad: [] })];
+  const front = data.items[0];
+  const frames = [snap(data, `A queue only exposes its FRONT (${front.value}) — that is the only element you may change.`, { hl: [front.id] })];
+  front.value = value;
+  frames.push(snap(data, `Front overwritten with ${value}. The waiting order behind it is unchanged.`, { hl: [front.id], ok: [front.id] }));
   return frames;
 }
 
@@ -260,6 +310,46 @@ export function bstRemove(root: TreeNode | null, value: number): Frame[] {
   return frames;
 }
 
+const treeContains = (root: TreeNode | null, v: number): boolean => {
+  let n = root;
+  while (n) {
+    if (n.value === v) return true;
+    n = v < n.value ? n.left : n.right;
+  }
+  return false;
+};
+
+export function treeTraverse(root: TreeNode | null, order: "in" | "pre" | "post"): Frame[] {
+  const r = clone(root);
+  if (!r) return [snap(tree(r), `The tree is empty — nothing to traverse.`, { bad: [] })];
+  const frames: Frame[] = [];
+  const out: TreeNode[] = [];
+  const intro = {
+    in: `INORDER (left, node, right): visits a BST in perfectly SORTED order.`,
+    pre: `PREORDER (node, left, right): the order you'd use to COPY the tree, roots first.`,
+    post: `POSTORDER (left, right, node): the order you'd use to safely DELETE it, children first.`,
+  };
+  frames.push(snap(tree(r), intro[order], {}));
+  const visit = (n: TreeNode) => {
+    out.push(n);
+    frames.push(snap(tree(r), `Output ${n.value} — sequence so far: ${out.map((o) => o.value).join(", ")}.`, {
+      hl: [n.id],
+      ok: out.map((o) => o.id),
+    }));
+  };
+  const walk = (n: TreeNode | null) => {
+    if (!n) return;
+    if (order === "pre") visit(n);
+    walk(n.left);
+    if (order === "in") visit(n);
+    walk(n.right);
+    if (order === "post") visit(n);
+  };
+  walk(r);
+  frames.push(snap(tree(r), `Traversal complete: ${out.map((o) => o.value).join(" → ")}.`, { ok: out.map((o) => o.id) }));
+  return frames;
+}
+
 // ---------- AVL tree ----------
 
 interface ANode extends TreeNode {
@@ -354,6 +444,75 @@ export function avlInsert(root: TreeNode | null, value: number): Frame[] {
     return frames;
   }
   snapTree(`${value} inserted and every node balanced again — height stays O(log n).`, { ok: [] });
+  return frames;
+}
+
+export function avlRemove(root: TreeNode | null, value: number): Frame[] {
+  const frames: Frame[] = [];
+  let treeRoot = clone(root) as ANode | null;
+  const withHeights = (n: ANode | null): number => (n ? (n.h = 1 + Math.max(withHeights(n.left), withHeights(n.right))) : 0);
+  withHeights(treeRoot);
+  const snapTree = (note: string, extra: Partial<Frame> = {}) =>
+    frames.push({ data: { kind: "tree", root: strip(treeRoot) }, hl: [], note, ...extra });
+
+  let found = false;
+  const rebalance = (n: ANode): ANode => {
+    upd(n);
+    const b = bal(n);
+    if (b > 1 || b < -1) {
+      snapTree(`Node ${n.value} is UNBALANCED (balance ${b}) after the deletion below it.`, { hl: [n.id], bad: [n.id] });
+      if (b > 1) {
+        if (bal(n.left as ANode) >= 0) {
+          snapTree(`Left-heavy, and the left child leans left too → one ROTATE RIGHT around ${n.value}.`, { hl: [n.id] });
+          n = rotateRight(n);
+        } else {
+          snapTree(`Left-Right shape → rotate LEFT around ${(n.left as ANode).value}, then RIGHT around ${n.value}.`, { hl: [n.id] });
+          n.left = rotateLeft(n.left as ANode);
+          n = rotateRight(n);
+        }
+      } else if (bal(n.right as ANode) <= 0) {
+        snapTree(`Right-heavy, and the right child leans right too → one ROTATE LEFT around ${n.value}.`, { hl: [n.id] });
+        n = rotateLeft(n);
+      } else {
+        snapTree(`Right-Left shape → rotate RIGHT around ${(n.right as ANode).value}, then LEFT around ${n.value}.`, { hl: [n.id] });
+        n.right = rotateRight(n.right as ANode);
+        n = rotateLeft(n);
+      }
+    }
+    return n;
+  };
+
+  const remove = (n: ANode | null, v: number): ANode | null => {
+    if (!n) return null;
+    if (v < n.value) {
+      snapTree(`${v} < ${n.value} — go LEFT (normal BST delete first).`, { hl: [n.id] });
+      n.left = remove(n.left, v);
+    } else if (v > n.value) {
+      snapTree(`${v} > ${n.value} — go RIGHT (normal BST delete first).`, { hl: [n.id] });
+      n.right = remove(n.right, v);
+    } else {
+      found = true;
+      if (n.left && n.right) {
+        let s = n.right;
+        while (s.left) s = s.left;
+        snapTree(`${v} has two children — copy its SUCCESSOR ${s.value} up, then delete ${s.value} from the right subtree.`, { hl: [n.id, s.id], bad: [n.id] });
+        n.value = s.value;
+        n.right = remove(n.right, s.value);
+      } else {
+        const child = n.left ?? n.right;
+        snapTree(child ? `Found ${v} — its single child takes its place.` : `Found ${v} — a leaf, snip it off.`, { hl: [n.id], bad: [n.id] });
+        return child;
+      }
+    }
+    return rebalance(n);
+  };
+
+  treeRoot = remove(treeRoot, value);
+  if (!found) {
+    snapTree(`${value} is not in the tree — nothing to remove.`, { bad: [] });
+    return frames;
+  }
+  snapTree(`${value} removed and every node on the way back up re-balanced — AVL deletion may rotate at SEVERAL levels.`, { ok: [] });
   return frames;
 }
 
@@ -467,6 +626,153 @@ export function rbInsert(root: TreeNode | null, value: number): Frame[] {
   return frames;
 }
 
+export function rbRemove(root: TreeNode | null, value: number): Frame[] {
+  const frames: Frame[] = [];
+  let rbRoot = rbFromTree(clone(root), null);
+  const snapTree = (note: string, extra: Partial<Frame> = {}) =>
+    frames.push({ data: { kind: "tree", root: rbStrip(rbRoot) }, hl: [], note, ...extra });
+
+  let z = rbRoot;
+  while (z && z.value !== value) {
+    snapTree(`BST walk: ${value} vs ${z.value} → ${value < z.value ? "left" : "right"}.`, { hl: [z.id] });
+    z = value < z.value ? z.left : z.right;
+  }
+  if (!z) {
+    snapTree(`${value} is not in the tree — nothing to remove.`, { bad: [] });
+    return frames;
+  }
+  snapTree(`Found ${value} (a ${z.color.toUpperCase()} node). Removing a red node is free; removing a black one shortens a path's black count.`, { hl: [z.id], bad: [z.id] });
+
+  const rotate = (x: RNode, dir: "left" | "right"): void => {
+    const other = dir === "left" ? "right" : "left";
+    const y = x[other] as RNode;
+    x[other] = y[dir];
+    if (y[dir]) (y[dir] as RNode).parent = x;
+    y.parent = x.parent;
+    if (!x.parent) rbRoot = y;
+    else if (x.parent.left === x) x.parent.left = y;
+    else x.parent.right = y;
+    y[dir] = x;
+    x.parent = y;
+  };
+
+  const transplant = (u: RNode, v: RNode | null): void => {
+    if (!u.parent) rbRoot = v;
+    else if (u === u.parent.left) u.parent.left = v;
+    else u.parent.right = v;
+    if (v) v.parent = u.parent;
+  };
+
+  let removedColor = z.color;
+  let x: RNode | null;
+  let xParent: RNode | null;
+  if (!z.left) {
+    x = z.right;
+    xParent = z.parent;
+    transplant(z, z.right);
+    snapTree(z.right ? `${value} has one child — it slides up into its place.` : `Unlink ${value}.`, {});
+  } else if (!z.right) {
+    x = z.left;
+    xParent = z.parent;
+    transplant(z, z.left);
+    snapTree(`${value} has one child — it slides up into its place.`, {});
+  } else {
+    let y = z.right;
+    while (y.left) y = y.left;
+    snapTree(`${value} has two children — its SUCCESSOR ${y.value} will take its position AND its color.`, { hl: [y.id] });
+    removedColor = y.color;
+    x = y.right;
+    if (y.parent === z) {
+      xParent = y;
+    } else {
+      xParent = y.parent;
+      transplant(y, y.right);
+      y.right = z.right;
+      y.right.parent = y;
+    }
+    transplant(z, y);
+    y.left = z.left;
+    y.left.parent = y;
+    y.color = z.color;
+    snapTree(`${y.value} moved up wearing ${value}'s color (${z.color}) — colors belong to POSITIONS, not keys. The node actually removed was ${removedColor}.`, { hl: [y.id] });
+  }
+
+  if (removedColor === "black") {
+    const isBlack = (n: RNode | null): boolean => !n || n.color === "black";
+    snapTree(`A BLACK node left the tree, so one path is short a black — a "DOUBLE BLACK" sits ${x ? `on ${x.value}` : "on the empty spot"}. Repair it.`, x ? { hl: [x.id], bad: [x.id] } : { bad: [] });
+    while (x !== rbRoot && isBlack(x) && xParent) {
+      const p = xParent;
+      const onLeft = p.left === x;
+      let w = onLeft ? p.right : p.left;
+      if (!w) break;
+      if (w.color === "red") {
+        snapTree(`Case 1 — sibling ${w.value} is RED: swap its color with parent ${p.value} and rotate toward the double black. The new sibling is black.`, { hl: [w.id, p.id] });
+        w.color = "black";
+        p.color = "red";
+        rotate(p, onLeft ? "left" : "right");
+        w = onLeft ? p.right : p.left;
+        if (!w) break;
+      }
+      if (isBlack(w.left) && isBlack(w.right)) {
+        snapTree(`Case 2 — sibling ${w.value} and both its children are black: paint ${w.value} RED, which pushes the double black up to ${p.value}.`, { hl: [w.id], bad: [p.id] });
+        w.color = "red";
+        x = p;
+        xParent = p.parent;
+        continue;
+      }
+      if (onLeft ? isBlack(w.right) : isBlack(w.left)) {
+        const near = (onLeft ? w.left : w.right) as RNode;
+        snapTree(`Case 3 — sibling's NEAR child ${near.value} is red, far child black: rotate around ${w.value} to point the red child outward.`, { hl: [w.id, near.id] });
+        near.color = "black";
+        w.color = "red";
+        rotate(w, onLeft ? "right" : "left");
+        w = (onLeft ? p.right : p.left) as RNode;
+      }
+      const far = (onLeft ? w.right : w.left) as RNode;
+      snapTree(`Case 4 — sibling ${w.value} has a red FAR child ${far.value}: rotate the parent and recolor — the missing black is restored, done.`, { hl: [w.id, far.id, p.id] });
+      w.color = p.color;
+      p.color = "black";
+      far.color = "black";
+      rotate(p, onLeft ? "left" : "right");
+      x = rbRoot;
+      xParent = null;
+    }
+    if (x && x.color === "red") {
+      snapTree(`The double black landed on a RED node (${x.value}) — simply paint it black to restore the count.`, { hl: [x.id] });
+    }
+    if (x) x.color = "black";
+  } else {
+    snapTree(`The removed node was RED — no path lost a black, so no repair is needed.`, {});
+  }
+  snapTree(`${value} removed — every root-to-leaf path carries equal black again, and no red stacks on red.`, { ok: [] });
+  return frames;
+}
+
+// tree update = remove + insert (works for BST, AVL, and red-black alike)
+function updateVia(
+  root: TreeNode | null,
+  from: number,
+  to: number,
+  removeFn: (r: TreeNode | null, v: number) => Frame[],
+  insertFn: (r: TreeNode | null, v: number) => Frame[],
+  flavor: string,
+): Frame[] {
+  if (!treeContains(root, from)) return [snap(tree(clone(root)), `${from} is not in the tree — nothing to update.`, { bad: [] })];
+  if (treeContains(root, to)) return [snap(tree(clone(root)), `${to} is already in the tree — updating would create a duplicate.`, { bad: [] })];
+  const frames: Frame[] = [
+    snap(tree(clone(root)), `You can't just overwrite a key in a ${flavor} — the ordering would break. UPDATE = REMOVE ${from}, then INSERT ${to}.`, {}),
+  ];
+  const rem = removeFn(root, from);
+  frames.push(...rem);
+  const mid = rem[rem.length - 1].data;
+  frames.push(...insertFn(mid.kind === "tree" ? mid.root : null, to));
+  return frames;
+}
+
+export const bstUpdate = (root: TreeNode | null, from: number, to: number): Frame[] => updateVia(root, from, to, bstRemove, bstInsert, "BST");
+export const avlUpdate = (root: TreeNode | null, from: number, to: number): Frame[] => updateVia(root, from, to, avlRemove, avlInsert, "AVL tree");
+export const rbUpdate = (root: TreeNode | null, from: number, to: number): Frame[] => updateVia(root, from, to, rbRemove, rbInsert, "red-black tree");
+
 // ---------- graph ----------
 
 export function graphAddNode(d: { nodes: ListNode[]; edges: [number, number][] }, value: number): Frame[] {
@@ -538,6 +844,89 @@ export function graphTraverse(
   return frames;
 }
 
+export function graphRemoveNode(d: { nodes: ListNode[]; edges: [number, number][] }, value: number): Frame[] {
+  const node = d.nodes.find((n) => n.value === value);
+  if (!node) return [snap({ kind: "graph", ...clone(d) }, `Vertex ${value} does not exist.`, { bad: [] })];
+  const incident = d.edges.filter(([a, b]) => a === node.id || b === node.id).length;
+  const frames = [snap({ kind: "graph", ...clone(d) }, `Removing vertex ${value} — its ${incident} edge${incident === 1 ? "" : "s"} must go with it, or they would dangle.`, { hl: [node.id], bad: [node.id] })];
+  const data: DSData = {
+    kind: "graph",
+    nodes: clone(d.nodes).filter((n) => n.id !== node.id),
+    edges: clone(d.edges).filter(([a, b]) => a !== node.id && b !== node.id),
+  };
+  frames.push(snap(data, `Vertex ${value} and its incident edges are gone; every other connection survives.`, {}));
+  return frames;
+}
+
+export function graphRemoveEdge(d: { nodes: ListNode[]; edges: [number, number][] }, a: number, b: number): Frame[] {
+  const na = d.nodes.find((n) => n.value === a);
+  const nb = d.nodes.find((n) => n.value === b);
+  const hit = na && nb ? d.edges.find(([x, y]) => (x === na.id && y === nb.id) || (x === nb.id && y === na.id)) : undefined;
+  if (!hit) return [snap({ kind: "graph", ...clone(d) }, `There is no edge ${a} — ${b} to remove.`, { bad: [] })];
+  const frames = [snap({ kind: "graph", ...clone(d) }, `Removing edge ${a} — ${b}: the vertices stay, they just stop being neighbours.`, { hl: [na!.id, nb!.id], bad: [na!.id, nb!.id] })];
+  const data: DSData = { kind: "graph", nodes: clone(d.nodes), edges: clone(d.edges).filter(([x, y]) => !(x === hit[0] && y === hit[1])) };
+  frames.push(snap(data, `Edge gone. Any path that used it must now go another way.`, {}));
+  return frames;
+}
+
+export function graphUpdateNode(d: { nodes: ListNode[]; edges: [number, number][] }, from: number, to: number): Frame[] {
+  const data: DSData = { kind: "graph", nodes: clone(d.nodes), edges: clone(d.edges) };
+  const node = data.nodes.find((n) => n.value === from);
+  if (!node) return [snap(data, `Vertex ${from} does not exist.`, { bad: [] })];
+  if (data.nodes.some((n) => n.value === to)) return [snap(data, `A vertex named ${to} already exists.`, { bad: [] })];
+  const frames = [snap(data, `Renaming vertex ${from} to ${to} — labels are just data; the edges don't care.`, { hl: [node.id] })];
+  node.value = to;
+  frames.push(snap(data, `Done: same vertex, same neighbours, new label ${to}.`, { hl: [node.id], ok: [node.id] }));
+  return frames;
+}
+
+export function graphPath(d: { nodes: ListNode[]; edges: [number, number][] }, a: number, b: number): Frame[] {
+  const data: DSData = { kind: "graph", nodes: clone(d.nodes), edges: clone(d.edges) };
+  const na = data.nodes.find((n) => n.value === a);
+  const nb = data.nodes.find((n) => n.value === b);
+  if (!na || !nb) return [snap(data, `Both endpoints must exist — add them first.`, { bad: [] })];
+  if (na === nb) return [snap(data, `Start and goal are the same vertex — a path of 0 edges.`, { ok: [na.id] })];
+
+  const adj = new Map<number, number[]>();
+  for (const [x, y] of data.edges) {
+    adj.set(x, [...(adj.get(x) ?? []), y]);
+    adj.set(y, [...(adj.get(y) ?? []), x]);
+  }
+  const label = (id: number) => data.nodes.find((n) => n.id === id)?.value;
+
+  const frames: Frame[] = [
+    snap(data, `SHORTEST PATH ${a} → ${b}: BFS explores level by level, so the FIRST time it reaches ${b} is via a fewest-edges route.`, { hl: [na.id] }),
+  ];
+  const parent = new Map<number, number>();
+  const q = [na.id];
+  const seen = new Set([na.id]);
+  let found = false;
+  while (q.length && !found) {
+    const id = q.shift() as number;
+    for (const nx of adj.get(id) ?? []) {
+      if (seen.has(nx)) continue;
+      seen.add(nx);
+      parent.set(nx, id);
+      q.push(nx);
+      if (nx === nb.id) {
+        found = true;
+        break;
+      }
+    }
+    frames.push(snap(data, found
+      ? `Expanding ${label(id)} discovers ${b} — stop the search.`
+      : `Expand ${label(id)} — everything reached so far is at most ${seen.size - 1} hop(s) deep.`, { hl: [...seen] }));
+  }
+  if (!found) {
+    frames.push(snap(data, `The frontier died out without reaching ${b} — it lives in a different component; NO path exists.`, { bad: [] }));
+    return frames;
+  }
+  const path = [nb.id];
+  while (path[0] !== na.id) path.unshift(parent.get(path[0]) as number);
+  frames.push(snap(data, `Walk the parent links back: ${path.map(label).join(" → ")} — ${path.length - 1} edge(s), provably the minimum.`, { ok: path }));
+  return frames;
+}
+
 // ---------- binary min-heap ----------
 
 const heap = (items: ListNode[]): DSData => ({ kind: "heap", items });
@@ -599,6 +988,71 @@ export function heapExtract(d: { items: ListNode[] }): Frame[] {
   }
 }
 
+/** Repair the heap at index i in whichever direction the value violates the rule. */
+function heapSift(items: ListNode[], i: number, frames: Frame[]): void {
+  const p = (i - 1) >> 1;
+  if (i > 0 && items[i].value < items[p].value) {
+    while (i > 0) {
+      const up = (i - 1) >> 1;
+      if (items[up].value <= items[i].value) break;
+      frames.push(snap(heap(items), `${items[i].value} < parent ${items[up].value} — SIFT UP: swap.`, { hl: [items[up].id, items[i].id], bad: [items[up].id] }));
+      [items[i], items[up]] = [items[up], items[i]];
+      i = up;
+    }
+    frames.push(snap(heap(items), `${items[i].value} stopped where its parent is smaller — heap repaired.`, { ok: [items[i].id] }));
+    return;
+  }
+  for (;;) {
+    const l = 2 * i + 1;
+    const r = 2 * i + 2;
+    let s = i;
+    if (l < items.length && items[l].value < items[s].value) s = l;
+    if (r < items.length && items[r].value < items[s].value) s = r;
+    if (s === i) {
+      frames.push(snap(heap(items), l < items.length
+        ? `${items[i].value} is ≤ its children — heap repaired.`
+        : `${items[i].value} reached a leaf — heap repaired.`, { ok: [items[i].id] }));
+      return;
+    }
+    frames.push(snap(heap(items), `${items[i].value} > smallest child ${items[s].value} — SIFT DOWN: swap.`, { hl: [items[i].id, items[s].id], bad: [items[i].id] }));
+    [items[i], items[s]] = [items[s], items[i]];
+    i = s;
+  }
+}
+
+export function heapRemove(d: { items: ListNode[] }, value: number): Frame[] {
+  const items = clone(d.items);
+  const idx = items.findIndex((n) => n.value === value);
+  if (idx === -1) return [snap(heap(items), `${value} is not in the heap.`, { bad: [] })];
+  const target = items[idx];
+  const frames = [snap(heap(items), `Remove ${value} — unlike extract-min this can be ANY node, but the repair trick is the same.`, { hl: [target.id], bad: [target.id] })];
+  const last = items.pop() as ListNode;
+  if (idx === items.length) {
+    frames.push(snap(heap(items), `${value} occupied the LAST slot — just drop it; the tree stays complete.`, {}));
+    return frames;
+  }
+  items[idx] = last;
+  frames.push(snap(heap(items), `Fill the hole with the LAST element ${last.value} to keep the tree complete — then repair.`, { hl: [last.id] }));
+  heapSift(items, idx, frames);
+  return frames;
+}
+
+export function heapUpdate(d: { items: ListNode[] }, from: number, to: number): Frame[] {
+  const items = clone(d.items);
+  const idx = items.findIndex((n) => n.value === from);
+  if (idx === -1) return [snap(heap(items), `${from} is not in the heap.`, { bad: [] })];
+  const target = items[idx];
+  const frames = [
+    snap(heap(items), to < from
+      ? `DECREASE-KEY ${from} → ${to}: the value shrinks, so it may need to float UP toward the root.`
+      : `INCREASE-KEY ${from} → ${to}: the value grows, so it may need to sink DOWN below its children.`, { hl: [target.id] }),
+  ];
+  target.value = to;
+  frames.push(snap(heap(items), `Rewrite the key in place…`, { hl: [target.id] }));
+  heapSift(items, idx, frames);
+  return frames;
+}
+
 // ---------- hash table (separate chaining) ----------
 
 export const HASH_BUCKETS = 7;
@@ -657,6 +1111,31 @@ export function hashRemove(d: { buckets: ListNode[][] }, value: number): Frame[]
   return frames;
 }
 
+export function hashUpdate(d: { buckets: ListNode[][] }, from: number, to: number): Frame[] {
+  const buckets = clone(d.buckets);
+  const hFrom = bucketOf(from);
+  const hTo = bucketOf(to);
+  const chain = buckets[hFrom];
+  const i = chain.findIndex((n) => n.value === from);
+  if (i === -1) return [snap(hashTable(buckets), `${from} is not in the table (its bucket ${hFrom} doesn't hold it).`, { bad: [] })];
+  if (buckets[hTo].some((n) => n.value === to)) return [snap(hashTable(buckets), `${to} already exists in bucket ${hTo} — no duplicates.`, { bad: [] })];
+  const node = chain[i];
+  const frames = [
+    snap(hashTable(buckets), `Updating a KEY changes its hash: ${from} lives in bucket ${hFrom}, but ${to} belongs in bucket ${hTo}${hTo === hFrom ? " — the same one, luckily" : ""}.`, { hl: [node.id] }),
+  ];
+  if (hTo === hFrom) {
+    node.value = to;
+    frames.push(snap(hashTable(buckets), `Same bucket, so rewriting in place is safe.`, { hl: [node.id], ok: [node.id] }));
+    return frames;
+  }
+  chain.splice(i, 1);
+  frames.push(snap(hashTable(buckets), `Unlink ${from} from bucket ${hFrom}…`, { bad: [] }));
+  node.value = to;
+  buckets[hTo].push(node);
+  frames.push(snap(hashTable(buckets), `…and re-insert it as ${to} into bucket ${hTo}. NEVER update a hashed key in place — it becomes unfindable.`, { hl: [node.id], ok: [node.id] }));
+  return frames;
+}
+
 // ---------- sorting ----------
 
 const arrData = (items: ListNode[]): DSData => ({ kind: "array", items });
@@ -665,6 +1144,26 @@ export function arrayPush(d: { items: ListNode[] }, value: number): Frame[] {
   const node = fresh(value);
   const items = [...clone(d.items), node];
   return [snap(arrData(items), `Added ${value}. Load a few values, then pick a sorting algorithm.`, { hl: [node.id], ok: [node.id] })];
+}
+
+export function arrayRemove(d: { items: ListNode[] }, value: number): Frame[] {
+  const items = clone(d.items);
+  const idx = items.findIndex((n) => n.value === value);
+  if (idx === -1) return [snap(arrData(items), `${value} is not in the array.`, { bad: [] })];
+  const frames = [snap(arrData(items), `Remove items[${idx}] = ${value}…`, { hl: [items[idx].id], bad: [items[idx].id] })];
+  items.splice(idx, 1);
+  frames.push(snap(arrData(items), `…and every later element shifts one slot left to close the gap — that shift is why array removal costs O(n).`, {}));
+  return frames;
+}
+
+export function arrayUpdate(d: { items: ListNode[] }, from: number, to: number): Frame[] {
+  const items = clone(d.items);
+  const idx = items.findIndex((n) => n.value === from);
+  if (idx === -1) return [snap(arrData(items), `${from} is not in the array.`, { bad: [] })];
+  const frames = [snap(arrData(items), `Update items[${idx}]: ${from} → ${to}.`, { hl: [items[idx].id] })];
+  items[idx].value = to;
+  frames.push(snap(arrData(items), `Overwritten in place — with an index in hand, an array update is O(1). Watch the bar change height.`, { hl: [items[idx].id], ok: [items[idx].id] }));
+  return frames;
 }
 
 /** Frame helper: sorted-so-far ids stay green in every subsequent frame. */
@@ -796,5 +1295,122 @@ export function sortQuick(d: { items: ListNode[] }): Frame[] {
   };
   part(0, items.length - 1);
   shot(`All ranges partitioned down to single elements — array sorted.`);
+  return frames;
+}
+
+export function sortMerge(d: { items: ListNode[] }): Frame[] {
+  const items = clone(d.items);
+  if (items.length < 2) return trivial(items);
+  const { frames, shot } = sorter(items);
+  shot(`MERGE SORT: split the array in half, sort each half, then MERGE the two sorted halves together.`);
+  const rec = (lo: number, hi: number): void => {
+    if (lo >= hi) return;
+    const mid = (lo + hi) >> 1;
+    shot(`Split [${lo}..${hi}] into [${lo}..${mid}] and [${mid + 1}..${hi}].`, { hl: items.slice(lo, hi + 1).map((n) => n.id) });
+    rec(lo, mid);
+    rec(mid + 1, hi);
+    shot(`Both halves of [${lo}..${hi}] are sorted — merge them front to front.`, { hl: items.slice(lo, hi + 1).map((n) => n.id) });
+    let i = lo;
+    let m = mid;
+    let j = mid + 1;
+    while (i <= m && j <= hi) {
+      if (items[i].value <= items[j].value) {
+        shot(`${items[i].value} ≤ ${items[j].value} — the left element is already in place.`, { hl: [items[i].id, items[j].id] });
+        i++;
+      } else {
+        const leftVal = items[i].value;
+        const [moved] = items.splice(j, 1);
+        items.splice(i, 0, moved);
+        shot(`${moved.value} < ${leftVal} — slide it in front of the left run.`, { hl: [moved.id] });
+        i++;
+        m++;
+        j++;
+      }
+    }
+    shot(`[${lo}..${hi}] merged.`, { ok: items.slice(lo, hi + 1).map((n) => n.id) });
+  };
+  rec(0, items.length - 1);
+  frames.push(snap(arrData(items), `All halves merged — array sorted. Merge sort ALWAYS costs O(n log n), even on hostile input.`, { ok: items.map((n) => n.id) }));
+  return frames;
+}
+
+export function sortHeap(d: { items: ListNode[] }): Frame[] {
+  const items = clone(d.items);
+  if (items.length < 2) return trivial(items);
+  const { frames, done, shot } = sorter(items);
+  shot(`HEAP SORT: treat the array as a tree and arrange it into a MAX-heap, then repeatedly swap the biggest element to the end.`);
+  const n0 = items.length;
+  const sift = (start: number, n: number): void => {
+    let i = start;
+    for (;;) {
+      const l = 2 * i + 1;
+      const r = 2 * i + 2;
+      let big = i;
+      if (l < n && items[l].value > items[big].value) big = l;
+      if (r < n && items[r].value > items[big].value) big = r;
+      if (big === i) return;
+      shot(`Sift down at index ${i}: child ${items[big].value} beats parent ${items[i].value} — swap.`, { hl: [items[i].id, items[big].id] });
+      [items[i], items[big]] = [items[big], items[i]];
+      i = big;
+    }
+  };
+  for (let i = (n0 >> 1) - 1; i >= 0; i--) sift(i, n0);
+  shot(`Build-heap done: every parent ≥ its children, so the MAXIMUM ${items[0].value} sits at index 0.`, { hl: [items[0].id] });
+  for (let end = n0 - 1; end > 0; end--) {
+    shot(`Swap the max ${items[0].value} into its FINAL slot, index ${end}.`, { hl: [items[0].id, items[end].id], bad: [items[0].id] });
+    [items[0], items[end]] = [items[end], items[0]];
+    done.push(items[end].id);
+    shot(`${items[end].value} is final. Repair the heap on the remaining ${end} element${end === 1 ? "" : "s"}.`);
+    sift(0, end);
+  }
+  done.push(items[0].id);
+  shot(`Heap exhausted — array sorted in place, O(n log n) worst case with no extra memory.`);
+  return frames;
+}
+
+// ---------- searching ----------
+
+export function searchLinear(d: { items: ListNode[] }, value: number): Frame[] {
+  const items = clone(d.items);
+  if (items.length === 0) return [snap(arrData(items), `The array is empty.`, { bad: [] })];
+  const frames = [snap(arrData(items), `LINEAR SEARCH for ${value}: check every element left to right — works on ANY array, sorted or not.`, {})];
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].value === value) {
+      frames.push(snap(arrData(items), `items[${i}] = ${value} — found after ${i + 1} check${i === 0 ? "" : "s"}.`, { hl: [items[i].id], ok: [items[i].id] }));
+      return frames;
+    }
+    frames.push(snap(arrData(items), `items[${i}] = ${items[i].value} ≠ ${value} — keep going.`, { hl: [items[i].id] }));
+  }
+  frames.push(snap(arrData(items), `Scanned all ${items.length} elements — ${value} is not here. That's the O(n) worst case.`, { bad: [] }));
+  return frames;
+}
+
+export function searchBinary(d: { items: ListNode[] }, value: number): Frame[] {
+  const items = clone(d.items);
+  if (items.length === 0) return [snap(arrData(items), `The array is empty.`, { bad: [] })];
+  if (!items.every((n, i) => i === 0 || items[i - 1].value <= n.value)) {
+    return [snap(arrData(items), `BINARY SEARCH needs a SORTED array — run one of the sorts first!`, { bad: [] })];
+  }
+  const frames = [snap(arrData(items), `BINARY SEARCH for ${value}: the array is sorted, so each comparison throws away HALF the remaining range.`, {})];
+  let lo = 0;
+  let hi = items.length - 1;
+  let steps = 0;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    steps++;
+    const range = items.slice(lo, hi + 1).map((n) => n.id);
+    if (items[mid].value === value) {
+      frames.push(snap(arrData(items), `mid = ${mid}: items[${mid}] = ${value} — FOUND in ${steps} step${steps === 1 ? "" : "s"} (a linear scan could have needed ${items.length}).`, { hl: range, ok: [items[mid].id] }));
+      return frames;
+    }
+    if (items[mid].value < value) {
+      frames.push(snap(arrData(items), `Range [${lo}..${hi}], middle items[${mid}] = ${items[mid].value} < ${value} — discard the LEFT half.`, { hl: range, bad: [items[mid].id] }));
+      lo = mid + 1;
+    } else {
+      frames.push(snap(arrData(items), `Range [${lo}..${hi}], middle items[${mid}] = ${items[mid].value} > ${value} — discard the RIGHT half.`, { hl: range, bad: [items[mid].id] }));
+      hi = mid - 1;
+    }
+  }
+  frames.push(snap(arrData(items), `The range shrank to nothing — ${value} is not here, decided in only ${steps} step${steps === 1 ? "" : "s"}: O(log n).`, { bad: [] }));
   return frames;
 }
