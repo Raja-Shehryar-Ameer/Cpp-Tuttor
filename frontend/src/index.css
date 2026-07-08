@@ -348,17 +348,18 @@ footer { border-top: 1px solid var(--border); background: var(--panel); }
 .ds-svg { overflow: visible; }
 
 .ds-node { transition: transform 0.45s cubic-bezier(0.25, 0.8, 0.3, 1); }
-.ds-box, .ds-circle {
+.ds-box, .ds-circle, .ds-bar {
   fill: var(--panel); stroke: var(--border-strong); stroke-width: 1.6;
   transition: fill 0.3s ease, stroke 0.3s ease;
 }
+.ds-slot { fill: transparent; stroke: var(--border-strong); stroke-width: 1.4; stroke-dasharray: 3 3; }
 .ds-value {
   font-family: var(--mono); font-size: 0.9rem; fill: var(--text); text-anchor: middle;
   transition: fill 0.3s ease;
 }
-.ds-node.hl .ds-box, .ds-node.hl .ds-circle { stroke: var(--accent); stroke-width: 2.4; fill: var(--accent-soft); }
-.ds-node.ok .ds-box, .ds-node.ok .ds-circle { stroke: var(--ok); stroke-width: 2.4; fill: #e9f7f0; }
-.ds-node.bad .ds-box, .ds-node.bad .ds-circle { stroke: var(--danger); stroke-width: 2.4; fill: var(--danger-soft); }
+.ds-node.hl .ds-box, .ds-node.hl .ds-circle, .ds-node.hl .ds-bar { stroke: var(--accent); stroke-width: 2.4; fill: var(--accent-soft); }
+.ds-node.ok .ds-box, .ds-node.ok .ds-circle, .ds-node.ok .ds-bar { stroke: var(--ok); stroke-width: 2.4; fill: #e9f7f0; }
+.ds-node.bad .ds-box, .ds-node.bad .ds-circle, .ds-node.bad .ds-bar { stroke: var(--danger); stroke-width: 2.4; fill: var(--danger-soft); }
 .ds-node.rb-red .ds-circle { fill: #d64545; stroke: #b23636; }
 .ds-node.rb-red .ds-value { fill: #fff; }
 .ds-node.rb-black .ds-circle { fill: #2c3140; stroke: #1c202b; }

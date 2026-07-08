@@ -1,5 +1,6 @@
 import {
   ArrowLeftRight,
+  ArrowUpDown,
   ChevronFirst,
   GraduationCap,
   Pause,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
+  arrayPush,
   avlInsert,
   bstInsert,
   bstRemove,
@@ -21,6 +23,12 @@ import {
   graphAddEdge,
   graphAddNode,
   graphTraverse,
+  HASH_BUCKETS,
+  hashInsert,
+  hashRemove,
+  hashSearch,
+  heapExtract,
+  heapInsert,
   listInsertBack,
   listInsertFront,
   listRemove,
@@ -28,6 +36,10 @@ import {
   queueDequeue,
   queueEnqueue,
   rbInsert,
+  sortBubble,
+  sortInsertion,
+  sortQuick,
+  sortSelection,
   stackPop,
   stackPush,
   type DSData,
@@ -36,7 +48,7 @@ import {
 } from "../../ds/engine";
 import { DSView } from "./DSView";
 
-type Structure = "list" | "stack" | "queue" | "bst" | "avl" | "rb" | "graph";
+type Structure = "list" | "stack" | "queue" | "bst" | "avl" | "rb" | "heap" | "hash" | "graph" | "array";
 
 const STRUCTURES: { key: Structure; label: string; intro: string }[] = [
   { key: "list", label: "Linked List", intro: "Nodes chained by next pointers. Type a value and insert it — watch the links rewire." },
@@ -45,7 +57,10 @@ const STRUCTURES: { key: Structure; label: string; intro: string }[] = [
   { key: "bst", label: "BST", intro: "Binary search tree: smaller keys live left, bigger keys right. Every walk is a lesson in halving." },
   { key: "avl", label: "AVL Tree", intro: "A BST that refuses to lean: after every insert it re-balances itself with rotations." },
   { key: "rb", label: "Red-Black", intro: "A BST balanced by coloring rules — red nodes may never stack, and every path carries equal black." },
+  { key: "heap", label: "Min-Heap", intro: "A complete tree living inside a plain array: every parent ≤ its children, so the minimum is always at the root." },
+  { key: "hash", label: "Hash Table", intro: `hash(key) = key mod ${HASH_BUCKETS} jumps straight to a bucket — collisions chain into little linked lists.` },
   { key: "graph", label: "Graph", intro: "Vertices and edges. Build one, then run BFS or DFS and watch the frontier spread." },
+  { key: "array", label: "Sorting", intro: "Load some values, then pick an algorithm and watch every comparison and swap, one step at a time." },
 ];
 
 const empty = (s: Structure): DSData => {
@@ -53,6 +68,9 @@ const empty = (s: Structure): DSData => {
   if (s === "stack") return { kind: "stack", items: [] };
   if (s === "queue") return { kind: "queue", items: [] };
   if (s === "graph") return { kind: "graph", nodes: [], edges: [] };
+  if (s === "heap") return { kind: "heap", items: [] };
+  if (s === "hash") return { kind: "hash", buckets: Array.from({ length: HASH_BUCKETS }, () => []) };
+  if (s === "array") return { kind: "array", items: [] };
   return { kind: "tree", root: null };
 };
 
@@ -75,7 +93,10 @@ export function DSPage() {
     bst: empty("bst"),
     avl: empty("avl"),
     rb: empty("rb"),
+    heap: empty("heap"),
+    hash: empty("hash"),
     graph: empty("graph"),
+    array: empty("array"),
   });
   const [frames, setFrames] = useState<Frame[]>([]);
   const [idx, setIdx] = useState(0);
@@ -151,7 +172,10 @@ export function DSPage() {
     bst: [["Insert", (d, v) => bstInsert(rootOf(d), v)]],
     avl: [["Insert", (d, v) => avlInsert(rootOf(d), v)]],
     rb: [["Insert", (d, v) => rbInsert(rootOf(d), v)]],
+    heap: [["Insert", (d, v) => heapInsert(d as never, v)]],
+    hash: [["Insert", (d, v) => hashInsert(d as never, v)]],
     graph: [["Add vertex", (d, v) => graphAddNode(d as never, v)]],
+    array: [["Add", (d, v) => arrayPush(d as never, v)]],
   };
 
   const switchTo = (s: Structure) => {
@@ -220,6 +244,37 @@ export function DSPage() {
           <button onClick={() => runEach((d, v) => bstSearch(rootOf(d), v))}>
             <Search size={13} /> Search
           </button>
+        )}
+        {structure === "heap" && (
+          <button onClick={() => run((d) => heapExtract(d as never))}>
+            <Trash2 size={13} /> Extract min
+          </button>
+        )}
+        {structure === "hash" && (
+          <>
+            <button onClick={() => runEach((d, v) => hashRemove(d as never, v))}>
+              <Trash2 size={13} /> Remove
+            </button>
+            <button onClick={() => runEach((d, v) => hashSearch(d as never, v))}>
+              <Search size={13} /> Search
+            </button>
+          </>
+        )}
+        {structure === "array" && (
+          <>
+            <button onClick={() => run((d) => sortBubble(d as never))}>
+              <ArrowUpDown size={13} /> Bubble
+            </button>
+            <button onClick={() => run((d) => sortInsertion(d as never))}>
+              <ArrowUpDown size={13} /> Insertion
+            </button>
+            <button onClick={() => run((d) => sortSelection(d as never))}>
+              <ArrowUpDown size={13} /> Selection
+            </button>
+            <button onClick={() => run((d) => sortQuick(d as never))}>
+              <ArrowUpDown size={13} /> Quick
+            </button>
+          </>
         )}
         {structure === "graph" && (
           <span className="ds-edge-inputs">

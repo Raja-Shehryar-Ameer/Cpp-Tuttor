@@ -20,7 +20,10 @@ export type DSData =
   | { kind: "stack"; items: ListNode[] }
   | { kind: "queue"; items: ListNode[] }
   | { kind: "tree"; root: TreeNode | null }
-  | { kind: "graph"; nodes: ListNode[]; edges: [number, number][] };
+  | { kind: "graph"; nodes: ListNode[]; edges: [number, number][] }
+  | { kind: "heap"; items: ListNode[] }
+  | { kind: "hash"; buckets: ListNode[][] }
+  | { kind: "array"; items: ListNode[] };
 
 export interface Frame {
   data: DSData;
@@ -532,5 +535,266 @@ export function graphTraverse(
       visited.length < data.nodes.length ? " (unreached vertices are in a different component)" : ""
     }.`, { ok: [...visited] }),
   );
+  return frames;
+}
+
+// ---------- binary min-heap ----------
+
+const heap = (items: ListNode[]): DSData => ({ kind: "heap", items });
+
+export function heapInsert(d: { items: ListNode[] }, value: number): Frame[] {
+  const items = clone(d.items);
+  const node = fresh(value);
+  items.push(node);
+  if (items.length === 1) {
+    return [snap(heap(items), `The heap is empty, so ${value} becomes the root — trivially the minimum.`, { hl: [node.id], ok: [node.id] })];
+  }
+  const frames = [
+    snap(heap(items), `Place ${value} in the first FREE slot (index ${items.length - 1}) — a heap always stays a complete tree.`, { hl: [node.id] }),
+  ];
+  let i = items.length - 1;
+  while (i > 0) {
+    const p = (i - 1) >> 1;
+    if (items[p].value <= items[i].value) {
+      frames.push(snap(heap(items), `Parent ${items[p].value} ≤ ${items[i].value}: the min-heap rule holds — stop sifting.`, { hl: [items[p].id], ok: [items[i].id] }));
+      return frames;
+    }
+    frames.push(snap(heap(items), `Parent ${items[p].value} > ${items[i].value}: rule broken — swap them (SIFT UP).`, { hl: [items[p].id, items[i].id], bad: [items[p].id] }));
+    [items[i], items[p]] = [items[p], items[i]];
+    frames.push(snap(heap(items), `${value} climbs to index ${p}.`, { hl: [items[p].id] }));
+    i = p;
+  }
+  frames.push(snap(heap(items), `${value} reached the root — it is the new minimum.`, { ok: [items[0].id] }));
+  return frames;
+}
+
+export function heapExtract(d: { items: ListNode[] }): Frame[] {
+  const items = clone(d.items);
+  if (items.length === 0) return [snap(heap(items), `The heap is empty — nothing to extract.`, { bad: [] })];
+  const root = items[0];
+  const frames = [snap(heap(items), `Extract-min: the smallest value ${root.value} always sits at the root — that is the whole point of a heap.`, { hl: [root.id], ok: [root.id] })];
+  const last = items.pop() as ListNode;
+  if (items.length === 0) {
+    frames.push(snap(heap(items), `Removed ${root.value} — the heap is empty now.`, {}));
+    return frames;
+  }
+  items[0] = last;
+  frames.push(snap(heap(items), `Fill the hole with the LAST element ${last.value} so the tree stays complete — then repair the rule downward.`, { hl: [last.id], bad: [last.id] }));
+  let i = 0;
+  for (;;) {
+    const l = 2 * i + 1;
+    const r = 2 * i + 2;
+    let s = i;
+    if (l < items.length && items[l].value < items[s].value) s = l;
+    if (r < items.length && items[r].value < items[s].value) s = r;
+    if (s === i) {
+      frames.push(snap(heap(items), l < items.length
+        ? `${items[i].value} is ≤ its children — the heap rule holds everywhere again.`
+        : `${items[i].value} reached a leaf — SIFT DOWN complete.`, { ok: [items[i].id] }));
+      return frames;
+    }
+    frames.push(snap(heap(items), `${items[i].value} vs its children: the smallest child ${items[s].value} wins — swap down.`, { hl: [items[i].id, items[s].id], bad: [items[i].id] }));
+    [items[i], items[s]] = [items[s], items[i]];
+    i = s;
+  }
+}
+
+// ---------- hash table (separate chaining) ----------
+
+export const HASH_BUCKETS = 7;
+const hashTable = (buckets: ListNode[][]): DSData => ({ kind: "hash", buckets });
+const bucketOf = (v: number): number => ((v % HASH_BUCKETS) + HASH_BUCKETS) % HASH_BUCKETS;
+
+export function hashInsert(d: { buckets: ListNode[][] }, value: number): Frame[] {
+  const buckets = clone(d.buckets);
+  const h = bucketOf(value);
+  const chain = buckets[h];
+  const frames = [snap(hashTable(buckets), `hash(${value}) = ${value} mod ${HASH_BUCKETS} = ${h} — jump straight to bucket ${h}, ignore all others.`, { hl: chain.map((n) => n.id) })];
+  for (const n of chain) {
+    if (n.value === value) {
+      frames.push(snap(hashTable(buckets), `${value} is already in bucket ${h} — no duplicates.`, { hl: [n.id], bad: [n.id] }));
+      return frames;
+    }
+  }
+  const node = fresh(value);
+  chain.push(node);
+  frames.push(snap(hashTable(buckets), chain.length > 1
+    ? `Bucket ${h} is occupied — a COLLISION. Chaining handles it: ${value} joins the bucket's little linked list.`
+    : `Bucket ${h} is free — ${value} drops straight in. One arithmetic step, no searching: O(1).`, { hl: [node.id], ok: [node.id] }));
+  return frames;
+}
+
+export function hashSearch(d: { buckets: ListNode[][] }, value: number): Frame[] {
+  const buckets = clone(d.buckets);
+  const h = bucketOf(value);
+  const frames = [snap(hashTable(buckets), `hash(${value}) = ${value} mod ${HASH_BUCKETS} = ${h} — if ${value} exists, it can ONLY be in bucket ${h}.`, { hl: buckets[h].map((n) => n.id) })];
+  for (const n of buckets[h]) {
+    if (n.value === value) {
+      frames.push(snap(hashTable(buckets), `Found ${value} in bucket ${h}'s chain.`, { hl: [n.id], ok: [n.id] }));
+      return frames;
+    }
+    frames.push(snap(hashTable(buckets), `Chain node holds ${n.value}, not ${value} — follow the chain.`, { hl: [n.id] }));
+  }
+  frames.push(snap(hashTable(buckets), `Bucket ${h}'s chain is exhausted — ${value} is not in the table.`, { bad: [] }));
+  return frames;
+}
+
+export function hashRemove(d: { buckets: ListNode[][] }, value: number): Frame[] {
+  const buckets = clone(d.buckets);
+  const h = bucketOf(value);
+  const frames = [snap(hashTable(buckets), `hash(${value}) = ${value} mod ${HASH_BUCKETS} = ${h} — look for ${value} in bucket ${h}.`, { hl: buckets[h].map((n) => n.id) })];
+  for (let i = 0; i < buckets[h].length; i++) {
+    const n = buckets[h][i];
+    if (n.value === value) {
+      frames.push(snap(hashTable(buckets), `Found ${value} — unlink it from the chain…`, { hl: [n.id], bad: [n.id] }));
+      buckets[h].splice(i, 1);
+      frames.push(snap(hashTable(buckets), `…and it is gone. The rest of the chain stays linked.`, {}));
+      return frames;
+    }
+    frames.push(snap(hashTable(buckets), `Chain node holds ${n.value}, not ${value} — keep walking.`, { hl: [n.id] }));
+  }
+  frames.push(snap(hashTable(buckets), `${value} is not in bucket ${h}, so it is not in the table.`, { bad: [] }));
+  return frames;
+}
+
+// ---------- sorting ----------
+
+const arrData = (items: ListNode[]): DSData => ({ kind: "array", items });
+
+export function arrayPush(d: { items: ListNode[] }, value: number): Frame[] {
+  const node = fresh(value);
+  const items = [...clone(d.items), node];
+  return [snap(arrData(items), `Added ${value}. Load a few values, then pick a sorting algorithm.`, { hl: [node.id], ok: [node.id] })];
+}
+
+/** Frame helper: sorted-so-far ids stay green in every subsequent frame. */
+function sorter(items: ListNode[]) {
+  const frames: Frame[] = [];
+  const done: number[] = [];
+  const shot = (note: string, extra: Partial<Frame> = {}) =>
+    frames.push(snap(arrData(items), note, { ...extra, ok: [...done, ...(extra.ok ?? [])] }));
+  return { frames, done, shot };
+}
+
+const trivial = (items: ListNode[]): Frame[] => [
+  snap(arrData(items), `Fewer than two elements — nothing to sort.`, { ok: items.map((n) => n.id) }),
+];
+
+export function sortBubble(d: { items: ListNode[] }): Frame[] {
+  const items = clone(d.items);
+  if (items.length < 2) return trivial(items);
+  const { frames, done, shot } = sorter(items);
+  shot(`BUBBLE SORT: sweep left to right, swapping any neighbours that are out of order — big values bubble to the end.`);
+  for (let end = items.length - 1; end > 0; end--) {
+    let swapped = false;
+    for (let j = 0; j < end; j++) {
+      if (items[j].value > items[j + 1].value) {
+        shot(`${items[j].value} > ${items[j + 1].value} — out of order: swap.`, { hl: [items[j].id, items[j + 1].id], bad: [items[j].id] });
+        [items[j], items[j + 1]] = [items[j + 1], items[j]];
+        swapped = true;
+        shot(`Swapped — ${items[j + 1].value} moves one step toward the end.`, { hl: [items[j].id, items[j + 1].id] });
+      } else {
+        shot(`${items[j].value} ≤ ${items[j + 1].value} — already in order, move on.`, { hl: [items[j].id, items[j + 1].id] });
+      }
+    }
+    done.push(items[end].id);
+    shot(`Pass complete: ${items[end].value} is locked in its FINAL slot.`);
+    if (!swapped) {
+      for (let k = 0; k < end; k++) done.push(items[k].id);
+      shot(`A full pass with zero swaps means everything is already sorted — stop early.`);
+      return frames;
+    }
+  }
+  done.push(items[0].id);
+  shot(`The last element standing is the smallest — array sorted.`);
+  return frames;
+}
+
+export function sortInsertion(d: { items: ListNode[] }): Frame[] {
+  const items = clone(d.items);
+  if (items.length < 2) return trivial(items);
+  const { frames, shot } = sorter(items);
+  shot(`INSERTION SORT: grow a sorted prefix on the left; take each next value and walk it back to where it belongs.`);
+  for (let i = 1; i < items.length; i++) {
+    const key = items[i];
+    shot(`Take ${key.value} (index ${i}) — insert it into the sorted prefix on its left.`, { hl: [key.id] });
+    let j = i;
+    while (j > 0 && items[j - 1].value > items[j].value) {
+      shot(`${items[j - 1].value} > ${key.value} — shift it right and step back.`, { hl: [items[j - 1].id, key.id], bad: [items[j - 1].id] });
+      [items[j - 1], items[j]] = [items[j], items[j - 1]];
+      j--;
+    }
+    shot(j === i
+      ? `${key.value} is already ≥ its left neighbour — it stays put; the prefix grew by one.`
+      : `${key.value} slots in at index ${j} — the prefix is sorted again.`, { hl: [key.id], ok: [key.id] });
+  }
+  frames.push(snap(arrData(items), `Every element has been inserted into place — array sorted.`, { ok: items.map((n) => n.id) }));
+  return frames;
+}
+
+export function sortSelection(d: { items: ListNode[] }): Frame[] {
+  const items = clone(d.items);
+  if (items.length < 2) return trivial(items);
+  const { frames, done, shot } = sorter(items);
+  shot(`SELECTION SORT: scan for the smallest remaining value, swap it to the front, repeat.`);
+  for (let i = 0; i < items.length - 1; i++) {
+    let min = i;
+    shot(`Round ${i + 1}: assume ${items[i].value} is the minimum, then scan the rest.`, { hl: [items[i].id] });
+    for (let j = i + 1; j < items.length; j++) {
+      if (items[j].value < items[min].value) {
+        shot(`${items[j].value} < ${items[min].value} — new minimum candidate.`, { hl: [items[j].id, items[min].id] });
+        min = j;
+      } else {
+        shot(`${items[j].value} ≥ ${items[min].value} — keep the current minimum.`, { hl: [items[j].id] });
+      }
+    }
+    if (min !== i) {
+      shot(`The smallest remaining is ${items[min].value} — swap it into index ${i}.`, { hl: [items[min].id, items[i].id], bad: [items[i].id] });
+      [items[i], items[min]] = [items[min], items[i]];
+    }
+    done.push(items[i].id);
+    shot(`${items[i].value} is FINAL — the sorted prefix grows by one.`);
+  }
+  done.push(items[items.length - 1].id);
+  shot(`Only one value remains and it must be the largest — array sorted.`);
+  return frames;
+}
+
+export function sortQuick(d: { items: ListNode[] }): Frame[] {
+  const items = clone(d.items);
+  if (items.length < 2) return trivial(items);
+  const { frames, done, shot } = sorter(items);
+  shot(`QUICK SORT: pick a pivot, partition smaller values to its left and bigger to its right, then recurse on each side.`);
+  const part = (lo: number, hi: number): void => {
+    if (lo > hi) return;
+    if (lo === hi) {
+      done.push(items[lo].id);
+      shot(`A single-element range (${items[lo].value}) is already sorted.`);
+      return;
+    }
+    const pivot = items[hi];
+    shot(`Partition [${lo}..${hi}]: the pivot is the last element, ${pivot.value}.`, { hl: [pivot.id] });
+    let i = lo;
+    for (let j = lo; j < hi; j++) {
+      if (items[j].value < pivot.value) {
+        if (i !== j) {
+          [items[i], items[j]] = [items[j], items[i]];
+          shot(`${items[i].value} < pivot ${pivot.value} — swapped into the "smaller" zone at index ${i}.`, { hl: [items[i].id], bad: [pivot.id] });
+        } else {
+          shot(`${items[j].value} < pivot ${pivot.value} — already inside the "smaller" zone.`, { hl: [items[j].id] });
+        }
+        i++;
+      } else {
+        shot(`${items[j].value} ≥ pivot ${pivot.value} — leave it on the right side.`, { hl: [items[j].id] });
+      }
+    }
+    [items[i], items[hi]] = [items[hi], items[i]];
+    done.push(pivot.id);
+    shot(`Swap the pivot to the boundary: ${pivot.value} is now in its FINAL position — everything left is smaller, everything right is bigger.`, { hl: [pivot.id] });
+    part(lo, i - 1);
+    part(i + 1, hi);
+  };
+  part(0, items.length - 1);
+  shot(`All ranges partitioned down to single elements — array sorted.`);
   return frames;
 }

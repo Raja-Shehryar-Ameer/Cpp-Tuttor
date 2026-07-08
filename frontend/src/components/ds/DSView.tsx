@@ -244,6 +244,146 @@ function GraphScene({
   );
 }
 
+function HeapScene({ frame, items }: { frame: Frame; items: { id: number; value: number }[] }) {
+  const n = items.length;
+  const depthMax = n ? Math.floor(Math.log2(n)) : 0;
+  const treeW = Math.max(460, Math.pow(2, depthMax) * 84 + 40);
+  const w = Math.max(treeW, 30 + n * 54 + 40);
+  const arrY = 40 + depthMax * 66 + 64;
+  const h = arrY + 76;
+  const placed = items.map((node, i) => {
+    const depth = Math.floor(Math.log2(i + 1));
+    const row = Math.pow(2, depth);
+    const j = i + 1 - row;
+    return { ...node, i, x: (w * (2 * j + 1)) / (2 * row), y: 40 + depth * 66 };
+  });
+  return (
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+      {placed.slice(1).map((p) => {
+        const parent = placed[(p.i - 1) >> 1];
+        return <Edge key={`e${p.id}`} className="ds-edge" x1={parent.x} y1={parent.y} x2={p.x} y2={p.y} />;
+      })}
+      {placed.map((p) => (
+        <g key={p.id} className={nodeClass(p.id, frame)} style={{ transform: `translate(${p.x}px, ${p.y}px)` }}>
+          <circle className="ds-circle" r={21} />
+          <text className="ds-value" y={5.5}>
+            {p.value}
+          </text>
+        </g>
+      ))}
+      <g>
+        {items.map((node, i) => (
+          <g key={node.id} className={nodeClass(node.id, frame)} style={{ transform: `translate(${30 + i * 54}px, ${arrY}px)` }}>
+            <rect className="ds-box" width={46} height={38} rx={8} />
+            <text className="ds-value" x={23} y={24}>
+              {node.value}
+            </text>
+          </g>
+        ))}
+        {items.map((node, i) => (
+          <text key={`i${node.id}`} className="ds-tag" x={30 + i * 54 + 23} y={arrY + 54} textAnchor="middle">
+            {i}
+          </text>
+        ))}
+      </g>
+      {n > 0 && (
+        <text className="ds-tag" x={30} y={arrY - 10}>
+          the same heap, as the array it really lives in:
+        </text>
+      )}
+      {n === 0 && (
+        <text className="ds-tag" x={30} y={60}>
+          (empty heap)
+        </text>
+      )}
+    </svg>
+  );
+}
+
+function HashScene({ frame, buckets }: { frame: Frame; buckets: { id: number; value: number }[][] }) {
+  const rowH = 54;
+  const h = 20 + buckets.length * rowH + 10;
+  const maxChain = Math.max(0, ...buckets.map((b) => b.length));
+  const w = Math.max(460, 96 + maxChain * 100 + 60);
+  return (
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+      <defs>
+        <marker id="ds-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" className="ds-arrow-head" />
+        </marker>
+      </defs>
+      {buckets.map((chain, b) => {
+        const y = 20 + b * rowH;
+        return (
+          <g key={`b${b}`}>
+            <text className="ds-tag" x={14} y={y + 24}>
+              [{b}]
+            </text>
+            <rect className="ds-slot" x={44} y={y} width={26} height={38} rx={6} />
+            {chain.length === 0 ? (
+              <text className="ds-tag" x={80} y={y + 24}>
+                ∅
+              </text>
+            ) : (
+              <Edge className="ds-link" x1={70} y1={y + 19} x2={92} y2={y + 19} marker />
+            )}
+            {chain.slice(0, -1).map((node, i) => (
+              <Edge key={`l${node.id}`} className="ds-link" x1={96 + i * 100 + 64} y1={y + 19} x2={96 + (i + 1) * 100 - 4} y2={y + 19} marker />
+            ))}
+          </g>
+        );
+      })}
+      {buckets.flatMap((chain, b) =>
+        chain.map((node, i) => (
+          <g
+            key={node.id}
+            className={nodeClass(node.id, frame)}
+            style={{ transform: `translate(${96 + i * 100}px, ${20 + b * rowH}px)` }}
+          >
+            <rect className="ds-box" width={62} height={38} rx={9} />
+            <text className="ds-value" x={31} y={24}>
+              {node.value}
+            </text>
+          </g>
+        )),
+      )}
+    </svg>
+  );
+}
+
+function ArrayScene({ frame, items }: { frame: Frame; items: { id: number; value: number }[] }) {
+  const max = Math.max(1, ...items.map((n) => n.value));
+  const w = Math.max(460, 30 + items.length * 56 + 30);
+  const h = 252;
+  const base = h - 36;
+  return (
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+      <line className="ds-floor" x1={20} y1={base + 5} x2={w - 20} y2={base + 5} />
+      {items.map((node, i) => {
+        const barH = 26 + (node.value / max) * 150;
+        return (
+          <g key={node.id} className={nodeClass(node.id, frame)} style={{ transform: `translate(${30 + i * 56}px, ${base - barH}px)` }}>
+            <rect className="ds-bar" width={44} height={barH} rx={7} />
+            <text className="ds-value" x={22} y={19}>
+              {node.value}
+            </text>
+          </g>
+        );
+      })}
+      {items.map((node, i) => (
+        <text key={`i${node.id}`} className="ds-tag" x={30 + i * 56 + 22} y={base + 22} textAnchor="middle">
+          {i}
+        </text>
+      ))}
+      {items.length === 0 && (
+        <text className="ds-tag" x={26} y={40}>
+          (empty array — add some values first)
+        </text>
+      )}
+    </svg>
+  );
+}
+
 export function DSView({ frame }: { frame: Frame }) {
   const data: DSData = frame.data;
   switch (data.kind) {
@@ -257,5 +397,11 @@ export function DSView({ frame }: { frame: Frame }) {
       return <TreeScene frame={frame} root={data.root} />;
     case "graph":
       return <GraphScene frame={frame} nodes={data.nodes} edges={data.edges} />;
+    case "heap":
+      return <HeapScene frame={frame} items={data.items} />;
+    case "hash":
+      return <HashScene frame={frame} buckets={data.buckets} />;
+    case "array":
+      return <ArrayScene frame={frame} items={data.items} />;
   }
 }
