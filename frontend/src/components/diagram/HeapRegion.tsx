@@ -28,8 +28,9 @@ function HeapBox({ object }: { object: HeapObject }) {
   );
 }
 
-// Rendered column-reverse: the first allocation sits lowest and newer
-// objects appear above it, so the heap visually grows upward.
+// Objects render in allocation order; the CSS wrap-reverse rows keep the
+// oldest at the bottom-left and let chains read left-to-right, wrapping
+// upward — the heap still grows up.
 export function HeapRegion({ objects }: { objects: HeapObject[] }) {
   return (
     <div className="heap-region">

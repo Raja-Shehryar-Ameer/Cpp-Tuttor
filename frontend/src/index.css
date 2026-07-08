@@ -88,7 +88,7 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
   position: relative; display: flex; flex-direction: column;
   min-height: 100%; padding: 1rem 130px 1rem 1.25rem;
 }
-.memory-region { width: 100%; max-width: 560px; }
+.memory-region { width: 100%; }
 .region-spacer { flex: 1 1 auto; min-height: 2.5rem; }
 
 .region-header {
@@ -109,6 +109,7 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 .stack-frame {
   background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
   padding: 0.55rem 0.75rem; box-shadow: var(--shadow);
+  width: fit-content; min-width: 250px; max-width: 100%;
   animation: slide-down-in 0.22s ease-out;
 }
 .stack-frame.active {
@@ -123,13 +124,18 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 .frame-name { font-family: var(--mono); font-size: 0.85rem; }
 .frame-line { color: var(--muted); font-size: 0.72rem; font-weight: 400; margin-left: auto; }
 
-/* heap: anchored to the bottom, newest allocations rendered above older ones */
-.heap-region { display: flex; flex-direction: column-reverse; gap: 0.6rem; }
-.heap-region .heap-object:first-child { margin-bottom: 0; }
+/* heap: anchored to the bottom; objects flow left-to-right in allocation
+   order and wrap to a new row ABOVE when the width runs out, so the heap
+   still grows upward while pointer chains read forward. */
+.heap-region {
+  display: flex; flex-direction: row; flex-wrap: wrap-reverse;
+  gap: 0.9rem 1.4rem; align-items: stretch;
+}
 
 .heap-object {
   background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
   padding: 0.55rem 0.75rem; box-shadow: var(--shadow);
+  width: fit-content; min-width: 120px; max-width: 100%;
   animation: slide-up-in 0.22s ease-out;
 }
 .heap-object.freed { opacity: 0.55; border-style: dashed; box-shadow: none; }
@@ -146,7 +152,10 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 
 /* ---------- values ---------- */
 
-.value-row { display: flex; align-items: baseline; gap: 0.5rem; margin: 0.3rem 0; flex-wrap: wrap; }
+.value-row {
+  display: flex; align-items: baseline; gap: 0.5rem; margin: 0.3rem 0; flex-wrap: wrap;
+  animation: var-in 0.25s ease-out;
+}
 .var-name { color: var(--muted); font-family: var(--mono); font-size: 0.82rem; min-width: 2ch; }
 .value-cell {
   display: inline-flex; align-items: center;
@@ -179,7 +188,7 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
   pointer-events: none; overflow: visible;
 }
 .arrow { transition: opacity 0.25s ease; animation: arrow-in 0.25s ease-out; }
-.arrow path { fill: none; stroke: var(--accent); stroke-width: 1.7; }
+.arrow path { fill: none; stroke: var(--accent); stroke-width: 1.7; transition: d 0.28s ease; }
 .arrow.danger path { stroke: var(--danger); stroke-dasharray: 4 3; }
 .arrow.faded { opacity: 0.15; }
 .arrow-head-ok { fill: var(--accent); }
@@ -270,6 +279,10 @@ footer { border-top: 1px solid var(--border); background: var(--panel); }
 @keyframes value-flash {
   from { background-color: var(--warn-flash); }
   to { background-color: transparent; }
+}
+@keyframes var-in {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: none; }
 }
 @keyframes arrow-in {
   from { opacity: 0; }
