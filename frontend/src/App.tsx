@@ -1,15 +1,20 @@
 import { Braces, Check, CircleAlert, Link2, Moon, Pencil, Play, Shapes, SquareCode, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { fetchSharedTrace, requestTrace } from "./api/client";
 import { Controls } from "./components/Controls";
-import { EditorPane } from "./components/EditorPane";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { StdoutPane } from "./components/StdoutPane";
-import { DSPage } from "./components/ds/DSPage";
 import { MemoryDiagram } from "./components/diagram/MemoryDiagram";
 import { usePlayback } from "./hooks/usePlayback";
 import { SAMPLES } from "./samples";
 import { useTraceStore } from "./store/traceStore";
+
+// Code-split the heavy corners: CodeMirror only loads for the tracer, the
+// lesson engine only for the playground — first paint pays for neither.
+const EditorPane = lazy(() =>
+  import("./components/EditorPane").then((m) => ({ default: m.EditorPane })),
+);
+const DSPage = lazy(() => import("./components/ds/DSPage").then((m) => ({ default: m.DSPage })));
 
 const DEFAULT_SAMPLE = "pointers — swap via pointers";
 
@@ -158,32 +163,36 @@ export default function App() {
         </div>
       )}
       <ErrorBoundary>
-        {mode === "ds" ? (
-          <DSPage />
-        ) : (
-          <>
-            <main>
-              <section className="editor-pane">
-                <EditorPane code={code} onChange={setCode} theme={theme} />
-                {trace === null && (
-                  <textarea
-                    className="stdin-box"
-                    placeholder="stdin for the program (optional)"
-                    value={stdin}
-                    onChange={(e) => setStdin(e.target.value)}
-                  />
-                )}
-              </section>
-              <section className="diagram-pane">
-                <MemoryDiagram />
-              </section>
-            </main>
-            <footer>
-              <Controls />
-              <StdoutPane />
-            </footer>
-          </>
-        )}
+        <Suspense fallback={<div className="pane-loading">loading…</div>}>
+          {mode === "ds" ? (
+            <DSPage />
+          ) : (
+            <>
+              <main>
+                <section className="editor-pane">
+                  <Suspense fallback={<div className="pane-loading">loading editor…</div>}>
+                    <EditorPane code={code} onChange={setCode} theme={theme} />
+                  </Suspense>
+                  {trace === null && (
+                    <textarea
+                      className="stdin-box"
+                      placeholder="stdin for the program (optional)"
+                      value={stdin}
+                      onChange={(e) => setStdin(e.target.value)}
+                    />
+                  )}
+                </section>
+                <section className="diagram-pane">
+                  <MemoryDiagram />
+                </section>
+              </main>
+              <footer>
+                <Controls />
+                <StdoutPane />
+              </footer>
+            </>
+          )}
+        </Suspense>
       </ErrorBoundary>
     </div>
   );
