@@ -4,6 +4,8 @@ import { useArrowPositions, type Arrow } from "../../hooks/useArrowPositions";
 import type { Step } from "../../types/trace";
 
 // "forward": plain bezier into the target's left edge (chain look).
+// "backward": the mirror bezier for right-to-left serpentine rows — leaves
+// the pointer cell's left edge and enters the target's right edge.
 // "down": drop corridor just past the source, along the gap above the
 // target's row, into its top edge — heap targets below the source.
 // "lane": rounded orthogonal via a gutter lane into the target's right edge.
@@ -13,6 +15,10 @@ function path(a: Arrow): string {
   if (a.kind === "forward") {
     const bend = Math.max(22, (a.x2 - a.x1) / 2);
     return `M ${a.x1} ${a.y1} C ${a.x1 + bend} ${a.y1}, ${a.x2 - bend} ${a.y2}, ${a.x2} ${a.y2}`;
+  }
+  if (a.kind === "backward") {
+    const bend = Math.max(22, (a.x1 - a.x2) / 2);
+    return `M ${a.x1} ${a.y1} C ${a.x1 - bend} ${a.y1}, ${a.x2 + bend} ${a.y2}, ${a.x2} ${a.y2}`;
   }
   if (a.kind === "down") {
     const r = Math.min(12, Math.max(1, (a.gapY - a.y1) / 2), Math.max(1, a.laneX - a.x1));
@@ -61,6 +67,7 @@ function path(a: Arrow): string {
 
 function warnPos(a: Arrow): { x: number; y: number } {
   if (a.kind === "forward") return { x: a.x2 + 2, y: a.y2 - 6 };
+  if (a.kind === "backward") return { x: a.x2 - 14, y: a.y2 - 6 };
   if (a.kind === "lane") return { x: a.laneX + 5, y: a.y2 - 6 };
   return { x: a.x2 + 8, y: a.gapY - 14 };
 }

@@ -360,7 +360,8 @@ function ArrayScene({ frame, items }: { frame: Frame; items: { id: number; value
     <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
       <line className="ds-floor" x1={20} y1={base + 5} x2={w - 20} y2={base + 5} />
       {items.map((node, i) => {
-        const barH = 26 + (node.value / max) * 150;
+        // Clamp so zero/negative values still draw a visible, valid bar.
+        const barH = Math.max(12, 26 + (node.value / max) * 150);
         return (
           <g key={node.id} className={nodeClass(node.id, frame)} style={{ transform: `translate(${30 + i * 56}px, ${base - barH}px)` }}>
             <rect className="ds-bar" width={44} height={barH} rx={7} />

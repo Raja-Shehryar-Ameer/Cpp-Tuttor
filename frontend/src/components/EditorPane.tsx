@@ -32,9 +32,11 @@ const extensions = [cpp(), highlightField];
 export function EditorPane({
   code,
   onChange,
+  theme,
 }: {
   code: string;
   onChange: (code: string) => void;
+  theme: "light" | "dark";
 }) {
   const editorRef = useRef<ReactCodeMirrorRef>(null);
   const trace = useTraceStore((s) => s.trace);
@@ -56,7 +58,7 @@ export function EditorPane({
       readOnly={playbackActive}
       extensions={extensions}
       basicSetup={{ foldGutter: false, autocompletion: false }}
-      theme="light"
+      theme={theme}
     />
   );
 }

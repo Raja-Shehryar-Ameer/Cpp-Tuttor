@@ -1,10 +1,22 @@
 import { Ban, Droplet } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { collectPointers, registerBox } from "../../store/boxRegistry";
 import type { HeapObject, Step, Value } from "../../types/trace";
 import { ValueBox } from "./ValueBox";
 
-function HeapBox({ object, leaked }: { object: HeapObject; leaked: boolean }) {
+function HeapBox({
+  object,
+  leaked,
+  x,
+  y,
+  ready,
+}: {
+  object: HeapObject;
+  leaked: boolean;
+  x: number;
+  y: number;
+  ready: boolean;
+}) {
   const ref = useCallback(
     (el: HTMLElement | null) => {
       if (el) registerBox(object.address, el);
@@ -12,7 +24,12 @@ function HeapBox({ object, leaked }: { object: HeapObject; leaked: boolean }) {
     [object.address],
   );
   return (
-    <div ref={ref} className={`heap-object ${object.freed ? "freed" : ""}`}>
+    <div
+      ref={ref}
+      data-addr={object.address}
+      className={`heap-object ${object.freed ? "freed" : ""}`}
+      style={{ transform: `translate(${x}px, ${y}px)`, opacity: ready ? undefined : 0 }}
+    >
       <div className="heap-label">
         <span className="heap-label-text">{object.label}</span>
         {object.freed && (
@@ -80,15 +97,115 @@ function chainOrder(step: Step): HeapObject[] {
   return ordered;
 }
 
+const GAP_X = 48; // corridor between neighbours in a row (arrows live here)
+const GAP_Y = 52; // corridor between rows (top-entry approach runs live here)
+
+interface HeapLayout {
+  pos: Map<string, { x: number; y: number }>;
+  height: number;
+}
+
+/**
+ * Serpentine (boustrophedon) placement: chain order fills row 0 left→right;
+ * when width runs out the next row fills right→left, the one after that
+ * left→right again, and so on. The last box of a row therefore sits directly
+ * above the first box of the next, so a wrapping link is a short straight
+ * drop instead of a long crossing arrow, and every row reads in the direction
+ * the chain actually flows.
+ */
+function computeLayout(width: number, boxes: { addr: string; w: number; h: number }[]): HeapLayout {
+  const rows: { addr: string; w: number; h: number }[][] = [];
+  let row: typeof boxes = [];
+  let filled = 0;
+  for (const box of boxes) {
+    if (row.length > 0 && filled + box.w > width) {
+      rows.push(row);
+      row = [];
+      filled = 0;
+    }
+    row.push(box);
+    filled += box.w + GAP_X;
+  }
+  if (row.length > 0) rows.push(row);
+
+  const pos = new Map<string, { x: number; y: number }>();
+  let y = 0;
+  rows.forEach((items, rowIndex) => {
+    const rowHeight = Math.max(...items.map((b) => b.h));
+    if (rowIndex % 2 === 0) {
+      let x = 0;
+      for (const b of items) {
+        pos.set(b.addr, { x, y });
+        x += b.w + GAP_X;
+      }
+    } else {
+      let x = width;
+      for (const b of items) {
+        x -= b.w;
+        pos.set(b.addr, { x: Math.max(0, x), y });
+        x -= GAP_X;
+      }
+    }
+    y += rowHeight + GAP_Y;
+  });
+  return { pos, height: rows.length > 0 ? y - GAP_Y : 0 };
+}
+
+function sameLayout(a: HeapLayout, b: HeapLayout): boolean {
+  if (a.height !== b.height || a.pos.size !== b.pos.size) return false;
+  for (const [addr, p] of a.pos) {
+    const q = b.pos.get(addr);
+    if (!q || q.x !== p.x || q.y !== p.y) return false;
+  }
+  return true;
+}
+
 // On the exit step, anything never freed is flagged as a leak.
 export function HeapRegion({ step }: { step: Step | null }) {
   const objects = step ? chainOrder(step) : [];
   const exited = step?.event === "exit";
+  const regionRef = useRef<HTMLDivElement>(null);
+  const [layout, setLayout] = useState<HeapLayout>({ pos: new Map(), height: 0 });
+
+  useLayoutEffect(() => {
+    const region = regionRef.current;
+    if (!region) return;
+    const update = () => {
+      // DOM order is chain order — boxes are rendered in it.
+      const boxes = [...region.querySelectorAll<HTMLElement>(".heap-object")].map((el) => ({
+        addr: el.dataset.addr ?? "",
+        w: el.offsetWidth,
+        h: el.offsetHeight,
+      }));
+      const next = computeLayout(region.clientWidth, boxes);
+      setLayout((prev) => (sameLayout(prev, next) ? prev : next));
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(region);
+    region.querySelectorAll(".heap-object").forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [step]);
+
   return (
-    <div className="heap-region">
-      {objects.map((object) => (
-        <HeapBox key={object.address} object={object} leaked={exited && !object.freed} />
-      ))}
+    <div
+      className="heap-region"
+      ref={regionRef}
+      style={{ height: objects.length > 0 ? layout.height : undefined }}
+    >
+      {objects.map((object) => {
+        const p = layout.pos.get(object.address);
+        return (
+          <HeapBox
+            key={object.address}
+            object={object}
+            leaked={exited && !object.freed}
+            x={p?.x ?? 0}
+            y={p?.y ?? 0}
+            ready={p !== undefined}
+          />
+        );
+      })}
       {objects.length === 0 && <div className="empty-note">nothing on the heap</div>}
     </div>
   );

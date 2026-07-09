@@ -2,15 +2,15 @@ import { useLayoutEffect, useState, type RefObject } from "react";
 import { collectPointers, getBox, purgeDisconnected } from "../store/boxRegistry";
 import type { Step } from "../types/trace";
 
-export type ArrowKind = "forward" | "lane" | "laneTop" | "down";
+export type ArrowKind = "forward" | "backward" | "lane" | "laneTop" | "down";
 
 export interface Arrow {
   key: string;
   kind: ArrowKind;
-  /** source anchor: right edge of the pointer cell */
+  /** source anchor: right edge of the pointer cell (left edge for "backward") */
   x1: number;
   y1: number;
-  /** entry point on the target: left edge (forward), right edge (lane), or top (laneTop/down) */
+  /** entry point on the target: left edge (forward), right edge (backward/lane), or top (laneTop/down) */
   x2: number;
   y2: number;
   /** x of the vertical run: gutter lane (lane kinds) or drop corridor (down) */
@@ -41,13 +41,17 @@ interface Rect {
  * data structure is — only geometry decides:
  * - "forward": target sits to the right in (roughly) the same row — a plain
  *   bezier into its LEFT edge, the natural chain look.
+ * - "backward": target sits to the left in the same row (a serpentine
+ *   right-to-left row) — the mirror bezier, leaving the pointer cell's LEFT
+ *   edge into the target's RIGHT edge.
  * - "down": target sits below (stack pointer into the heap, or a chain that
  *   wrapped to the next row) — drop through the nearest clear vertical
  *   corridor, run along the gap above the target's row, enter its TOP edge.
  * - "lane": target in the stack — out to a right-hand gutter lane, back into
  *   the target's RIGHT edge (nothing sits right of a stack frame).
- * - "laneTop": target in the heap but ABOVE the source (a back-pointer) —
- *   gutter lane, then along the gap above the target's row into its TOP.
+ * - "laneTop": target in the heap but not reachable by a straight run (above
+ *   the source, or a same-row shot with another card in the way) — gutter
+ *   lane, then along the gap above the target's row into its TOP.
  * Gutter lanes are packed greedily (shortest spans first); drop corridors
  * slide right past any card or other corridor they would hit.
  */
@@ -57,22 +61,42 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
   const freed = new Set(step.heap.filter((h) => h.freed).map((h) => h.address));
   const activeFrameId = step.stack[0]?.frameId ?? null;
 
-  // Card rectangles double as the obstacle map for drop corridors.
-  const cards: Rect[] = [];
+  // Card rectangles double as the obstacle map for straight runs & corridors.
+  const cards: { el: Element; rect: Rect }[] = [];
   let contentRight = 0;
   for (const card of container.querySelectorAll(".stack-frame, .heap-object")) {
     const r = card.getBoundingClientRect();
-    cards.push({
+    const rect = {
       left: r.left - origin.left,
       right: r.right - origin.left,
       top: r.top - origin.top,
       bottom: r.bottom - origin.top,
-    });
-    contentRight = Math.max(contentRight, r.right - origin.left);
+    };
+    cards.push({ el: card, rect });
+    contentRight = Math.max(contentRight, rect.right);
   }
 
+  // A straight (bezier) run is only allowed when no third card sits inside
+  // the horizontal span crossed at the height band the curve sweeps through.
+  const blocked = (fromCard: Element | null, toCard: Element | null, xa: number, xb: number, ya: number, yb: number): boolean => {
+    const lo = Math.min(xa, xb) + 4;
+    const hi = Math.max(xa, xb) - 4;
+    const top = Math.min(ya, yb) - 6;
+    const bottom = Math.max(ya, yb) + 6;
+    return cards.some(
+      ({ el, rect }) =>
+        el !== fromCard &&
+        el !== toCard &&
+        rect.left < hi &&
+        rect.right > lo &&
+        rect.top < bottom &&
+        rect.bottom > top,
+    );
+  };
+
   const measured: Measured[] = [];
-  const entrySeen = new Map<string, number>(); // arrows already entering a target's top
+  const topSeen = new Map<string, number>(); // arrows already entering a target's top
+  const sideSeen = new Map<string, number>(); // arrows already entering a target's left/right edge
   for (const pointer of collectPointers(step)) {
     if (!pointer.address) continue;
     const fromEl = getBox(pointer.address);
@@ -84,7 +108,10 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
 
     const from = fromEl.getBoundingClientRect();
     const to = toEl.getBoundingClientRect();
+    const fromCard = fromEl.closest(".stack-frame, .heap-object");
+    const toCard = toEl.closest(".stack-frame, .heap-object");
     const x1 = from.right - origin.left;
+    const x1Left = from.left - origin.left;
     const y1 = from.top + from.height / 2 - origin.top;
     const toLeft = to.left - origin.left;
     const toRight = to.right - origin.left;
@@ -96,18 +123,44 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       activeFrameId !== null &&
       pointer.sourceFrameId !== activeFrameId;
 
+    // Side entries fan out vertically so several arrows into one node stay apart.
+    const fanY = (count: number) => {
+      const offset = Math.ceil(count / 2) * 9 * (count % 2 === 0 ? 1 : -1);
+      return Math.min(to.bottom - origin.top - 6, Math.max(toTop + 6, toCy + offset));
+    };
+
     // Stack cells always enter heap targets from the left (the heap is the
-    // right-hand column); within the heap, forward means "same row".
+    // right-hand column); within the heap, forward/backward mean "same row".
     const stackToHeap =
       !!fromEl.closest(".stack-region") && !!toEl.closest(".heap-region");
-    if (toLeft > x1 + 14 && (stackToHeap || Math.abs(toCy - y1) < FORWARD_MAX_DY)) {
-      measured.push({ kind: "forward", x1, y1, x2: toLeft - 2, y2: toCy, gapY: 0, danger, faded });
+    const heapToHeap =
+      !!fromEl.closest(".heap-region") && !!toEl.closest(".heap-region");
+    const sameRow = Math.abs(toCy - y1) < FORWARD_MAX_DY;
+
+    if (
+      toLeft > x1 + 14 &&
+      (stackToHeap || sameRow) &&
+      !blocked(fromCard, toCard, x1, toLeft, y1, toCy)
+    ) {
+      const seen = sideSeen.get(pointer.target) ?? 0;
+      sideSeen.set(pointer.target, seen + 1);
+      measured.push({ kind: "forward", x1, y1, x2: toLeft - 2, y2: fanY(seen), gapY: 0, danger, faded });
+    } else if (
+      heapToHeap &&
+      sameRow &&
+      toRight < x1Left - 14 &&
+      !blocked(fromCard, toCard, toRight, x1Left, toCy, y1)
+    ) {
+      // Serpentine right-to-left row: the mirror of "forward".
+      const seen = sideSeen.get(pointer.target) ?? 0;
+      sideSeen.set(pointer.target, seen + 1);
+      measured.push({ kind: "backward", x1: x1Left, y1, x2: toRight + 2, y2: fanY(seen), gapY: 0, danger, faded });
     } else if (!toEl.closest(".heap-region")) {
       measured.push({ kind: "lane", x1, y1, x2: toRight + 2, y2: toCy, gapY: 0, danger, faded });
     } else {
       // Top entry: stagger arrows sharing a target so heads don't stack.
-      const seen = entrySeen.get(pointer.target) ?? 0;
-      entrySeen.set(pointer.target, seen + 1);
+      const seen = topSeen.get(pointer.target) ?? 0;
+      topSeen.set(pointer.target, seen + 1);
       const entryX = toLeft + Math.min(18, to.width / 2) + Math.min(seen * 12, to.width - 30);
       const below = toTop > y1 + 16;
       measured.push({
@@ -155,10 +208,10 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     const bottom = m.gapY;
     for (let guard = 0; guard < 40; guard++) {
       const card = cards.find(
-        (c) => c.top < bottom && c.bottom > top && dropX > c.left + 4 && dropX < c.right + 12,
+        ({ rect: c }) => c.top < bottom && c.bottom > top && dropX > c.left + 4 && dropX < c.right + 12,
       );
       if (card) {
-        dropX = card.right + 14;
+        dropX = card.rect.right + 14;
         continue;
       }
       const other = drops.find(
@@ -199,12 +252,15 @@ export function useArrowPositions(
     const observer = new ResizeObserver(update);
     observer.observe(container);
     container.addEventListener("scroll", update, true);
-    // Boxes animate into place on mount; re-measure once they settle.
+    // Boxes animate/glide into place on mount and re-layout; re-measure once
+    // they settle so arrows land on the final positions.
     container.addEventListener("animationend", update, true);
+    container.addEventListener("transitionend", update, true);
     return () => {
       observer.disconnect();
       container.removeEventListener("scroll", update, true);
       container.removeEventListener("animationend", update, true);
+      container.removeEventListener("transitionend", update, true);
     };
   }, [containerRef, step]);
 

@@ -1,8 +1,9 @@
-import { Braces, Check, CircleAlert, Link2, Pencil, Play, Shapes, SquareCode } from "lucide-react";
+import { Braces, Check, CircleAlert, Link2, Moon, Pencil, Play, Shapes, SquareCode, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { fetchSharedTrace, requestTrace } from "./api/client";
 import { Controls } from "./components/Controls";
 import { EditorPane } from "./components/EditorPane";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { StdoutPane } from "./components/StdoutPane";
 import { DSPage } from "./components/ds/DSPage";
 import { MemoryDiagram } from "./components/diagram/MemoryDiagram";
@@ -11,6 +12,14 @@ import { SAMPLES } from "./samples";
 import { useTraceStore } from "./store/traceStore";
 
 const DEFAULT_SAMPLE = "pointers — swap via pointers";
+
+type Theme = "light" | "dark";
+
+function initialTheme(): Theme {
+  const saved = localStorage.getItem("cpptutor-theme");
+  if (saved === "light" || saved === "dark") return saved;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
 
 function updatePermalink(traceId: string | null): void {
   const url = new URL(window.location.href);
@@ -21,6 +30,7 @@ function updatePermalink(traceId: string | null): void {
 
 export default function App() {
   const [mode, setMode] = useState<"code" | "ds">("code");
+  const [theme, setTheme] = useState<Theme>(initialTheme);
   const [code, setCode] = useState(SAMPLES[DEFAULT_SAMPLE]);
   const [stdin, setStdin] = useState("");
   const [traceId, setTraceId] = useState<string | null>(null);
@@ -30,6 +40,11 @@ export default function App() {
   const requestError = useTraceStore((s) => s.requestError);
   const { setTrace, setLoading, setRequestError } = useTraceStore();
   usePlayback();
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("cpptutor-theme", theme);
+  }, [theme]);
 
   // Shared permalink: ?t=<id> loads a stored trace without re-running code.
   useEffect(() => {
@@ -82,6 +97,13 @@ export default function App() {
           CppTutor <span className="tagline">step-by-step C++ visualizer</span>
         </h1>
         <div className="header-actions">
+          <button
+            className="icon-btn theme-toggle"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            title={theme === "dark" ? "switch to light theme" : "switch to dark theme"}
+          >
+            {theme === "dark" ? <Sun size={14} aria-hidden="true" /> : <Moon size={14} aria-hidden="true" />}
+          </button>
           <div className="mode-switch" role="tablist" aria-label="mode">
             <button className={mode === "code" ? "active" : ""} onClick={() => setMode("code")}>
               <SquareCode size={13} aria-hidden="true" /> C++ Tracer
@@ -135,32 +157,34 @@ export default function App() {
           {trace.error}
         </div>
       )}
-      {mode === "ds" ? (
-        <DSPage />
-      ) : (
-        <>
-          <main>
-            <section className="editor-pane">
-              <EditorPane code={code} onChange={setCode} />
-              {trace === null && (
-                <textarea
-                  className="stdin-box"
-                  placeholder="stdin for the program (optional)"
-                  value={stdin}
-                  onChange={(e) => setStdin(e.target.value)}
-                />
-              )}
-            </section>
-            <section className="diagram-pane">
-              <MemoryDiagram />
-            </section>
-          </main>
-          <footer>
-            <Controls />
-            <StdoutPane />
-          </footer>
-        </>
-      )}
+      <ErrorBoundary>
+        {mode === "ds" ? (
+          <DSPage />
+        ) : (
+          <>
+            <main>
+              <section className="editor-pane">
+                <EditorPane code={code} onChange={setCode} theme={theme} />
+                {trace === null && (
+                  <textarea
+                    className="stdin-box"
+                    placeholder="stdin for the program (optional)"
+                    value={stdin}
+                    onChange={(e) => setStdin(e.target.value)}
+                  />
+                )}
+              </section>
+              <section className="diagram-pane">
+                <MemoryDiagram />
+              </section>
+            </main>
+            <footer>
+              <Controls />
+              <StdoutPane />
+            </footer>
+          </>
+        )}
+      </ErrorBoundary>
     </div>
   );
 }

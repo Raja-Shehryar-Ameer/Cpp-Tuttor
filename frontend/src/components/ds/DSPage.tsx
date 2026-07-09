@@ -2,21 +2,32 @@ import {
   ArrowLeftRight,
   ArrowUpDown,
   ChevronFirst,
+  CircleDot,
   Eye,
+  Gauge,
+  GitBranch,
   GraduationCap,
+  Hash,
+  Layers,
+  Link2,
+  ListOrdered,
+  ListTree,
+  Network,
   Pause,
   Pencil,
   Play,
   Plus,
   Route,
   Search,
+  SearchCheck,
   Shuffle,
   StepBack,
   StepForward,
   Trash2,
+  Triangle,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import {
   arrayPush,
   arrayRemove,
@@ -71,23 +82,38 @@ import {
   treeTraverse,
   type DSData,
   type Frame,
+  type ListNode,
   type TreeNode,
 } from "../../ds/engine";
 import { DSView } from "./DSView";
 
-type Structure = "list" | "stack" | "queue" | "bst" | "avl" | "rb" | "heap" | "hash" | "graph" | "array";
+type Structure =
+  | "list"
+  | "stack"
+  | "queue"
+  | "bst"
+  | "avl"
+  | "rb"
+  | "heap"
+  | "hash"
+  | "graph"
+  | "array"
+  | "search";
 
-const STRUCTURES: { key: Structure; label: string; intro: string }[] = [
-  { key: "list", label: "Linked List", intro: "Nodes chained by next pointers. Type a value and insert it — watch the links rewire." },
-  { key: "stack", label: "Stack", intro: "LIFO: the last thing pushed is the first thing popped. Try pushing a few values." },
-  { key: "queue", label: "Queue", intro: "FIFO: elements leave in the order they arrived. Enqueue some values." },
-  { key: "bst", label: "BST", intro: "Binary search tree: smaller keys live left, bigger keys right. Every walk is a lesson in halving." },
-  { key: "avl", label: "AVL Tree", intro: "A BST that refuses to lean: after every insert it re-balances itself with rotations." },
-  { key: "rb", label: "Red-Black", intro: "A BST balanced by coloring rules — red nodes may never stack, and every path carries equal black." },
-  { key: "heap", label: "Min-Heap", intro: "A complete tree living inside a plain array: every parent ≤ its children, so the minimum is always at the root." },
-  { key: "hash", label: "Hash Table", intro: `hash(key) = key mod ${HASH_BUCKETS} jumps straight to a bucket — collisions chain into little linked lists.` },
-  { key: "graph", label: "Graph", intro: "Vertices and edges. Build one, then run BFS or DFS and watch the frontier spread." },
-  { key: "array", label: "Sorting", intro: "Load some values, then pick an algorithm and watch every comparison and swap, one step at a time." },
+const MAX_BATCH = 24; // more values than this per op makes the lesson unwatchable
+
+const STRUCTURES: { key: Structure; label: string; icon: ComponentType<{ size?: number | string }>; intro: string }[] = [
+  { key: "list", label: "Linked List", icon: Link2, intro: "Nodes chained by next pointers. Type a value and insert it — watch the links rewire." },
+  { key: "stack", label: "Stack", icon: Layers, intro: "LIFO: the last thing pushed is the first thing popped. Try pushing a few values." },
+  { key: "queue", label: "Queue", icon: ListOrdered, intro: "FIFO: elements leave in the order they arrived. Enqueue some values." },
+  { key: "bst", label: "BST", icon: GitBranch, intro: "Binary search tree: smaller keys live left, bigger keys right. Every walk is a lesson in halving." },
+  { key: "avl", label: "AVL Tree", icon: ListTree, intro: "A BST that refuses to lean: after every insert it re-balances itself with rotations." },
+  { key: "rb", label: "Red-Black", icon: CircleDot, intro: "A BST balanced by coloring rules — red nodes may never stack, and every path carries equal black." },
+  { key: "heap", label: "Min-Heap", icon: Triangle, intro: "A complete tree living inside a plain array: every parent ≤ its children, so the minimum is always at the root." },
+  { key: "hash", label: "Hash Table", icon: Hash, intro: `hash(key) = key mod ${HASH_BUCKETS} jumps straight to a bucket — collisions chain into little linked lists.` },
+  { key: "graph", label: "Graph", icon: Network, intro: "Vertices and edges. Build one, then run BFS or DFS and watch the frontier spread." },
+  { key: "array", label: "Sorting", icon: ArrowUpDown, intro: "Load some values, then pick an algorithm and watch every comparison and swap, one step at a time." },
+  { key: "search", label: "Searching", icon: SearchCheck, intro: "Two ways to find a value: linear checks every slot; binary halves a SORTED range each step. Load values, then search." },
 ];
 
 const empty = (s: Structure): DSData => {
@@ -97,7 +123,7 @@ const empty = (s: Structure): DSData => {
   if (s === "graph") return { kind: "graph", nodes: [], edges: [] };
   if (s === "heap") return { kind: "heap", items: [] };
   if (s === "hash") return { kind: "hash", buckets: Array.from({ length: HASH_BUCKETS }, () => []) };
-  if (s === "array") return { kind: "array", items: [] };
+  if (s === "array" || s === "search") return { kind: "array", items: [] };
   return { kind: "tree", root: null };
 };
 
@@ -106,10 +132,17 @@ const rootOf = (d: DSData): TreeNode | null => (d.kind === "tree" ? d.root : nul
 function parseValues(raw: string): number[] {
   return raw
     .split(/[\s,;]+/)
+    .filter((token) => token.length > 0)
     .map((token) => Number(token))
     .filter((n) => Number.isFinite(n))
     .map((n) => Math.trunc(n));
 }
+
+const SPEEDS = [
+  { label: "0.5×", ms: 2200 },
+  { label: "1×", ms: 1200 },
+  { label: "2×", ms: 600 },
+];
 
 export function DSPage() {
   const [structure, setStructure] = useState<Structure>("list");
@@ -124,10 +157,12 @@ export function DSPage() {
     hash: empty("hash"),
     graph: empty("graph"),
     array: empty("array"),
+    search: empty("search"),
   });
   const [frames, setFrames] = useState<Frame[]>([]);
   const [idx, setIdx] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1); // index into SPEEDS
   const [value, setValue] = useState("");
   const [edgeA, setEdgeA] = useState("");
   const [edgeB, setEdgeB] = useState("");
@@ -146,9 +181,16 @@ export function DSPage() {
         }
         return i + 1;
       });
-    }, 1200);
+    }, SPEEDS[speed].ms);
     return () => window.clearInterval(t);
-  }, [playing, frames.length]);
+  }, [playing, frames.length, speed]);
+
+  /** One-frame teacher message without touching the stored structure. */
+  const say = (note: string) => {
+    setFrames([{ data: dataRef.current[structure], hl: [], bad: [], note }]);
+    setIdx(0);
+    setPlaying(false);
+  };
 
   const run = (makeFrames: (d: DSData) => Frame[]) => {
     const produced = makeFrames(dataRef.current[structure]);
@@ -162,7 +204,18 @@ export function DSPage() {
   /** Run one op per typed value, chaining lessons ("5, 3, 8" inserts all three). */
   const runEach = (op: (d: DSData, v: number) => Frame[]) => {
     const values = parseValues(value);
-    if (values.length === 0) return;
+    if (values.length === 0) {
+      say(
+        value.trim()
+          ? `I couldn't read any numbers in “${value.trim()}” — type digits like 5, 3, 8 (commas or spaces between them).`
+          : "Type a value in the box first — one number, or several separated by commas.",
+      );
+      return;
+    }
+    if (values.length > MAX_BATCH) {
+      say(`That's ${values.length} values — keep it to ${MAX_BATCH} or fewer so each step stays readable.`);
+      return;
+    }
     run((initial) => {
       let d = initial;
       const all: Frame[] = [];
@@ -180,13 +233,41 @@ export function DSPage() {
   const runPair = (op: (d: DSData, a: number, b: number) => Frame[]) => {
     const values = parseValues(value);
     if (values.length < 2) {
-      setFrames([{ data: dataRef.current[structure], hl: [], bad: [], note: "Update needs two numbers in the box — old value, new value — e.g. 10, 25." }]);
-      setIdx(0);
-      setPlaying(false);
+      say("Update needs two numbers in the box — old value, new value — e.g. 10, 25.");
       return;
     }
     run((d) => op(d, values[0], values[1]));
     setValue("");
+  };
+
+  /** Graph ops read the little A/B boxes; blank or non-numeric input gets a hint, not NaN. */
+  const vertexOf = (raw: string): number | null => {
+    const n = Number(raw.trim());
+    return raw.trim() !== "" && Number.isFinite(n) ? Math.trunc(n) : null;
+  };
+  const runEdge = (needB: boolean, op: (d: DSData, a: number, b: number) => Frame[]) => {
+    const a = vertexOf(edgeA);
+    const b = needB ? vertexOf(edgeB) : 0;
+    if (a === null || b === null) {
+      say(needB ? "Fill both vertex boxes — A and B — with numbers first." : "Fill the A box with a vertex number first.");
+      return;
+    }
+    run((d) => op(d, a, b));
+  };
+
+  /** Searching tab helper: sort in one hop so binary search becomes legal. */
+  const sortInstantly = () => {
+    run((d) => {
+      const items = [...(d as { items: ListNode[] }).items].sort((a, b) => a.value - b.value);
+      if (items.length === 0) return [{ data: { kind: "array", items }, hl: [], note: "Nothing to sort yet — add some values first." } as Frame];
+      return [
+        {
+          data: { kind: "array", items },
+          hl: items.map((n) => n.id),
+          note: "Sorted ascending in one hop — binary search is now allowed. (To watch HOW sorting works, visit the Sorting tab.)",
+        } as Frame,
+      ];
+    });
   };
 
   const randomFill = () => {
@@ -216,6 +297,7 @@ export function DSPage() {
     hash: [["Insert", (d, v) => hashInsert(d as never, v)]],
     graph: [["Add vertex", (d, v) => graphAddNode(d as never, v)]],
     array: [["Add", (d, v) => arrayPush(d as never, v)]],
+    search: [["Add", (d, v) => arrayPush(d as never, v)]],
   };
 
   const switchTo = (s: Structure) => {
@@ -230,6 +312,7 @@ export function DSPage() {
       <nav className="ds-tabs">
         {STRUCTURES.map((s) => (
           <button key={s.key} className={`ds-tab${s.key === structure ? " active" : ""}`} onClick={() => switchTo(s.key)}>
+            <s.icon size={13} aria-hidden="true" />
             {s.label}
           </button>
         ))}
@@ -383,11 +466,24 @@ export function DSPage() {
             <button onClick={() => run((d) => sortHeap(d as never))}>
               <ArrowUpDown size={13} /> Heap
             </button>
+          </>
+        )}
+        {structure === "search" && (
+          <>
+            <button onClick={() => runEach((d, v) => arrayRemove(d as never, v))}>
+              <Trash2 size={13} /> Remove
+            </button>
+            <button onClick={() => runPair((d, a, b) => arrayUpdate(d as never, a, b))} title="type: old, new">
+              <Pencil size={13} /> Update
+            </button>
+            <button onClick={sortInstantly} title="sort ascending in one step so binary search is allowed">
+              <ArrowUpDown size={13} /> Sort array
+            </button>
             <button onClick={() => runEach((d, v) => searchLinear(d as never, v))}>
-              <Search size={13} /> Linear
+              <Search size={13} /> Linear search
             </button>
             <button onClick={() => runEach((d, v) => searchBinary(d as never, v))}>
-              <Search size={13} /> Binary
+              <SearchCheck size={13} /> Binary search
             </button>
           </>
         )}
@@ -403,11 +499,11 @@ export function DSPage() {
               <input className="ds-input small" value={edgeA} placeholder="A" onChange={(e) => setEdgeA(e.target.value)} />
               <ArrowLeftRight size={12} aria-hidden="true" />
               <input className="ds-input small" value={edgeB} placeholder="B" onChange={(e) => setEdgeB(e.target.value)} />
-              <button onClick={() => run((d) => graphAddEdge(d as never, Number(edgeA), Number(edgeB)))}>Add edge</button>
-              <button onClick={() => run((d) => graphRemoveEdge(d as never, Number(edgeA), Number(edgeB)))}>Remove edge</button>
-              <button onClick={() => run((d) => graphTraverse(d as never, Number(edgeA), "bfs"))}>BFS from A</button>
-              <button onClick={() => run((d) => graphTraverse(d as never, Number(edgeA), "dfs"))}>DFS from A</button>
-              <button onClick={() => run((d) => graphPath(d as never, Number(edgeA), Number(edgeB)))}>
+              <button onClick={() => runEdge(true, (d, a, b) => graphAddEdge(d as never, a, b))}>Add edge</button>
+              <button onClick={() => runEdge(true, (d, a, b) => graphRemoveEdge(d as never, a, b))}>Remove edge</button>
+              <button onClick={() => runEdge(false, (d, a) => graphTraverse(d as never, a, "bfs"))}>BFS from A</button>
+              <button onClick={() => runEdge(false, (d, a) => graphTraverse(d as never, a, "dfs"))}>DFS from A</button>
+              <button onClick={() => runEdge(true, (d, a, b) => graphPath(d as never, a, b))}>
                 <Route size={13} /> Path A→B
               </button>
             </span>
@@ -445,6 +541,25 @@ export function DSPage() {
             </button>
             <button onClick={() => setIdx((i) => Math.min(frames.length - 1, i + 1))} disabled={idx >= frames.length - 1} title="next step">
               <StepForward size={15} />
+            </button>
+            <input
+              className="ds-scrub"
+              type="range"
+              min={0}
+              max={frames.length - 1}
+              value={idx}
+              title="scrub through the lesson"
+              onChange={(e) => {
+                setPlaying(false);
+                setIdx(Number(e.target.value));
+              }}
+            />
+            <button
+              className="speed-btn"
+              onClick={() => setSpeed((s) => (s + 1) % SPEEDS.length)}
+              title="playback speed"
+            >
+              <Gauge size={13} /> {SPEEDS[speed].label}
             </button>
             <span className="step-counter">
               {idx + 1} / {frames.length}
