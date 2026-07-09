@@ -1,4 +1,16 @@
-import { Braces, Check, CircleAlert, Link2, Moon, Pencil, Play, Shapes, SquareCode, Sun } from "lucide-react";
+import {
+  Braces,
+  Check,
+  CircleAlert,
+  Link2,
+  MemoryStick,
+  Moon,
+  Pencil,
+  Play,
+  Shapes,
+  SquareCode,
+  Sun,
+} from "lucide-react";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { fetchSharedTrace, requestTrace } from "./api/client";
 import { Controls } from "./components/Controls";
@@ -183,7 +195,20 @@ export default function App() {
                   )}
                 </section>
                 <section className="diagram-pane">
-                  <MemoryDiagram />
+                  {trace === null ? (
+                    <div className="diagram-empty">
+                      <span className="empty-icon">
+                        <MemoryStick size={22} aria-hidden="true" />
+                      </span>
+                      <h2>Watch your program think</h2>
+                      <p>
+                        Press Visualize and step through every call, variable, and pointer —
+                        the stack and heap drawn like a textbook diagram.
+                      </p>
+                    </div>
+                  ) : (
+                    <MemoryDiagram />
+                  )}
                 </section>
               </main>
               <footer>
