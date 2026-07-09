@@ -1,5 +1,5 @@
 import { TriangleAlert } from "lucide-react";
-import type { CSSProperties, RefObject } from "react";
+import type { RefObject } from "react";
 import { useArrowPositions, type Arrow } from "../../hooks/useArrowPositions";
 import type { Step } from "../../types/trace";
 
@@ -17,8 +17,10 @@ function path(a: Arrow): string {
     return `M ${a.x1} ${a.y1} C ${a.x1 + bend} ${a.y1}, ${a.x2 - bend} ${a.y2}, ${a.x2} ${a.y2}`;
   }
   if (a.kind === "backward") {
+    // Dip a little so a mutual pair (A→B and B→A in one row) reads as two
+    // distinct arcs instead of two arrows fighting over the same line.
     const bend = Math.max(22, (a.x1 - a.x2) / 2);
-    return `M ${a.x1} ${a.y1} C ${a.x1 - bend} ${a.y1}, ${a.x2 + bend} ${a.y2}, ${a.x2} ${a.y2}`;
+    return `M ${a.x1} ${a.y1} C ${a.x1 - bend} ${a.y1 + 14}, ${a.x2 + bend} ${a.y2 + 14}, ${a.x2} ${a.y2}`;
   }
   if (a.kind === "down") {
     const r = Math.min(12, Math.max(1, (a.gapY - a.y1) / 2), Math.max(1, a.laneX - a.x1));
@@ -91,7 +93,8 @@ export function ArrowLayer({
         </marker>
       </defs>
       {arrows.map((arrow) => {
-        const d = path(arrow);
+        // Position comes fresh from the per-frame measurement loop, so the
+        // path is set directly — no CSS morph, no mid-flight marker flips.
         const warn = warnPos(arrow);
         return (
           <g
@@ -99,9 +102,7 @@ export function ArrowLayer({
             className={`arrow${arrow.danger ? " danger" : ""}${arrow.faded ? " faded" : ""}`}
           >
             <path
-              d={d}
-              // style.d transitions smoothly in Chromium; attribute is the fallback
-              style={{ d: `path("${d}")` } as CSSProperties}
+              d={path(arrow)}
               markerEnd={arrow.danger ? "url(#arrow-bad)" : "url(#arrow-ok)"}
             />
             {arrow.danger && (

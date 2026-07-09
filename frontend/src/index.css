@@ -298,7 +298,9 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
   pointer-events: none; overflow: visible;
 }
 .arrow { transition: opacity 0.25s ease; animation: arrow-in 0.25s ease-out; }
-.arrow path { fill: none; stroke: var(--arrow); stroke-width: 1.7; transition: d 0.28s ease; }
+/* No `d` transition: the measurement loop redraws arrows every frame while
+   boxes glide, so paths are always exact and markers never flip mid-morph. */
+.arrow path { fill: none; stroke: var(--arrow); stroke-width: 1.7; }
 .arrow.danger path { stroke: var(--danger); stroke-dasharray: 4 3; }
 .arrow.faded { opacity: 0.15; }
 .arrow-head-ok { fill: var(--arrow); }

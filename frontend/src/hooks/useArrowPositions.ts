@@ -26,8 +26,9 @@ export interface Arrow {
 const LANE_GAP = 13; // px between adjacent gutter lanes
 const LANE_PAD = 10; // min vertical clearance between arrows sharing a lane
 const FORWARD_MAX_DY = 70; // beyond this a same-direction target is not "in the row"
+const GLIDE_MS = 700; // re-measure window covering the boxes' 450ms transform glide
 
-type Measured = Omit<Arrow, "key" | "laneX"> & { laneX?: number };
+type Measured = Omit<Arrow, "laneX"> & { laneX?: number };
 
 interface Rect {
   left: number;
@@ -97,6 +98,16 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
   const measured: Measured[] = [];
   const topSeen = new Map<string, number>(); // arrows already entering a target's top
   const sideSeen = new Map<string, number>(); // arrows already entering a target's left/right edge
+  // Keys are the pointer cell's ADDRESS, not the array index: an arrow keeps
+  // its DOM node across steps only while it is the same logical pointer, so
+  // one pointer's path can never morph into another's (the "arrow briefly
+  // points at itself / the triangle flips" glitch).
+  const keySeen = new Map<string, number>();
+  const keyFor = (address: string): string => {
+    const n = keySeen.get(address) ?? 0;
+    keySeen.set(address, n + 1);
+    return n === 0 ? address : `${address}#${n}`;
+  };
   for (const pointer of collectPointers(step)) {
     if (!pointer.address) continue;
     const fromEl = getBox(pointer.address);
@@ -144,7 +155,7 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     ) {
       const seen = sideSeen.get(pointer.target) ?? 0;
       sideSeen.set(pointer.target, seen + 1);
-      measured.push({ kind: "forward", x1, y1, x2: toLeft - 2, y2: fanY(seen), gapY: 0, danger, faded });
+      measured.push({ key: keyFor(pointer.address), kind: "forward", x1, y1, x2: toLeft - 2, y2: fanY(seen), gapY: 0, danger, faded });
     } else if (
       heapToHeap &&
       sameRow &&
@@ -154,9 +165,9 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       // Serpentine right-to-left row: the mirror of "forward".
       const seen = sideSeen.get(pointer.target) ?? 0;
       sideSeen.set(pointer.target, seen + 1);
-      measured.push({ kind: "backward", x1: x1Left, y1, x2: toRight + 2, y2: fanY(seen), gapY: 0, danger, faded });
+      measured.push({ key: keyFor(pointer.address), kind: "backward", x1: x1Left, y1, x2: toRight + 2, y2: fanY(seen), gapY: 0, danger, faded });
     } else if (!toEl.closest(".heap-region")) {
-      measured.push({ kind: "lane", x1, y1, x2: toRight + 2, y2: toCy, gapY: 0, danger, faded });
+      measured.push({ key: keyFor(pointer.address), kind: "lane", x1, y1, x2: toRight + 2, y2: toCy, gapY: 0, danger, faded });
     } else {
       // Top entry: stagger arrows sharing a target so heads don't stack.
       const seen = topSeen.get(pointer.target) ?? 0;
@@ -164,6 +175,7 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       const entryX = toLeft + Math.min(18, to.width / 2) + Math.min(seen * 12, to.width - 30);
       const below = toTop > y1 + 16;
       measured.push({
+        key: keyFor(pointer.address),
         kind: below ? "down" : "laneTop",
         x1,
         y1,
@@ -227,7 +239,7 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     m.laneX = dropX;
   }
 
-  return measured.map((m, index) => ({ key: `a${index}`, ...m, laneX: m.laneX ?? 0 }));
+  return measured.map((m) => ({ ...m, laneX: m.laneX ?? 0 }));
 }
 
 function laneSpan(m: Measured): number {
@@ -248,19 +260,39 @@ export function useArrowPositions(
       return;
     }
     const update = () => setArrows(measure(container, step));
+
+    // Boxes GLIDE to their slots (transform transition), so a single
+    // measurement would leave arrows pinned to stale positions — and a CSS
+    // `d` morph between two measurements is what used to flip arrowheads
+    // mid-flight. Instead, re-measure every animation frame while anything
+    // is still moving: arrows stay attached to the boxes' true positions and
+    // the triangle marker always points the way the path actually travels.
+    let raf = 0;
+    let until = 0;
+    const tick = () => {
+      update();
+      if (performance.now() < until) raf = requestAnimationFrame(tick);
+      else raf = 0;
+    };
+    const track = (ms: number) => {
+      until = Math.max(until, performance.now() + ms);
+      if (raf === 0) raf = requestAnimationFrame(tick);
+    };
+
     update();
-    const observer = new ResizeObserver(update);
+    track(GLIDE_MS);
+    const observer = new ResizeObserver(() => track(GLIDE_MS));
     observer.observe(container);
+    const retrack = () => track(GLIDE_MS);
     container.addEventListener("scroll", update, true);
-    // Boxes animate/glide into place on mount and re-layout; re-measure once
-    // they settle so arrows land on the final positions.
-    container.addEventListener("animationend", update, true);
-    container.addEventListener("transitionend", update, true);
+    container.addEventListener("transitionrun", retrack, true);
+    container.addEventListener("animationstart", retrack, true);
     return () => {
+      cancelAnimationFrame(raf);
       observer.disconnect();
       container.removeEventListener("scroll", update, true);
-      container.removeEventListener("animationend", update, true);
-      container.removeEventListener("transitionend", update, true);
+      container.removeEventListener("transitionrun", retrack, true);
+      container.removeEventListener("animationstart", retrack, true);
     };
   }, [containerRef, step]);
 
