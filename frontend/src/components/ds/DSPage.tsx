@@ -48,11 +48,17 @@ import {
   graphRemoveNode,
   graphTraverse,
   graphUpdateNode,
+  emptyOA,
   HASH_BUCKETS,
   hashInsert,
   hashRemove,
   hashSearch,
   hashUpdate,
+  oaHashInsert,
+  oaHashRemove,
+  oaHashSearch,
+  oaHashUpdate,
+  OA_SLOTS,
   heapExtract,
   heapInsert,
   heapRemove,
@@ -85,6 +91,7 @@ import {
   type DSData,
   type Frame,
   type ListNode,
+  type Probe,
   type TreeNode,
 } from "../../ds/engine";
 import { DSView } from "./DSView";
@@ -224,11 +231,15 @@ function loadSeen(): Record<string, boolean> {
   }
 }
 
+// Slow enough that every glide (600ms) finishes and the note can be read
+// before the next step fires.
 const SPEEDS = [
-  { label: "0.5×", ms: 2200 },
-  { label: "1×", ms: 1200 },
-  { label: "2×", ms: 600 },
+  { label: "0.5×", ms: 3200 },
+  { label: "1×", ms: 1800 },
+  { label: "2×", ms: 900 },
 ];
+
+type HashMode = "chain" | Probe;
 
 export function DSPage() {
   const [structure, setStructure] = useState<Structure>("list");
@@ -255,6 +266,22 @@ export function DSPage() {
   const [bulkOpen, setBulkOpen] = useState(false);
   const [bulkText, setBulkText] = useState("");
   const [infoOpen, setInfoOpen] = useState(() => !loadSeen()["list"]);
+  const [hashMode, setHashMode] = useState<HashMode>("chain");
+
+  const emptyHash = (mode: HashMode): DSData => (mode === "chain" ? empty("hash") : emptyOA(mode));
+
+  const switchHashMode = (mode: HashMode) => {
+    setHashMode(mode);
+    dataRef.current.hash = emptyHash(mode);
+    setFrames([{
+      data: dataRef.current.hash, hl: [],
+      note: mode === "chain"
+        ? `Chaining: hash(key) = key mod ${HASH_BUCKETS} — colliding keys link up inside their bucket.`
+        : `${mode === "linear" ? "Linear" : "Quadratic"} probing: ${OA_SLOTS} flat slots — a colliding key walks ${mode === "linear" ? "+1, +2, +3…" : "+1², +2², +3²…"} until it finds a free one. Fresh table.`,
+    }]);
+    setIdx(0);
+    setPlaying(false);
+  };
 
   const meta = STRUCTURES.find((s) => s.key === structure)!;
   const data = dataRef.current[structure];
@@ -370,7 +397,7 @@ export function DSPage() {
   };
 
   const reset = () => {
-    dataRef.current[structure] = empty(structure);
+    dataRef.current[structure] = structure === "hash" ? emptyHash(hashMode) : empty(structure);
     setFrames([]);
     setIdx(0);
     setPlaying(false);
@@ -397,10 +424,19 @@ export function DSPage() {
       const seen = new Set<number>();
       let edgeCount = 0;
       let bad = 0;
+      // Each landed vertex/edge contributes its own highlighted frame so the
+      // playback shows the graph being built piece by piece.
+      const lesson: Frame[] = [];
+      const land = (produced: Frame[]) => {
+        if (produced.length === 0) return;
+        const last = produced[produced.length - 1];
+        d = last.data;
+        lesson.push(last);
+      };
       const addVertex = (v: number): boolean => {
         if (seen.has(v)) return true;
         if (seen.size >= MAX_BULK_VERTICES) return false;
-        d = graphAddNode(d as never, v)[0].data;
+        land(graphAddNode(d as never, v));
         seen.add(v);
         return true;
       };
@@ -421,18 +457,19 @@ export function DSPage() {
           }
           if (a !== b) {
             const before = (d as { edges: [number, number][] }).edges.length;
-            d = graphAddEdge(d as never, a, b)[0].data;
+            land(graphAddEdge(d as never, a, b));
             if ((d as { edges: [number, number][] }).edges.length > before) edgeCount += 1;
           }
         }
       }
       dataRef.current.graph = d;
-      setFrames([{
+      lesson.push({
         data: d, hl: [],
         note: `Loaded ${seen.size} ${seen.size === 1 ? "vertex" : "vertices"} and ${edgeCount} ${edgeCount === 1 ? "edge" : "edges"}${bad ? ` (skipped ${bad} unreadable ${bad === 1 ? "line" : "lines"})` : ""}. Try BFS or DFS from a vertex.`,
-      }]);
+      });
+      setFrames(lesson);
       setIdx(0);
-      setPlaying(false);
+      setPlaying(lesson.length > 1);
     } else {
       const { values, outOfRange } = parseValues(bulkText);
       if (outOfRange.length > 0) {
@@ -452,15 +489,22 @@ export function DSPage() {
       const op = structure === "list"
         ? (d: DSData, v: number) => listInsertBack(d as never, v)
         : insertOps[structure][0][1];
-      let d = empty(structure);
-      for (const v of values) {
+      let d = structure === "hash" ? emptyHash(hashMode) : empty(structure);
+      // One highlighted frame per value: the playback shows each value
+      // finding its place (rotations, sifting, probing already applied).
+      const lesson: Frame[] = [];
+      values.forEach((v, k) => {
         const produced = op(d, v);
-        if (produced.length) d = produced[produced.length - 1].data;
-      }
+        if (produced.length === 0) return;
+        const last = produced[produced.length - 1];
+        d = last.data;
+        lesson.push({ ...last, note: `${k + 1} of ${values.length}: ${last.note}` });
+      });
       dataRef.current[structure] = d;
-      setFrames([{ data: d, hl: [], note: `Loaded ${values.length} values in one hop. Now run an operation to see the steps.` }]);
+      lesson.push({ data: d, hl: [], note: `All ${values.length} values are in. Now run an operation to see the steps.` });
+      setFrames(lesson);
       setIdx(0);
-      setPlaying(false);
+      setPlaying(lesson.length > 1);
     }
     setBulkOpen(false);
     setBulkText("");
@@ -477,7 +521,7 @@ export function DSPage() {
     avl: [["Insert", (d, v) => avlInsert(rootOf(d), v)]],
     rb: [["Insert", (d, v) => rbInsert(rootOf(d), v)]],
     heap: [["Insert", (d, v) => heapInsert(d as never, v)]],
-    hash: [["Insert", (d, v) => hashInsert(d as never, v)]],
+    hash: [["Insert", (d, v) => (hashMode === "chain" ? hashInsert(d as never, v) : oaHashInsert(d as never, v))]],
     graph: [["Add vertex", (d, v) => graphAddNode(d as never, v)]],
     array: [["Add", (d, v) => arrayPush(d as never, v)]],
     search: [["Add", (d, v) => arrayPush(d as never, v)]],
@@ -615,15 +659,26 @@ export function DSPage() {
         )}
         {structure === "hash" && (
           <>
-            <button onClick={() => runEach((d, v) => hashRemove(d as never, v))}>
+            <button onClick={() => runEach((d, v) => (hashMode === "chain" ? hashRemove(d as never, v) : oaHashRemove(d as never, v)))}>
               <Trash2 size={13} /> Remove
             </button>
-            <button onClick={() => runPair((d, a, b) => hashUpdate(d as never, a, b))} title="type: old, new">
+            <button
+              onClick={() => runPair((d, a, b) => (hashMode === "chain" ? hashUpdate(d as never, a, b) : oaHashUpdate(d as never, a, b)))}
+              title="type: old, new"
+            >
               <Pencil size={13} /> Update
             </button>
-            <button onClick={() => runEach((d, v) => hashSearch(d as never, v))}>
+            <button onClick={() => runEach((d, v) => (hashMode === "chain" ? hashSearch(d as never, v) : oaHashSearch(d as never, v)))}>
               <Search size={13} /> Search
             </button>
+            <label className="ds-mode" title="how the table resolves two keys hashing to the same slot">
+              collisions:
+              <select value={hashMode} onChange={(e) => switchHashMode(e.target.value as HashMode)}>
+                <option value="chain">Chaining</option>
+                <option value="linear">Linear probing</option>
+                <option value="quadratic">Quadratic probing</option>
+              </select>
+            </label>
           </>
         )}
         {structure === "array" && (

@@ -23,6 +23,7 @@ export type DSData =
   | { kind: "graph"; nodes: ListNode[]; edges: [number, number][] }
   | { kind: "heap"; items: ListNode[] }
   | { kind: "hash"; buckets: ListNode[][] }
+  | { kind: "oahash"; slots: (ListNode | "tomb" | null)[]; probe: "linear" | "quadratic" }
   | { kind: "array"; items: ListNode[] };
 
 export interface Frame {
@@ -32,6 +33,8 @@ export interface Frame {
   /** ids flashed green (success) or red (problem) this frame */
   ok?: number[];
   bad?: number[];
+  /** ids drawn in the inverted "pivot" style (quick sort's anchor value) */
+  pivot?: number[];
   note: string;
 }
 
@@ -1136,6 +1139,132 @@ export function hashUpdate(d: { buckets: ListNode[][] }, from: number, to: numbe
   return frames;
 }
 
+// ---------- hash table: open addressing ----------
+// The alternative collision policy: no chains — collide, then PROBE for the
+// next free slot. Linear tries h, h+1, h+2, …; quadratic tries h, h+1², h+2²,
+// … Removals leave a tombstone so later probe walks don't stop early.
+
+export const OA_SLOTS = 11;
+export type Probe = "linear" | "quadratic";
+export type OASlot = ListNode | "tomb" | null;
+const oaTable = (slots: OASlot[], probe: Probe): DSData => ({ kind: "oahash", slots, probe });
+const oaHome = (v: number): number => ((v % OA_SLOTS) + OA_SLOTS) % OA_SLOTS;
+const oaStep = (h: number, k: number, probe: Probe): number => (h + (probe === "linear" ? k : k * k)) % OA_SLOTS;
+const probeName = (probe: Probe): string => (probe === "linear" ? "linear probing" : "quadratic probing");
+const probeJump = (k: number, probe: Probe): string =>
+  probe === "linear" ? `+${k}` : `+${k}² = +${k * k}`;
+export const emptyOA = (probe: Probe): DSData => oaTable(Array.from({ length: OA_SLOTS }, () => null), probe);
+
+export function oaHashInsert(d: { slots: OASlot[]; probe: Probe }, value: number): Frame[] {
+  const slots = clone(d.slots);
+  const probe = d.probe;
+  const h = oaHome(value);
+  const frames = [snap(oaTable(slots, probe), `hash(${value}) = ${value} mod ${OA_SLOTS} = ${h} — the home slot. If it's taken, ${probeName(probe)} finds the next candidate.`, {})];
+  let tombAt = -1;
+  for (let k = 0; k < OA_SLOTS; k++) {
+    const s = oaStep(h, k, probe);
+    const cur = slots[s];
+    if (cur !== null && cur !== "tomb" && cur.value === value) {
+      frames.push(snap(oaTable(slots, probe), `Slot ${s} already holds ${value} — no duplicates.`, { hl: [cur.id], bad: [cur.id] }));
+      return frames;
+    }
+    if (cur === null || cur === "tomb") {
+      if (cur === "tomb" && tombAt === -1) tombAt = s;
+      if (cur === "tomb") {
+        frames.push(snap(oaTable(slots, probe), `Slot ${s} holds a tombstone — a reusable grave. But keep probing first: ${value} might already live further along.`, {}));
+        continue;
+      }
+      const at = tombAt !== -1 ? tombAt : s;
+      const node = fresh(value);
+      slots[at] = node;
+      frames.push(snap(oaTable(slots, probe),
+        k === 0 && at === s
+          ? `Home slot ${at} is free — ${value} drops straight in: O(1), no probing needed.`
+          : tombAt !== -1
+            ? `${value} isn't in the table, so it recycles the first tombstone: slot ${at}.`
+            : `Free slot found: after ${k} ${k === 1 ? "probe" : "probes"}, ${value} settles into slot ${at}.`,
+        { hl: [node.id], ok: [node.id] }));
+      return frames;
+    }
+    frames.push(snap(oaTable(slots, probe), `Slot ${s} is occupied by ${cur.value} — COLLISION. Probe ${probeJump(k + 1, probe)} → slot ${oaStep(h, k + 1, probe)}.`, { hl: [cur.id] }));
+  }
+  if (tombAt !== -1) {
+    const node = fresh(value);
+    slots[tombAt] = node;
+    frames.push(snap(oaTable(slots, probe), `The whole probe path is walked — no duplicate found, so ${value} recycles the first tombstone: slot ${tombAt}.`, { hl: [node.id], ok: [node.id] }));
+    return frames;
+  }
+  frames.push(snap(oaTable(slots, probe), `The probe sequence found no free slot — with open addressing a crowded table simply fills up. A real table would RESIZE here.`, { bad: [] }));
+  return frames;
+}
+
+export function oaHashSearch(d: { slots: OASlot[]; probe: Probe }, value: number): Frame[] {
+  const slots = clone(d.slots);
+  const probe = d.probe;
+  const h = oaHome(value);
+  const frames = [snap(oaTable(slots, probe), `hash(${value}) = ${h} — start at the home slot and retrace the exact probe path an insert would take.`, {})];
+  for (let k = 0; k < OA_SLOTS; k++) {
+    const s = oaStep(h, k, probe);
+    const cur = slots[s];
+    if (cur === null) {
+      frames.push(snap(oaTable(slots, probe), `Slot ${s} is EMPTY — the probe path ends here, so ${value} cannot be in the table.`, { bad: [] }));
+      return frames;
+    }
+    if (cur === "tomb") {
+      frames.push(snap(oaTable(slots, probe), `Slot ${s} is a tombstone — someone was deleted here. The search must keep walking past it.`, {}));
+      continue;
+    }
+    if (cur.value === value) {
+      frames.push(snap(oaTable(slots, probe), `Found ${value} in slot ${s} after ${k} ${k === 1 ? "probe" : "probes"}.`, { hl: [cur.id], ok: [cur.id] }));
+      return frames;
+    }
+    frames.push(snap(oaTable(slots, probe), `Slot ${s} holds ${cur.value}, not ${value} — probe ${probeJump(k + 1, probe)}.`, { hl: [cur.id] }));
+  }
+  frames.push(snap(oaTable(slots, probe), `Probed every slot on the path — ${value} is not in the table.`, { bad: [] }));
+  return frames;
+}
+
+export function oaHashRemove(d: { slots: OASlot[]; probe: Probe }, value: number): Frame[] {
+  const slots = clone(d.slots);
+  const probe = d.probe;
+  const h = oaHome(value);
+  const frames = [snap(oaTable(slots, probe), `hash(${value}) = ${h} — walk the probe path to find ${value}.`, {})];
+  for (let k = 0; k < OA_SLOTS; k++) {
+    const s = oaStep(h, k, probe);
+    const cur = slots[s];
+    if (cur === null) {
+      frames.push(snap(oaTable(slots, probe), `Slot ${s} is empty — ${value} is not in the table.`, { bad: [] }));
+      return frames;
+    }
+    if (cur === "tomb") continue;
+    if (cur.value === value) {
+      frames.push(snap(oaTable(slots, probe), `Found ${value} in slot ${s}. It can't just be emptied — that would cut the probe path for everything inserted after it…`, { hl: [cur.id], bad: [cur.id] }));
+      slots[s] = "tomb";
+      frames.push(snap(oaTable(slots, probe), `…so it becomes a TOMBSTONE: searches walk past it, inserts may recycle it.`, {}));
+      return frames;
+    }
+    frames.push(snap(oaTable(slots, probe), `Slot ${s} holds ${cur.value} — probe onward.`, { hl: [cur.id] }));
+  }
+  frames.push(snap(oaTable(slots, probe), `${value} is not on the probe path — not in the table.`, { bad: [] }));
+  return frames;
+}
+
+export function oaHashUpdate(d: { slots: OASlot[]; probe: Probe }, from: number, to: number): Frame[] {
+  const exists = d.slots.some((s) => s !== null && s !== "tomb" && s.value === from);
+  if (!exists) return [snap(oaTable(clone(d.slots), d.probe), `${from} is not in the table.`, { bad: [] })];
+  if (d.slots.some((s) => s !== null && s !== "tomb" && s.value === to)) {
+    return [snap(oaTable(clone(d.slots), d.probe), `${to} already exists — no duplicates.`, { bad: [] })];
+  }
+  const removal = oaHashRemove(d, from);
+  const after = removal[removal.length - 1].data as { slots: OASlot[]; probe: Probe };
+  const insertion = oaHashInsert(after, to);
+  return [
+    snap(oaTable(clone(d.slots), d.probe), `Updating a hashed KEY means remove-then-reinsert: ${to} hashes to its own slot, not ${from}'s.`, {}),
+    ...removal,
+    ...insertion,
+  ];
+}
+
 // ---------- sorting ----------
 
 const arrData = (items: ListNode[]): DSData => ({ kind: "array", items });
@@ -1272,24 +1401,24 @@ export function sortQuick(d: { items: ListNode[] }): Frame[] {
       return;
     }
     const pivot = items[hi];
-    shot(`Partition [${lo}..${hi}]: the pivot is the last element, ${pivot.value}.`, { hl: [pivot.id] });
+    shot(`Partition [${lo}..${hi}]: the pivot is the last element, ${pivot.value} — drawn in ink so you never lose it.`, { pivot: [pivot.id] });
     let i = lo;
     for (let j = lo; j < hi; j++) {
       if (items[j].value < pivot.value) {
         if (i !== j) {
           [items[i], items[j]] = [items[j], items[i]];
-          shot(`${items[i].value} < pivot ${pivot.value} — swapped into the "smaller" zone at index ${i}.`, { hl: [items[i].id], bad: [pivot.id] });
+          shot(`${items[i].value} < pivot ${pivot.value} — swapped into the "smaller" zone at index ${i}.`, { hl: [items[i].id], pivot: [pivot.id] });
         } else {
-          shot(`${items[j].value} < pivot ${pivot.value} — already inside the "smaller" zone.`, { hl: [items[j].id] });
+          shot(`${items[j].value} < pivot ${pivot.value} — already inside the "smaller" zone.`, { hl: [items[j].id], pivot: [pivot.id] });
         }
         i++;
       } else {
-        shot(`${items[j].value} ≥ pivot ${pivot.value} — leave it on the right side.`, { hl: [items[j].id] });
+        shot(`${items[j].value} ≥ pivot ${pivot.value} — leave it on the right side.`, { hl: [items[j].id], pivot: [pivot.id] });
       }
     }
     [items[i], items[hi]] = [items[hi], items[i]];
     done.push(pivot.id);
-    shot(`Swap the pivot to the boundary: ${pivot.value} is now in its FINAL position — everything left is smaller, everything right is bigger.`, { hl: [pivot.id] });
+    shot(`Swap the pivot to the boundary: ${pivot.value} is now in its FINAL position — everything left is smaller, everything right is bigger.`, { pivot: [pivot.id] });
     part(lo, i - 1);
     part(i + 1, hi);
   };

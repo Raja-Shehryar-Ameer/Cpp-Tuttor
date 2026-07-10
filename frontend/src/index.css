@@ -606,12 +606,21 @@ button.toggled { background: var(--accent-soft); border-color: var(--accent); co
 .ds-node.rb-black .ds-circle { fill: var(--rb-black); stroke: var(--rb-black-line); }
 .ds-node.rb-black .ds-value { fill: #f2efe8; }
 .ds-node.rb-red.hl .ds-circle, .ds-node.rb-black.hl .ds-circle { stroke: var(--hl); stroke-width: 3; }
+/* quick sort's pivot: solid ink, inverted text — unmistakable next to the
+   amber highlighter and the green sorted zone */
+.ds-node.pivot .ds-box, .ds-node.pivot .ds-circle, .ds-node.pivot .ds-bar { fill: var(--text); stroke: var(--text); stroke-width: 1.6; }
+.ds-node.pivot .ds-value { fill: var(--panel); }
 .ds-link, .ds-edge, .ds-floor { stroke: var(--border-strong); stroke-width: 1.7; fill: none; }
 .ds-link { stroke: var(--arrow); }
 .ds-arrow-head { fill: var(--arrow); }
-.ds-link, .ds-edge { transition: d 0.45s var(--ease-glide), stroke 0.3s ease; }
+.ds-link, .ds-edge { transition: d 0.6s var(--ease-glide), stroke 0.3s ease; }
 .ds-floor { stroke-width: 3; stroke-linecap: round; }
 .ds-tag { font-size: 0.72rem; fill: var(--muted); font-family: var(--mono); }
+.ds-tomb { font-size: 0.95rem; fill: var(--danger); }
+.ds-mode {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  color: var(--muted); font-size: 0.8rem; font-family: var(--mono);
+}
 
 .ds-caption {
   display: flex; align-items: center; gap: 0.7rem;

@@ -79,7 +79,10 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
 
   // A straight (bezier) run is only allowed when no third card sits inside
   // the horizontal span crossed at the height band the curve sweeps through.
-  const blocked = (fromCard: Element | null, toCard: Element | null, xa: number, xb: number, ya: number, yb: number): boolean => {
+  // Stack→heap shots ignore stack-frame cards: the curve leaves the stack
+  // column horizontally at the source row, so sibling frames above or below
+  // can never actually be in its way — only heap cards can.
+  const blocked = (fromCard: Element | null, toCard: Element | null, xa: number, xb: number, ya: number, yb: number, heapOnly = false): boolean => {
     const lo = Math.min(xa, xb) + 4;
     const hi = Math.max(xa, xb) - 4;
     const top = Math.min(ya, yb) - 6;
@@ -88,6 +91,7 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       ({ el, rect }) =>
         el !== fromCard &&
         el !== toCard &&
+        !(heapOnly && el.classList.contains("stack-frame")) &&
         rect.left < hi &&
         rect.right > lo &&
         rect.top < bottom &&
@@ -151,7 +155,7 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     if (
       toLeft > x1 + 14 &&
       (stackToHeap || sameRow) &&
-      !blocked(fromCard, toCard, x1, toLeft, y1, toCy)
+      !blocked(fromCard, toCard, x1, toLeft, y1, toCy, stackToHeap)
     ) {
       const seen = sideSeen.get(pointer.target) ?? 0;
       sideSeen.set(pointer.target, seen + 1);
@@ -169,19 +173,26 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     } else if (!toEl.closest(".heap-region")) {
       measured.push({ key: keyFor(pointer.address), kind: "lane", x1, y1, x2: toRight + 2, y2: toCy, gapY: 0, danger, faded });
     } else {
-      // Top entry: stagger arrows sharing a target so heads don't stack.
+      // Top entry: stagger arrows sharing a target so heads don't stack —
+      // sideways for the entry point AND vertically for the approach run,
+      // otherwise two approaches draw the same horizontal line twice.
       const seen = topSeen.get(pointer.target) ?? 0;
       topSeen.set(pointer.target, seen + 1);
       const entryX = toLeft + Math.min(18, to.width / 2) + Math.min(seen * 12, to.width - 30);
+      const approachY = toTop - 10 - seen * 7;
+      // A stack source always has the corridor between the columns available,
+      // so a blocked stack→heap shot rides it in EITHER direction ("down"
+      // runs upward too) instead of detouring around the whole heap. Only
+      // heap→heap arrows to a higher row need the outer gutter.
       const below = toTop > y1 + 16;
       measured.push({
         key: keyFor(pointer.address),
-        kind: below ? "down" : "laneTop",
+        kind: stackToHeap || below ? "down" : "laneTop",
         x1,
         y1,
         x2: entryX,
         y2: toTop - 2,
-        gapY: toTop - 10,
+        gapY: approachY,
         danger,
         faded,
       });
@@ -216,8 +227,8 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
   const drops: { x: number; top: number; bottom: number }[] = [];
   for (const m of measured.filter((m) => m.kind === "down").sort((a, b) => laneSpan(a) - laneSpan(b))) {
     let dropX = m.x1 + 12;
-    const top = m.y1 - 4;
-    const bottom = m.gapY;
+    const top = Math.min(m.y1, m.gapY) - 4;
+    const bottom = Math.max(m.y1, m.gapY) + 4;
     for (let guard = 0; guard < 40; guard++) {
       const card = cards.find(
         ({ rect: c }) => c.top < bottom && c.bottom > top && dropX > c.left + 4 && dropX < c.right + 12,

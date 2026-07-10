@@ -23,15 +23,19 @@ function path(a: Arrow): string {
     return `M ${a.x1} ${a.y1} C ${a.x1 - bend} ${a.y1 + 14}, ${a.x2 + bend} ${a.y2 + 14}, ${a.x2} ${a.y2}`;
   }
   if (a.kind === "down") {
-    const r = Math.min(12, Math.max(1, (a.gapY - a.y1) / 2), Math.max(1, a.laneX - a.x1));
+    // The corridor run works in both directions: gapY below the source is
+    // the classic drop; gapY above it is a stack pointer climbing the
+    // corridor between the columns to a heap row higher up.
+    const dirV = a.gapY >= a.y1 ? 1 : -1;
+    const r = Math.min(12, Math.max(1, Math.abs(a.gapY - a.y1) / 2), Math.max(1, a.laneX - a.x1));
     const dirH = a.x2 >= a.laneX ? 1 : -1; // which way the gap run heads
     const r2 = Math.min(10, Math.abs(a.x2 - a.laneX) / 2);
     const yIn = Math.min(a.gapY + r2, a.y2);
     return [
       `M ${a.x1} ${a.y1}`,
       `L ${a.laneX - r} ${a.y1}`,
-      `Q ${a.laneX} ${a.y1} ${a.laneX} ${a.y1 + r}`,
-      `L ${a.laneX} ${a.gapY - r2}`,
+      `Q ${a.laneX} ${a.y1} ${a.laneX} ${a.y1 + dirV * r}`,
+      `L ${a.laneX} ${a.gapY - dirV * r2}`,
       `Q ${a.laneX} ${a.gapY} ${a.laneX + dirH * r2} ${a.gapY}`,
       `L ${a.x2 - dirH * r2} ${a.gapY}`,
       `Q ${a.x2} ${a.gapY} ${a.x2} ${yIn}`,

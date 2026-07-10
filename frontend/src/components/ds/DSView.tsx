@@ -24,7 +24,7 @@ function Edge({ className, x1, y1, x2, y2, marker }: { className: string; x1: nu
 // glide bends through a midpoint offset perpendicular to the motion, so swap
 // partners arc around each other instead of gliding through.
 
-const GLIDE_MS = 450;
+const GLIDE_MS = 600;
 const GLIDE_EASE = "cubic-bezier(0.25, 0.8, 0.3, 1)"; // keep in sync with --ease-glide
 
 function GlideG({ x, y, lift = 0, className, children }: { x: number; y: number; lift?: number; className: string; children: ReactNode }) {
@@ -44,9 +44,12 @@ function GlideG({ x, y, lift = 0, className, children }: { x: number; y: number;
     const amp = liftRef.current;
     let frames: Keyframe[];
     if (amp > 0) {
-      // Perpendicular to the motion, preferring upward (rightward for
-      // vertical moves), so horizontal swaps arc over the row and diagonal
-      // heap sifts bow out sideways from the edge they travel.
+      // A hop, not an arc: rise to FULL clearance before traveling, glide
+      // across lifted, then drop into the slot. A mid-path arc peak cannot
+      // clear an adjacent-slot swap — the boxes touch at ~7% progress, long
+      // before a triangular profile has any height. The lift direction is
+      // perpendicular to the motion, preferring upward (rightward for
+      // vertical moves).
       const len = Math.hypot(dx, dy);
       let px = dy / len;
       let py = -dx / len;
@@ -56,7 +59,8 @@ function GlideG({ x, y, lift = 0, className, children }: { x: number; y: number;
       }
       frames = [
         { transform: `translate(${dx}px, ${dy}px)` },
-        { transform: `translate(${dx / 2 + px * amp}px, ${dy / 2 + py * amp}px)`, offset: 0.5 },
+        { transform: `translate(${dx + px * amp}px, ${dy + py * amp}px)`, offset: 0.12 },
+        { transform: `translate(${px * amp}px, ${py * amp}px)`, offset: 0.88 },
         { transform: "translate(0px, 0px)" },
       ];
     } else {
@@ -160,6 +164,7 @@ function nodeClass(id: number, frame: Frame): string {
   if (frame.hl.includes(id)) cls += " hl";
   if (frame.ok?.includes(id)) cls += " ok";
   if (frame.bad?.includes(id)) cls += " bad";
+  if (frame.pivot?.includes(id)) cls += " pivot";
   return cls;
 }
 
@@ -377,7 +382,9 @@ function GraphScene({
   );
   const at = new Map(placed.map((p) => [p.id, p]));
   return (
-    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+    // When the ring outgrows the pane, the whole scene scales down to fit
+    // instead of overflowing into a scrollbar — viewBox keeps it crisp.
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ maxWidth: "100%", height: "auto" }}>
       {edges.map(([a, b]) => {
         const pa = at.get(a);
         const pb = at.get(b);
@@ -519,6 +526,56 @@ function HashScene({ frame, buckets }: { frame: Frame; buckets: { id: number; va
   );
 }
 
+function OAHashScene({ frame, slots }: { frame: Frame; slots: (({ id: number; value: number }) | "tomb" | null)[] }) {
+  const pitch = 56;
+  const y = 46;
+  const w = Math.max(460, 30 + slots.length * pitch + 30);
+  const h = 150;
+  const placed = slots.flatMap((s, i) =>
+    s !== null && s !== "tomb" ? [{ id: s.id, value: s.value, x: 30 + i * pitch, y }] : [],
+  );
+  const lifts = useLifts(
+    placed.map((p) => ({ key: p.id, cx: p.x + 23, cy: p.y + 19, w: 46, h: 38 })),
+    BOX_LIFT,
+  );
+  return (
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+      <text className="ds-tag" x={30} y={26}>
+        one flat array of {slots.length} slots — colliding keys probe for another slot instead of chaining:
+      </text>
+      {slots.map((s, i) => (
+        <g key={`s${i}`}>
+          <rect className="ds-slot" x={30 + i * pitch} y={y} width={46} height={38} rx={8} />
+          {s === null && (
+            <text className="ds-tag" x={30 + i * pitch + 23} y={y + 24} textAnchor="middle">
+              ∅
+            </text>
+          )}
+          {s === "tomb" && (
+            <text className="ds-tag ds-tomb" x={30 + i * pitch + 23} y={y + 24} textAnchor="middle">
+              ✝
+            </text>
+          )}
+          <text className="ds-tag" x={30 + i * pitch + 23} y={y + 58} textAnchor="middle">
+            {i}
+          </text>
+        </g>
+      ))}
+      {placed.map((p) => (
+        <GlideG key={p.id} x={p.x} y={p.y} lift={lifts.get(p.id)} className={nodeClass(p.id, frame)}>
+          <rect className="ds-box" width={46} height={38} rx={8} />
+          <text className="ds-value" x={23} y={24}>
+            {p.value}
+          </text>
+        </GlideG>
+      ))}
+      <text className="ds-tag" x={30} y={h - 14}>
+        ∅ = never used (a search may stop) · ✝ = tombstone (a search must walk past)
+      </text>
+    </svg>
+  );
+}
+
 function ArrayScene({ frame, items }: { frame: Frame; items: { id: number; value: number }[] }) {
   // Scale bars over the full min→max range so negatives get proportional
   // heights too (with 0 anchored inside the range when values straddle it).
@@ -528,12 +585,14 @@ function ArrayScene({ frame, items }: { frame: Frame; items: { id: number; value
   const span = max - min || 1;
   const w = Math.max(460, 30 + items.length * 56 + 30);
   // Headroom is sized so the worst swap — a max-height bar arcing over
-  // another max-height bar — still fits: base ≥ 2·maxBar + margin.
+  // another max-height bar — still fits: base ≥ 2·maxBar + margin. The 34px
+  // floor means every bar is tall enough to hold its number inside.
   const SCALE = 112;
-  const maxBar = 14 + SCALE;
+  const MIN_BAR = 34;
+  const maxBar = MIN_BAR + SCALE;
   const h = 2 * maxBar + 26 + 56;
   const base = h - 36;
-  const barHs = new Map(items.map((node) => [node.id, Math.max(14, 14 + ((node.value - min) / span) * SCALE)]));
+  const barHs = new Map(items.map((node) => [node.id, MIN_BAR + ((node.value - min) / span) * SCALE]));
   const lifts = useLifts(
     items.map((node, i) => {
       const bh = barHs.get(node.id)!;
@@ -547,13 +606,10 @@ function ArrayScene({ frame, items }: { frame: Frame; items: { id: number; value
       <line className="ds-floor" x1={20} y1={base + 5} x2={w - 20} y2={base + 5} />
       {items.map((node, i) => {
         const barH = barHs.get(node.id)!;
-        // Short bars can't hold their number — hoist it above the bar so the
-        // text never spills over the baseline or the index labels.
-        const inside = barH >= 34;
         return (
           <GlideG key={node.id} x={30 + i * 56} y={base - barH} lift={lifts.get(node.id)} className={nodeClass(node.id, frame)}>
             <rect className="ds-bar" width={44} height={barH} rx={7} />
-            <text className="ds-value" x={22} y={inside ? 19 : -8}>
+            <text className="ds-value" x={22} y={19}>
               {node.value}
             </text>
           </GlideG>
@@ -590,6 +646,8 @@ export function DSView({ frame }: { frame: Frame }) {
       return <HeapScene frame={frame} items={data.items} />;
     case "hash":
       return <HashScene frame={frame} buckets={data.buckets} />;
+    case "oahash":
+      return <OAHashScene frame={frame} slots={data.slots} />;
     case "array":
       return <ArrayScene frame={frame} items={data.items} />;
   }
