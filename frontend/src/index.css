@@ -550,8 +550,11 @@ button.toggled { background: var(--accent-soft); border-color: var(--accent); co
 
 /* first-visit card: what this structure is and what it costs */
 .ds-info-card {
+  /* Floats over the stage as a top-centered teaching card so the diagram
+     below can be centered in the full canvas without the card shifting it. */
+  position: absolute; z-index: 5; top: 1.1rem; left: 1.1rem; right: 1.1rem;
   display: flex; gap: 0.85rem; align-items: flex-start;
-  max-width: 34rem; margin: 0 auto 1.2rem;
+  max-width: 34rem; margin: 0 auto;
   background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
   padding: 0.9rem 1.1rem; box-shadow: var(--shadow-lift);
   animation: slide-down-in 0.25s var(--ease-out);
@@ -576,11 +579,16 @@ button.toggled { background: var(--accent-soft); border-color: var(--accent); co
 .ds-info-card > button { flex: none; align-self: center; }
 
 .ds-canvas {
-  flex: 1; overflow: auto; padding: 1.4rem;
+  /* Center the scene both axes so a small structure reads as intentionally
+     placed instead of stranded in the top-left. Oversized scenes scale down
+     to fit (via .ds-svg max-*) rather than overflowing into scrollbars. */
+  position: relative;
+  flex: 1; min-height: 0; overflow: hidden; padding: 1.4rem;
+  display: flex; align-items: center; justify-content: center;
   background-image: radial-gradient(var(--dot) 1px, transparent 1px);
   background-size: 24px 24px;
 }
-.ds-svg { overflow: visible; }
+.ds-svg { overflow: visible; max-width: 100%; max-height: 100%; }
 
 /* Glides are driven by GlideG's additive FLIP animation (DSView.tsx), not a
    CSS transition. Entering nodes fade in after a beat so a newcomer is never

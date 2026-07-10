@@ -1,4 +1,4 @@
-# CppTutor
+# Shinso
 
 Step-by-step C++ code visualizer — like [pythontutor.com](https://pythontutor.com), but for C++.
 
