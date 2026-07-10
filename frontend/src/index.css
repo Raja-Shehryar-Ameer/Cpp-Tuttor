@@ -526,6 +526,56 @@ footer { border-top: 1px solid var(--border); background: var(--panel); transiti
 .ds-input:focus { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
 .ds-edge-inputs { display: inline-flex; align-items: center; gap: 0.35rem; color: var(--muted); flex-wrap: wrap; }
 
+/* bulk editor: build the whole structure from text, CS-Academy style */
+.ds-bulk {
+  display: flex; gap: 0.8rem; align-items: stretch; flex-wrap: wrap;
+  padding: 0.7rem 1.2rem; background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  animation: slide-down-in 0.2s var(--ease-out);
+}
+.ds-bulk-text {
+  flex: 1; min-width: 220px; max-width: 34rem; resize: vertical;
+  background: var(--panel); color: var(--text); font-family: var(--mono);
+  font-size: 0.85rem; line-height: 1.5;
+  border: 1px solid var(--border-strong); border-radius: 8px; padding: 0.5rem 0.65rem;
+  transition: border-color 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out);
+}
+.ds-bulk-text:focus { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
+.ds-bulk-side {
+  display: flex; flex-direction: column; justify-content: space-between;
+  gap: 0.5rem; max-width: 22rem;
+}
+.ds-bulk-hint { margin: 0; color: var(--muted); font-size: 0.8rem; line-height: 1.45; }
+.ds-bulk-actions { display: flex; gap: 0.5rem; }
+button.toggled { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+/* first-visit card: what this structure is and what it costs */
+.ds-info-card {
+  display: flex; gap: 0.85rem; align-items: flex-start;
+  max-width: 34rem; margin: 0 auto 1.2rem;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+  padding: 0.9rem 1.1rem; box-shadow: var(--shadow-lift);
+  animation: slide-down-in 0.25s var(--ease-out);
+}
+.ds-info-icon {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--accent-soft); color: var(--accent);
+}
+.ds-info-body { flex: 1; min-width: 10rem; }
+.ds-info-body h3 {
+  margin: 0 0 0.25rem; font-family: var(--display); font-weight: 650;
+  font-size: 1.05rem; letter-spacing: -0.01em;
+}
+.ds-info-body p { margin: 0 0 0.6rem; color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
+.ds-complexity { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.ds-chip {
+  font-family: var(--mono); font-size: 0.7rem; color: var(--muted);
+  background: var(--panel-2); border: 1px solid var(--border); border-radius: 999px;
+  padding: 0.12rem 0.55rem; white-space: nowrap; font-variant-numeric: tabular-nums;
+}
+.ds-info-card > button { flex: none; align-self: center; }
+
 .ds-canvas {
   flex: 1; overflow: auto; padding: 1.4rem;
   background-image: radial-gradient(var(--dot) 1px, transparent 1px);
@@ -533,7 +583,11 @@ footer { border-top: 1px solid var(--border); background: var(--panel); transiti
 }
 .ds-svg { overflow: visible; }
 
-.ds-node { transition: transform 0.45s var(--ease-glide); }
+/* Glides are driven by GlideG's additive FLIP animation (DSView.tsx), not a
+   CSS transition. Entering nodes fade in after a beat so a newcomer is never
+   visible on top of a neighbor still gliding out of its slot. */
+.ds-node { animation: ds-node-in 0.3s var(--ease-out) 0.22s backwards; }
+@keyframes ds-node-in { from { opacity: 0; } }
 .ds-box, .ds-circle, .ds-bar {
   fill: var(--panel); stroke: var(--border-strong); stroke-width: 1.6;
   transition: fill 0.3s ease, stroke 0.3s ease;

@@ -8,7 +8,9 @@ import {
   GitBranch,
   GraduationCap,
   Hash,
+  Info,
   Layers,
+  ListPlus,
   Link2,
   ListOrdered,
   ListTree,
@@ -101,19 +103,89 @@ type Structure =
   | "search";
 
 const MAX_BATCH = 24; // more values than this per op makes the lesson unwatchable
+const MAX_BULK = 32; // bulk editor cap — beyond this the canvas stops being readable
+const MAX_BULK_VERTICES = 20;
+// Values are clamped so numbers always fit their boxes and circles.
+const V_MIN = -999;
+const V_MAX = 9999;
 
-const STRUCTURES: { key: Structure; label: string; icon: ComponentType<{ size?: number | string }>; intro: string }[] = [
-  { key: "list", label: "Linked List", icon: Link2, intro: "Nodes chained by next pointers. Type a value and insert it — watch the links rewire." },
-  { key: "stack", label: "Stack", icon: Layers, intro: "LIFO: the last thing pushed is the first thing popped. Try pushing a few values." },
-  { key: "queue", label: "Queue", icon: ListOrdered, intro: "FIFO: elements leave in the order they arrived. Enqueue some values." },
-  { key: "bst", label: "BST", icon: GitBranch, intro: "Binary search tree: smaller keys live left, bigger keys right. Every walk is a lesson in halving." },
-  { key: "avl", label: "AVL Tree", icon: ListTree, intro: "A BST that refuses to lean: after every insert it re-balances itself with rotations." },
-  { key: "rb", label: "Red-Black", icon: CircleDot, intro: "A BST balanced by coloring rules — red nodes may never stack, and every path carries equal black." },
-  { key: "heap", label: "Min-Heap", icon: Triangle, intro: "A complete tree living inside a plain array: every parent ≤ its children, so the minimum is always at the root." },
-  { key: "hash", label: "Hash Table", icon: Hash, intro: `hash(key) = key mod ${HASH_BUCKETS} jumps straight to a bucket — collisions chain into little linked lists.` },
-  { key: "graph", label: "Graph", icon: Network, intro: "Vertices and edges. Build one, then run BFS or DFS and watch the frontier spread." },
-  { key: "array", label: "Sorting", icon: ArrowUpDown, intro: "Load some values, then pick an algorithm and watch every comparison and swap, one step at a time." },
-  { key: "search", label: "Searching", icon: SearchCheck, intro: "Two ways to find a value: linear checks every slot; binary halves a SORTED range each step. Load values, then search." },
+interface StructureMeta {
+  key: Structure;
+  label: string;
+  icon: ComponentType<{ size?: number | string }>;
+  intro: string;
+  complexity: string[];
+  bulkPlaceholder: string;
+  bulkHint: string;
+}
+
+const STRUCTURES: StructureMeta[] = [
+  {
+    key: "list", label: "Linked List", icon: Link2,
+    intro: "Nodes chained by next pointers. Type a value and insert it — watch the links rewire.",
+    complexity: ["Access O(n)", "Insert front O(1)", "Search O(n)"],
+    bulkPlaceholder: "5, 3, 8, 1", bulkHint: "values separated by commas, spaces, or new lines — linked left to right",
+  },
+  {
+    key: "stack", label: "Stack", icon: Layers,
+    intro: "LIFO: the last thing pushed is the first thing popped. Try pushing a few values.",
+    complexity: ["Push O(1)", "Pop O(1)", "Peek O(1)"],
+    bulkPlaceholder: "5, 3, 8, 1", bulkHint: "values pushed in order — the last one ends up on top",
+  },
+  {
+    key: "queue", label: "Queue", icon: ListOrdered,
+    intro: "FIFO: elements leave in the order they arrived. Enqueue some values.",
+    complexity: ["Enqueue O(1)", "Dequeue O(1)", "Peek O(1)"],
+    bulkPlaceholder: "5, 3, 8, 1", bulkHint: "values enqueued in order — the first one is the front",
+  },
+  {
+    key: "bst", label: "BST", icon: GitBranch,
+    intro: "Binary search tree: smaller keys live left, bigger keys right. Every walk is a lesson in halving.",
+    complexity: ["Search O(h)", "Insert O(h)", "h = height, O(log n) when balanced"],
+    bulkPlaceholder: "8, 3, 10, 1, 6, 14", bulkHint: "insertion order shapes the tree — try sorted input to see it degenerate",
+  },
+  {
+    key: "avl", label: "AVL Tree", icon: ListTree,
+    intro: "A BST that refuses to lean: after every insert it re-balances itself with rotations.",
+    complexity: ["Search O(log n)", "Insert O(log n)", "Remove O(log n)"],
+    bulkPlaceholder: "1, 2, 3, 4, 5, 6", bulkHint: "even sorted input stays balanced — rotations happen while loading",
+  },
+  {
+    key: "rb", label: "Red-Black", icon: CircleDot,
+    intro: "A BST balanced by coloring rules — red nodes may never stack, and every path carries equal black.",
+    complexity: ["Search O(log n)", "Insert O(log n)", "Remove O(log n)"],
+    bulkPlaceholder: "10, 20, 30, 15, 5, 25", bulkHint: "values inserted in order, recoloring and rotating as needed",
+  },
+  {
+    key: "heap", label: "Min-Heap", icon: Triangle,
+    intro: "A complete tree living inside a plain array: every parent ≤ its children, so the minimum is always at the root.",
+    complexity: ["Insert O(log n)", "Extract-min O(log n)", "Peek-min O(1)"],
+    bulkPlaceholder: "50, 20, 40, 10, 30", bulkHint: "values sift into place while loading — the minimum surfaces at the root",
+  },
+  {
+    key: "hash", label: "Hash Table", icon: Hash,
+    intro: `hash(key) = key mod ${HASH_BUCKETS} jumps straight to a bucket — collisions chain into little linked lists.`,
+    complexity: ["Insert O(1) avg", "Search O(1) avg", "Worst case O(n)"],
+    bulkPlaceholder: "7, 14, 21, 3, 10", bulkHint: `keys land in bucket (key mod ${HASH_BUCKETS}) — same-bucket keys chain up`,
+  },
+  {
+    key: "graph", label: "Graph", icon: Network,
+    intro: "Vertices and edges. Build one, then run BFS or DFS and watch the frontier spread.",
+    complexity: ["BFS O(V+E)", "DFS O(V+E)", "Space O(V+E)"],
+    bulkPlaceholder: "1 2\n2 3\n3 1\n4", bulkHint: "one edge per line as “A B” — a lone number adds an isolated vertex",
+  },
+  {
+    key: "array", label: "Sorting", icon: ArrowUpDown,
+    intro: "Load some values, then pick an algorithm and watch every comparison and swap, one step at a time.",
+    complexity: ["Bubble/Insertion O(n²)", "Merge/Heap O(n log n)", "Quick O(n log n) avg"],
+    bulkPlaceholder: "29, 5, 17, 3, 42, 11", bulkHint: "values in the order they'll sit before sorting",
+  },
+  {
+    key: "search", label: "Searching", icon: SearchCheck,
+    intro: "Two ways to find a value: linear checks every slot; binary halves a SORTED range each step. Load values, then search.",
+    complexity: ["Linear O(n)", "Binary O(log n) — needs sorted input"],
+    bulkPlaceholder: "29, 5, 17, 3, 42, 11", bulkHint: "load values, sort, then race linear against binary",
+  },
 ];
 
 const empty = (s: Structure): DSData => {
@@ -129,13 +201,27 @@ const empty = (s: Structure): DSData => {
 
 const rootOf = (d: DSData): TreeNode | null => (d.kind === "tree" ? d.root : null);
 
-function parseValues(raw: string): number[] {
-  return raw
+function parseValues(raw: string): { values: number[]; outOfRange: number[] } {
+  const all = raw
     .split(/[\s,;]+/)
     .filter((token) => token.length > 0)
     .map((token) => Number(token))
     .filter((n) => Number.isFinite(n))
     .map((n) => Math.trunc(n));
+  return {
+    values: all.filter((n) => n >= V_MIN && n <= V_MAX),
+    outOfRange: all.filter((n) => n < V_MIN || n > V_MAX),
+  };
+}
+
+// First-visit tracking for the per-structure info panel.
+const SEEN_KEY = "cpptutor-ds-seen";
+function loadSeen(): Record<string, boolean> {
+  try {
+    return JSON.parse(localStorage.getItem(SEEN_KEY) ?? "{}") as Record<string, boolean>;
+  } catch {
+    return {};
+  }
 }
 
 const SPEEDS = [
@@ -166,6 +252,9 @@ export function DSPage() {
   const [value, setValue] = useState("");
   const [edgeA, setEdgeA] = useState("");
   const [edgeB, setEdgeB] = useState("");
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkText, setBulkText] = useState("");
+  const [infoOpen, setInfoOpen] = useState(() => !loadSeen()["list"]);
 
   const meta = STRUCTURES.find((s) => s.key === structure)!;
   const data = dataRef.current[structure];
@@ -203,7 +292,11 @@ export function DSPage() {
 
   /** Run one op per typed value, chaining lessons ("5, 3, 8" inserts all three). */
   const runEach = (op: (d: DSData, v: number) => Frame[]) => {
-    const values = parseValues(value);
+    const { values, outOfRange } = parseValues(value);
+    if (outOfRange.length > 0) {
+      say(`Keep values between ${V_MIN} and ${V_MAX} so they fit their boxes — ${outOfRange.join(", ")} ${outOfRange.length === 1 ? "is" : "are"} out of range.`);
+      return;
+    }
     if (values.length === 0) {
       say(
         value.trim()
@@ -231,7 +324,7 @@ export function DSPage() {
 
   /** Ops that need an (old, new) pair, typed as "old, new" in the value box. */
   const runPair = (op: (d: DSData, a: number, b: number) => Frame[]) => {
-    const values = parseValues(value);
+    const { values } = parseValues(value);
     if (values.length < 2) {
       say("Update needs two numbers in the box — old value, new value — e.g. 10, 25.");
       return;
@@ -283,6 +376,96 @@ export function DSPage() {
     setPlaying(false);
   };
 
+  const dismissInfo = () => {
+    const seen = loadSeen();
+    seen[structure] = true;
+    localStorage.setItem(SEEN_KEY, JSON.stringify(seen));
+    setInfoOpen(false);
+  };
+
+  /** CS-Academy-style bulk editor: replace the whole structure from text in
+      one hop, chaining the real engine ops silently so tree rotations, heap
+      sifting, and hash chaining all land exactly where the ops would put them. */
+  const bulkLoad = () => {
+    if (structure === "graph") {
+      const lines = bulkText.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+      if (lines.length === 0) {
+        say("The editor is empty — one edge per line as “A B”, or a lone number for an isolated vertex.");
+        return;
+      }
+      let d = empty("graph");
+      const seen = new Set<number>();
+      let edgeCount = 0;
+      let bad = 0;
+      const addVertex = (v: number): boolean => {
+        if (seen.has(v)) return true;
+        if (seen.size >= MAX_BULK_VERTICES) return false;
+        d = graphAddNode(d as never, v)[0].data;
+        seen.add(v);
+        return true;
+      };
+      for (const line of lines) {
+        const { values } = parseValues(line);
+        if (values.length === 0) {
+          bad += 1;
+        } else if (values.length === 1) {
+          if (!addVertex(values[0])) {
+            say(`That's more than ${MAX_BULK_VERTICES} vertices — keep the graph small enough to read.`);
+            return;
+          }
+        } else {
+          const [a, b] = values;
+          if (!addVertex(a) || !addVertex(b)) {
+            say(`That's more than ${MAX_BULK_VERTICES} vertices — keep the graph small enough to read.`);
+            return;
+          }
+          if (a !== b) {
+            const before = (d as { edges: [number, number][] }).edges.length;
+            d = graphAddEdge(d as never, a, b)[0].data;
+            if ((d as { edges: [number, number][] }).edges.length > before) edgeCount += 1;
+          }
+        }
+      }
+      dataRef.current.graph = d;
+      setFrames([{
+        data: d, hl: [],
+        note: `Loaded ${seen.size} ${seen.size === 1 ? "vertex" : "vertices"} and ${edgeCount} ${edgeCount === 1 ? "edge" : "edges"}${bad ? ` (skipped ${bad} unreadable ${bad === 1 ? "line" : "lines"})` : ""}. Try BFS or DFS from a vertex.`,
+      }]);
+      setIdx(0);
+      setPlaying(false);
+    } else {
+      const { values, outOfRange } = parseValues(bulkText);
+      if (outOfRange.length > 0) {
+        say(`Keep values between ${V_MIN} and ${V_MAX} so they fit their boxes — ${outOfRange.join(", ")} ${outOfRange.length === 1 ? "is" : "are"} out of range.`);
+        return;
+      }
+      if (values.length === 0) {
+        say("The editor is empty — type values separated by commas, spaces, or new lines.");
+        return;
+      }
+      if (values.length > MAX_BULK) {
+        say(`That's ${values.length} values — the bulk editor takes up to ${MAX_BULK} so the drawing stays readable.`);
+        return;
+      }
+      // Linked list special-case: "insert front" would reverse the typed
+      // order, so bulk always appends at the back.
+      const op = structure === "list"
+        ? (d: DSData, v: number) => listInsertBack(d as never, v)
+        : insertOps[structure][0][1];
+      let d = empty(structure);
+      for (const v of values) {
+        const produced = op(d, v);
+        if (produced.length) d = produced[produced.length - 1].data;
+      }
+      dataRef.current[structure] = d;
+      setFrames([{ data: d, hl: [], note: `Loaded ${values.length} values in one hop. Now run an operation to see the steps.` }]);
+      setIdx(0);
+      setPlaying(false);
+    }
+    setBulkOpen(false);
+    setBulkText("");
+  };
+
   const insertOps: Record<Structure, [string, (d: DSData, v: number) => Frame[]][]> = {
     list: [
       ["Insert front", (d, v) => listInsertFront(d as never, v)],
@@ -305,6 +488,9 @@ export function DSPage() {
     setFrames([]);
     setIdx(0);
     setPlaying(false);
+    setBulkOpen(false);
+    setBulkText("");
+    setInfoOpen(!loadSeen()[s]);
   };
 
   return (
@@ -512,12 +698,61 @@ export function DSPage() {
         <button onClick={randomFill} title="fill the input with random values">
           <Shuffle size={13} /> Random
         </button>
+        <button
+          className={bulkOpen ? "toggled" : ""}
+          onClick={() => setBulkOpen((o) => !o)}
+          title="build the whole structure from text in one hop"
+        >
+          <ListPlus size={13} /> Bulk load
+        </button>
         <button onClick={reset} title="clear this structure">
           <X size={13} /> Reset
         </button>
+        <button className="icon-btn" onClick={() => setInfoOpen(true)} title={`about ${meta.label}`}>
+          <Info size={14} />
+        </button>
       </div>
 
+      {bulkOpen && (
+        <div className="ds-bulk">
+          <textarea
+            className="ds-bulk-text"
+            value={bulkText}
+            placeholder={meta.bulkPlaceholder}
+            onChange={(e) => setBulkText(e.target.value)}
+            autoFocus
+            rows={structure === "graph" ? 5 : 3}
+          />
+          <div className="ds-bulk-side">
+            <p className="ds-bulk-hint">{meta.bulkHint}</p>
+            <div className="ds-bulk-actions">
+              <button className="primary" onClick={bulkLoad}>
+                <ListPlus size={13} /> Load
+              </button>
+              <button onClick={() => { setBulkOpen(false); setBulkText(""); }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="ds-canvas">
+        {infoOpen && (
+          <div className="ds-info-card" role="note">
+            <span className="ds-info-icon">
+              <meta.icon size={17} aria-hidden="true" />
+            </span>
+            <div className="ds-info-body">
+              <h3>{meta.label}</h3>
+              <p>{meta.intro}</p>
+              <div className="ds-complexity">
+                {meta.complexity.map((c) => (
+                  <span key={c} className="ds-chip">{c}</span>
+                ))}
+              </div>
+            </div>
+            <button className="primary" onClick={dismissInfo}>Got it</button>
+          </div>
+        )}
         <DSView frame={frame} />
       </div>
 
