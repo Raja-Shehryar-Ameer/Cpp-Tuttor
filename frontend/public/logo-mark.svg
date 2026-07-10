@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Shinso">
+  <title>Shinso</title>
+  <!-- The step: from the cell you're in, the arrow arcs over what's next and lands on the step after. -->
+  <rect x="7" y="38" width="14" height="14" rx="3.5" fill="#0f3d3a"/>
+  <rect x="25" y="38" width="14" height="14" rx="3.5" fill="none" stroke="#4b8a6c" stroke-width="3"/>
+  <rect x="43" y="38" width="14" height="14" rx="3.5" fill="none" stroke="#4b8a6c" stroke-width="3"/>
+  <path d="M 14 38 C 14 9, 50 9, 50 30" fill="none" stroke="#0f3d3a" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 45.5 29.5 L 50 36.5 L 54.5 29.5 Z" fill="#0f3d3a"/>
+</svg>

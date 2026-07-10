@@ -18,7 +18,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error("CppTutor crashed while rendering:", error, info.componentStack);
+    console.error("Shinso crashed while rendering:", error, info.componentStack);
   }
 
   render() {
@@ -32,7 +32,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, State> {
         </p>
         <pre>{this.state.error.message}</pre>
         <button className="primary" onClick={() => window.location.reload()}>
-          <RotateCcw size={14} aria-hidden="true" /> Reload CppTutor
+          <RotateCcw size={14} aria-hidden="true" /> Reload Shinso
         </button>
       </div>
     );

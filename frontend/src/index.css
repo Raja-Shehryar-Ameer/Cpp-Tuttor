@@ -127,10 +127,9 @@ header h1 {
 }
 .logo-mark {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border-radius: 8px;
-  background: var(--accent); color: #f6f4ef;
-  box-shadow: inset 0 -1.5px 0 rgba(0, 0, 0, 0.18);
+  width: 28px; height: 28px;
 }
+.logo-mark svg { display: block; }
 .tagline {
   color: var(--muted); font-size: 0.8rem; font-weight: 400; margin-left: 0.35rem;
   font-family: var(--display); font-style: italic;

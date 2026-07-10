@@ -1,1 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect width="48" height="48" rx="10" fill="#2e6b54"/><text x="24" y="33" font-family="Georgia, 'Times New Roman', serif" font-size="24" font-weight="700" text-anchor="middle" fill="#f6f4ef">{ }</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Shinso">
+  <title>Shinso</title>
+  <rect width="64" height="64" rx="14" fill="#0f3d3a"/>
+  <g transform="matrix(0.84 0 0 0.84 5.12 3.4)">
+    <rect x="12" y="38" width="14" height="14" rx="3.5" fill="#f6f4ef"/>
+    <rect x="38" y="38" width="14" height="14" rx="3.5" fill="none" stroke="#f6f4ef" stroke-width="3.5"/>
+    <path d="M 19 38 C 19 12, 45 12, 45 29" fill="none" stroke="#f6f4ef" stroke-width="5" stroke-linecap="round"/>
+    <path d="M 40.5 28.5 L 45 35.5 L 49.5 28.5 Z" fill="#f6f4ef"/>
+  </g>
+</svg>

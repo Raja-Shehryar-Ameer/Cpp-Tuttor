@@ -1,5 +1,4 @@
 import {
-  Braces,
   Check,
   CircleAlert,
   Link2,
@@ -109,9 +108,17 @@ export default function App() {
       <header>
         <h1>
           <span className="logo-mark">
-            <Braces size={15} aria-hidden="true" />
+            <svg viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
+              <rect width="64" height="64" rx="14" fill="#0f3d3a" />
+              <g transform="matrix(0.84 0 0 0.84 5.12 3.4)">
+                <rect x="12" y="38" width="14" height="14" rx="3.5" fill="#f6f4ef" />
+                <rect x="38" y="38" width="14" height="14" rx="3.5" fill="none" stroke="#f6f4ef" strokeWidth="3.5" />
+                <path d="M 19 38 C 19 12, 45 12, 45 29" fill="none" stroke="#f6f4ef" strokeWidth="5" strokeLinecap="round" />
+                <path d="M 40.5 28.5 L 45 35.5 L 49.5 28.5 Z" fill="#f6f4ef" />
+              </g>
+            </svg>
           </span>
-          CppTutor <span className="tagline">step-by-step C++ visualizer</span>
+          Shinso <span className="tagline">step-by-step C++ visualizer</span>
         </h1>
         <div className="header-actions">
           <button

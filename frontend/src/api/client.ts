@@ -17,7 +17,7 @@ function friendly(error: unknown): Error {
   }
   if (error instanceof TypeError) {
     return new Error(
-      `Can't reach the CppTutor backend at ${BASE} — make sure it is running (uvicorn on port 8000), then try again.`,
+      `Can't reach the Shinso backend at ${BASE} — make sure it is running (uvicorn on port 8000), then try again.`,
     );
   }
   return error instanceof Error ? error : new Error("Request failed.");
