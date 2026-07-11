@@ -58,17 +58,25 @@ function PointerCell({ value }: { value: Value }) {
 function Aggregate({ value, depth }: { value: Value; depth: number }) {
   const ref = useRegister(value.address);
   const kindClass = value.kind === "struct" ? "struct-box" : "array-box";
+  // An array whose elements are themselves arrays (a 2D+ array) stacks its
+  // rows vertically so it reads like a matrix instead of one long wrapped line.
+  const elements = value.elements ?? [];
+  const isMatrix =
+    (value.kind === "array" || value.kind === "vector") &&
+    elements.some((e) => e.kind === "array" || e.kind === "vector");
   return (
-    <span ref={ref} className={`aggregate ${kindClass}`} title={describe(value)}>
-      {(value.elements ?? []).map((element, i) => (
+    <span
+      ref={ref}
+      className={`aggregate ${kindClass}${isMatrix ? " matrix-rows" : ""}`}
+      title={describe(value)}
+    >
+      {elements.map((element, i) => (
         <span className="aggregate-item" key={`${element.name}-${i}`}>
           <span className="element-name">{element.name}</span>
           <ValueBody value={element} depth={depth + 1} />
         </span>
       ))}
-      {(value.elements === null || value.elements.length === 0) && (
-        <span className="value-cell">{value.value ?? "…"}</span>
-      )}
+      {elements.length === 0 && <span className="value-cell">{value.value ?? "…"}</span>}
     </span>
   );
 }

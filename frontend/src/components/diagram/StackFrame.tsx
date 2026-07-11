@@ -1,8 +1,17 @@
-import { CornerDownRight } from "lucide-react";
+import { CornerDownRight, CornerLeftDown } from "lucide-react";
+import type { ReturnInfo } from "../../hooks/useReturnInfo";
 import type { Frame } from "../../types/trace";
 import { ValueBox } from "./ValueBox";
 
-export function StackFrame({ frame, active }: { frame: Frame; active: boolean }) {
+export function StackFrame({
+  frame,
+  active,
+  returnInfo,
+}: {
+  frame: Frame;
+  active: boolean;
+  returnInfo?: ReturnInfo | null;
+}) {
   return (
     <div className={`stack-frame ${active ? "active" : ""}`}>
       <div className="frame-title">
@@ -10,6 +19,23 @@ export function StackFrame({ frame, active }: { frame: Frame; active: boolean })
         <span className="frame-name">{frame.functionName}()</span>
         <span className="frame-line">line {frame.line}</span>
       </div>
+      {returnInfo && (
+        <div className="return-bubble" key={`${frame.line}-${returnInfo.value}`}>
+          <CornerLeftDown size={12} aria-hidden="true" />
+          <span>
+            {returnInfo.value !== null ? (
+              <>
+                <code>{returnInfo.functionName}()</code> returned <strong>{returnInfo.value}</strong>
+                {returnInfo.intoLocal && <> → {returnInfo.intoLocal}</>}
+              </>
+            ) : (
+              <>
+                returned from <code>{returnInfo.functionName}()</code>
+              </>
+            )}
+          </span>
+        </div>
+      )}
       {frame.locals.map((value) => (
         <ValueBox key={value.name} value={value} />
       ))}
