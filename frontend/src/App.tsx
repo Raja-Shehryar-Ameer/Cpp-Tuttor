@@ -1,6 +1,7 @@
 import {
   Check,
   CircleAlert,
+  GitFork,
   Link2,
   MemoryStick,
   Moon,
@@ -26,6 +27,7 @@ const EditorPane = lazy(() =>
   import("./components/EditorPane").then((m) => ({ default: m.EditorPane })),
 );
 const DSPage = lazy(() => import("./components/ds/DSPage").then((m) => ({ default: m.DSPage })));
+const ForkPage = lazy(() => import("./fork/ForkPage").then((m) => ({ default: m.ForkPage })));
 
 const DEFAULT_SAMPLE = "pointers — swap via pointers";
 
@@ -45,7 +47,7 @@ function updatePermalink(traceId: string | null): void {
 }
 
 export default function App() {
-  const [mode, setMode] = useState<"code" | "ds">("code");
+  const [mode, setMode] = useState<"code" | "ds" | "fork">("code");
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const [code, setCode] = useState(SAMPLES[DEFAULT_SAMPLE]);
   const [stdin, setStdin] = useState("");
@@ -135,6 +137,9 @@ export default function App() {
             <button className={mode === "ds" ? "active" : ""} onClick={() => setMode("ds")}>
               <Shapes size={13} aria-hidden="true" /> Data Structures
             </button>
+            <button className={mode === "fork" ? "active" : ""} onClick={() => setMode("fork")}>
+              <GitFork size={13} aria-hidden="true" /> C fork()
+            </button>
           </div>
           {mode === "code" && trace === null && (
             <select
@@ -185,6 +190,8 @@ export default function App() {
         <Suspense fallback={<div className="pane-loading">loading…</div>}>
           {mode === "ds" ? (
             <DSPage />
+          ) : mode === "fork" ? (
+            <ForkPage />
           ) : (
             <>
               <main>
