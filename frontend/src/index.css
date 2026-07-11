@@ -698,38 +698,14 @@ button.toggled { background: var(--accent-soft); border-color: var(--accent); co
 
 .fork-view { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--bg); }
 .fork-view .region-header { padding: 0.7rem 1.1rem 0.4rem; }
-.fork-scroll { flex: 1; overflow: auto; padding: 0.6rem 1.1rem 1rem; min-height: 0; }
-.fork-canvas { position: relative; }
-.fork-edges { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
-.fork-edge { fill: none; stroke: var(--arrow); stroke-width: 1.6; }
-.fork-edge.orphan { stroke: var(--danger); stroke-dasharray: 4 4; opacity: 0.8; }
-
-.proc-node {
-  position: absolute; width: 158px; box-sizing: border-box;
-  background: var(--panel); border: 1px solid var(--border-strong); border-radius: 10px;
-  padding: 0.4rem 0.55rem; box-shadow: var(--shadow);
-  animation: return-pop 0.25s var(--ease-out);
-}
-.proc-node.orphaned { border-style: dashed; border-color: var(--danger); }
-.proc-node.systemd { background: var(--panel-2); border-style: solid; border-color: var(--border-strong); }
-.proc-head { display: flex; align-items: center; gap: 0.35rem; }
-.proc-head svg { color: var(--accent); flex: none; }
-.proc-node.systemd .proc-head svg { color: var(--muted); }
-.proc-label { font-family: var(--mono); font-weight: 650; font-size: 0.9rem; }
-.proc-pid { color: var(--muted); font-size: 0.68rem; margin-left: auto; font-variant-numeric: tabular-nums; }
-.proc-out {
-  margin: 0.35rem 0 0.3rem; padding: 0.25rem 0.4rem; border-radius: 6px;
-  background: var(--panel-2); border: 1px solid var(--border);
-  font-family: var(--mono); font-size: 0.74rem; white-space: pre-wrap; color: var(--text);
-  max-height: 4.2rem; overflow: auto;
-}
-.proc-sub { color: var(--muted); font-size: 0.72rem; font-style: italic; margin-top: 0.25rem; }
-.proc-foot { display: flex; align-items: center; gap: 0.35rem; margin-top: 0.2rem; flex-wrap: wrap; }
-.proc-exit { color: var(--muted); font-size: 0.68rem; margin-left: auto; }
-.proc-badge.orphan {
-  background: var(--danger-soft); color: var(--danger); border: 1px solid var(--danger);
-  border-radius: 5px; padding: 0.02rem 0.3rem; font-size: 0.64rem; font-weight: 550;
-}
+.fork-scroll { flex: 1; overflow: auto; padding: 0.6rem 1.1rem 1rem; min-height: 0; display: flex; justify-content: safe center; }
+/* Nodes reuse the playground's .ds-node/.ds-circle/.ds-value/.ds-edge look —
+   a process is just its label, like a BST node is just its key. */
+.fork-tree { flex: none; }
+.fork-adopt { fill: none; stroke: var(--danger); stroke-width: 1.5; stroke-dasharray: 4 4; opacity: 0.75; }
+.ds-circle.fork-orphan { stroke: var(--danger); stroke-dasharray: 4 3; }
+.ds-circle.fork-init { fill: var(--panel-2); }
+.fork-init-label { font-size: 0.72rem; fill: var(--muted); }
 
 .fork-bottom { border-top: 1px solid var(--border); padding: 0.6rem 1.1rem 0.8rem; background: var(--panel); }
 .fork-output {
