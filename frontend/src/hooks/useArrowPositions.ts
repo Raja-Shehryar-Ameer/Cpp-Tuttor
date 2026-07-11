@@ -151,10 +151,17 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     const heapToHeap =
       !!fromEl.closest(".heap-region") && !!toEl.closest(".heap-region");
     const sameRow = Math.abs(toCy - y1) < FORWARD_MAX_DY;
+    // A target that is one CELL of an array/struct (not the whole aggregate —
+    // a whole heap node registers on the `.aggregate` itself, never inside an
+    // `.aggregate-item`). A side-edge bezier into such a cell lands its head
+    // between two neighbouring values, so these must enter from the TOP; skip
+    // them past the forward/backward beziers to the top-entry branch below.
+    const toAggCell = !!toEl.closest(".aggregate-item");
 
     if (
       toLeft > x1 + 14 &&
       (stackToHeap || sameRow) &&
+      !toAggCell &&
       !blocked(fromCard, toCard, x1, toLeft, y1, toCy, stackToHeap)
     ) {
       const seen = sideSeen.get(pointer.target) ?? 0;
@@ -163,6 +170,7 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     } else if (
       heapToHeap &&
       sameRow &&
+      !toAggCell &&
       toRight < x1Left - 14 &&
       !blocked(fromCard, toCard, toRight, x1Left, toCy, y1)
     ) {
@@ -171,7 +179,22 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       sideSeen.set(pointer.target, seen + 1);
       measured.push({ key: keyFor(pointer.address), kind: "backward", x1: x1Left, y1, x2: toRight + 2, y2: fanY(seen), gapY: 0, danger, faded });
     } else if (!toEl.closest(".heap-region")) {
-      measured.push({ key: keyFor(pointer.address), kind: "lane", x1, y1, x2: toRight + 2, y2: toCy, gapY: 0, danger, faded });
+      // Stack target. An array/struct CELL has siblings to its right, so a
+      // right-edge approach at mid-height would run across them and drop the
+      // arrowhead onto the value text — enter such cells from the TOP instead.
+      // A standalone scalar/pointer box is clear on its right, so keep the
+      // tidy right-edge entry there.
+      if (toEl.closest(".aggregate")) {
+        const seen = topSeen.get(pointer.target) ?? 0;
+        topSeen.set(pointer.target, seen + 1);
+        const entryX = Math.min(toRight - 6, toLeft + to.width / 2 + seen * 10);
+        measured.push({ key: keyFor(pointer.address), kind: "laneTop", x1, y1, x2: entryX, y2: toTop - 2, gapY: toTop - 14 - seen * 7, danger, faded });
+      } else {
+        // Fan multiple pointers into one scalar so their heads don't stack.
+        const seen = sideSeen.get(pointer.target) ?? 0;
+        sideSeen.set(pointer.target, seen + 1);
+        measured.push({ key: keyFor(pointer.address), kind: "lane", x1, y1, x2: toRight + 2, y2: fanY(seen), gapY: 0, danger, faded });
+      }
     } else {
       // Top entry: stagger arrows sharing a target so heads don't stack —
       // sideways for the entry point AND vertically for the approach run,
