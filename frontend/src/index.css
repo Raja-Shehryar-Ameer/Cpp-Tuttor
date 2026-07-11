@@ -702,10 +702,20 @@ button.toggled { background: var(--accent-soft); border-color: var(--accent); co
 /* Nodes reuse the playground's .ds-node/.ds-circle/.ds-value/.ds-edge look —
    a process is just its label, like a BST node is just its key. */
 .fork-tree { flex: none; }
-.fork-adopt { fill: none; stroke: var(--danger); stroke-width: 1.5; stroke-dasharray: 4 4; opacity: 0.75; }
-.ds-circle.fork-orphan { stroke: var(--danger); stroke-dasharray: 4 3; }
-.ds-circle.fork-init { fill: var(--panel-2); }
-.fork-init-label { font-size: 0.72rem; fill: var(--muted); }
+/* Contrasting fills, not dashes: amber = orphan (adopted by init),
+   red = zombie (never reaped) — same semantic palette as the playground. */
+.ds-circle.fork-orphan { fill: var(--hl-soft); stroke: var(--hl); stroke-width: 2.4; }
+.ds-circle.fork-zombie { fill: var(--danger-soft); stroke: var(--danger); stroke-width: 2.4; }
+.fork-legend {
+  display: flex; gap: 1.1rem; flex-wrap: wrap; align-items: center;
+  padding: 0.15rem 1.1rem 0; color: var(--muted); font-size: 0.75rem;
+}
+.legend-item { display: inline-flex; align-items: center; gap: 0.35rem; }
+.legend-dot {
+  width: 11px; height: 11px; border-radius: 50%; display: inline-block;
+}
+.legend-dot.orphan { background: var(--hl-soft); border: 2px solid var(--hl); }
+.legend-dot.zombie { background: var(--danger-soft); border: 2px solid var(--danger); }
 
 .fork-bottom { border-top: 1px solid var(--border); padding: 0.6rem 1.1rem 0.8rem; background: var(--panel); }
 .fork-output {

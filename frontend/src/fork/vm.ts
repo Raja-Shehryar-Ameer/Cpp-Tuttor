@@ -256,6 +256,7 @@ export interface ProcNode {
   output: string;
   exitStatus: number | null;
   reparented: boolean; // orphaned then adopted by systemd/init
+  zombie: boolean; // exited before its parent, which never wait()ed for it
   childIds: number[];
 }
 
@@ -331,6 +332,7 @@ export function simulateFork(source: string): SimResult {
       output: "",
       exitStatus: null,
       reparented: false,
+      zombie: false,
       childIds: [],
       ip: parent ? parent.ip : 0,
       stack: parent ? parent.stack.slice() : [],
@@ -346,6 +348,11 @@ export function simulateFork(source: string): SimResult {
   const root = spawn(null);
   root.label = "P0";
 
+  // Ready queue: FIFO of runnable processes. sleep() pushes the sleeper to
+  // the back so its siblings/children get the CPU first — which is exactly
+  // how the classic "parent sleeps, child exits → zombie" programs behave.
+  const queue: Proc[] = [root];
+
   const terminate = (p: Proc, status: number) => {
     p.alive = false;
     p.exitStatus = status;
@@ -357,31 +364,38 @@ export function simulateFork(source: string): SimResult {
       const kid = byId(cid);
       if (kid.alive) kid.reparented = true;
     }
-    // Deliver to a parent blocked in wait().
     if (p.parentId !== null) {
       const par = byId(p.parentId);
-      const idx = par.unwaited.indexOf(p.id);
-      if (idx >= 0) par.unwaited.splice(idx, 1);
       if (par.waiting) {
+        // Parent was blocked in wait(): reaped immediately, no zombie.
+        const idx = par.unwaited.indexOf(p.id);
+        if (idx >= 0) par.unwaited.splice(idx, 1);
         par.waiting = false;
         par.stack.push(p.pid);
+        queue.push(par);
+      } else if (par.alive) {
+        // Parent alive but not waiting: this child is now a ZOMBIE. The flag
+        // is cleared if a later wait() reaps it; if the parent exits without
+        // ever waiting, it sticks (init reaps it, but it *was* a zombie).
+        p.zombie = true;
       }
+      // Parent already dead: we were reparented; init reaps us silently.
     }
   };
 
   let steps = 0;
   let cappedProcs = false;
 
-  const run = (p: Proc) => {
+  const run = (p: Proc): "slept" | "ended" => {
     while (p.alive && !p.waiting) {
       if (p.ip >= code.length) {
         terminate(p, 0);
-        return;
+        return "ended";
       }
       if (++steps > MAX_STEPS) {
         notes.push("Stopped: too many steps (possible infinite loop).");
         procs.forEach((q) => (q.alive = false));
-        return;
+        return "ended";
       }
       const ins = code[p.ip++];
       const st = p.stack;
@@ -413,7 +427,11 @@ export function simulateFork(source: string): SimResult {
         case "JNZ": if (st.pop() !== 0) p.ip = ins.arg as number; break;
         case "GETPID": st.push(p.pid); break;
         case "GETPPID": st.push(p.reparented ? SYSTEMD_PID : p.ppid); break;
-        case "SLEEP": st.pop(); break;
+        case "SLEEP":
+          // Yield the CPU: everyone else runs before the sleeper resumes —
+          // this is what lets a child exit while its parent naps (zombie).
+          st.pop();
+          return "slept";
         case "PRINT": {
           const argc = ins.argc ?? 0;
           const args = argc ? st.splice(st.length - argc, argc) : [];
@@ -433,13 +451,16 @@ export function simulateFork(source: string): SimResult {
           st.push(child.pid); // parent sees the child pid
           p.childIds.push(child.id);
           p.unwaited.push(child.id);
+          queue.push(child); // becomes runnable after the parent yields
           break;
         }
         case "WAIT": {
-          // reap an already-exited child if one is waiting to be collected
+          // reap an already-exited child if one is waiting to be collected —
+          // that collection is what un-zombifies it
           const done = p.unwaited.find((cid) => !byId(cid).alive);
           if (done !== undefined) {
             p.unwaited.splice(p.unwaited.indexOf(done), 1);
+            byId(done).zombie = false;
             st.push(byId(done).pid);
             break;
           }
@@ -448,32 +469,34 @@ export function simulateFork(source: string): SimResult {
             break;
           }
           p.waiting = true; // block; a child will unblock us on exit
-          return;
+          return "ended";
         }
-        case "EXIT": terminate(p, st.pop()! | 0); return;
-        case "HALT": terminate(p, 0); return;
+        case "EXIT": terminate(p, st.pop()! | 0); return "ended";
+        case "HALT": terminate(p, 0); return "ended";
       }
     }
+    return "ended";
   };
 
-  // Scheduler: always run the lowest-id runnable process to its next yield
-  // (a wait() or termination). Lowest-id-first means a parent runs before its
-  // children, giving one deterministic — and valid — interleaving.
+  // Scheduler: FIFO ready queue. A process runs to its next yield (wait(),
+  // sleep(), or termination); sleepers go to the back. Parent-before-child
+  // order is preserved because a parent keeps the CPU across a fork(), so
+  // this is one deterministic — and valid — interleaving.
   let guard = 0;
-  for (;;) {
-    if (++guard > MAX_PROCS * 4 + 50) break;
-    const p = procs.find((q) => q.alive && !q.waiting && q.ip < code.length);
-    if (!p) {
-      if (procs.some((q) => q.alive && q.waiting)) notes.push("A wait() had no child to reap.");
-      break;
-    }
-    run(p);
+  while (queue.length > 0) {
+    if (++guard > MAX_PROCS * 40 + 100) break;
+    const p = queue.shift()!;
+    if (!p.alive || p.waiting) continue; // stale entry (already exited / re-blocked)
+    const why = run(p);
+    if (why === "slept" && p.alive && !p.waiting) queue.push(p);
   }
+  if (procs.some((q) => q.alive && q.waiting)) notes.push("A wait() had no child to reap.");
 
   if (cappedProcs) notes.push(`Process cap reached (${MAX_PROCS}); some forks were not run.`);
-  const anyReparented = procs.some((q) => q.reparented);
-  if (anyReparented)
-    notes.push("Dashed links: children that outlived their parent were reparented to systemd (PID 1, classically init).");
+  if (procs.some((q) => q.reparented))
+    notes.push("Amber: orphans — children that outlived their parent, adopted by systemd (PID 1, classically init).");
+  if (procs.some((q) => q.zombie))
+    notes.push("Red: zombies — exited before their parent, which never wait()ed to reap them.");
   notes.push("Output shows one valid ordering — real fork() interleavings vary by scheduling.");
 
   const processes: ProcNode[] = procs.map((p) => ({
@@ -485,6 +508,7 @@ export function simulateFork(source: string): SimResult {
     output: p.output,
     exitStatus: p.exitStatus,
     reparented: p.reparented,
+    zombie: p.zombie,
     childIds: p.childIds,
   }));
 

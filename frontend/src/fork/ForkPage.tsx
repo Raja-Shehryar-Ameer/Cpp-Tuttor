@@ -37,11 +37,9 @@ interface Placed {
 
 // Tidy tree layout: leaves packed left-to-right, each parent centred over its
 // children (identical approach to the playground's BST renderer).
-function layout(processes: ProcNode[]): { placed: Placed[]; width: number; height: number; topPad: number } {
+function layout(processes: ProcNode[]): { placed: Placed[]; width: number; height: number } {
   const byId = new Map(processes.map((p) => [p.id, p]));
   const pos = new Map<number, { x: number; y: number }>();
-  const hasOrphans = processes.some((p) => p.reparented);
-  const topPad = hasOrphans ? V_GAP : 0; // room for the init/systemd row
   let cursor = PAD;
 
   const place = (id: number, depth: number): number => {
@@ -55,30 +53,28 @@ function layout(processes: ProcNode[]): { placed: Placed[]; width: number; heigh
       const centres = kids.map((k) => place(k, depth + 1));
       x = (centres[0] + centres[centres.length - 1]) / 2;
     }
-    pos.set(id, { x, y: PAD + topPad + depth * V_GAP });
+    pos.set(id, { x, y: PAD + depth * V_GAP });
     return x;
   };
   processes.filter((p) => p.parentId === null).forEach((r) => place(r.id, 0));
 
   const placed = processes.map((node) => ({ node, ...pos.get(node.id)! }));
   const maxY = Math.max(...placed.map((p) => p.y), PAD);
-  return {
-    placed,
-    width: Math.max(cursor - H_PITCH + PAD * 2, 260),
-    height: maxY + R + PAD,
-    topPad,
-  };
+  return { placed, width: Math.max(cursor - H_PITCH + PAD * 2, 260), height: maxY + R + PAD };
+}
+
+// Orphans and zombies are the states exam questions probe, so they get loud
+// contrasting fills (same semantic palette as the playground: amber = watch
+// this, red = trouble) rather than subtle dashes.
+function nodeClass(n: ProcNode): string {
+  if (n.zombie) return "ds-circle fork-zombie";
+  if (n.reparented) return "ds-circle fork-orphan";
+  return "ds-circle";
 }
 
 function ProcessTree({ processes }: { processes: ProcNode[] }) {
-  const { placed, width, height, topPad } = useMemo(() => layout(processes), [processes]);
+  const { placed, width, height } = useMemo(() => layout(processes), [processes]);
   const byId = new Map(placed.map((p) => [p.node.id, p]));
-  const initX = width / 2;
-  const initY = PAD;
-  // Dashed adoption links criss-cross everything on wide trees; past a few
-  // orphans the dashed circles + note carry the meaning on their own.
-  const orphans = placed.filter((p) => p.node.reparented);
-  const showOrphanEdges = topPad > 0 && orphans.length <= 4;
 
   return (
     <svg className="fork-tree" width={width} height={height} role="img" aria-label="process tree">
@@ -90,31 +86,15 @@ function ProcessTree({ processes }: { processes: ProcNode[] }) {
             return <line key={`${p.node.id}-${c}`} className="ds-edge" x1={p.x} y1={p.y} x2={kid.x} y2={kid.y} />;
           }),
       )}
-      {showOrphanEdges &&
-        orphans.map((p) => (
-          <path
-            key={`init-${p.node.id}`}
-            className="fork-adopt"
-            d={`M ${initX} ${initY} C ${initX} ${(initY + p.y) / 2}, ${p.x} ${(initY + p.y) / 2}, ${p.x} ${p.y}`}
-          />
-        ))}
-      {topPad > 0 && (
-        <g className="ds-node" transform={`translate(${initX}, ${initY})`}>
-          <title>systemd / init (PID 1) — adopts orphaned children</title>
-          <circle className="ds-circle fork-init" r={R} />
-          <text className="ds-value fork-init-label" dy="4">
-            init
-          </text>
-        </g>
-      )}
       {placed.map((p) => (
         <g key={p.node.id} className="ds-node" transform={`translate(${p.x}, ${p.y})`}>
           <title>
             {`${p.node.label} — pid ${p.node.pid}` +
-              (p.node.reparented ? "\norphaned → adopted by systemd (PID 1)" : "") +
+              (p.node.zombie ? "\nZOMBIE: exited before its parent, never reaped by wait()" : "") +
+              (p.node.reparented ? "\nORPHAN: outlived its parent → adopted by systemd (PID 1)" : "") +
               (p.node.output ? `\nprints:\n${p.node.output.replace(/\n$/, "")}` : "\nprints nothing")}
           </title>
-          <circle className={`ds-circle${p.node.reparented ? " fork-orphan" : ""}`} r={R} />
+          <circle className={nodeClass(p.node)} r={R} />
           <text className="ds-value" dy="4">
             {p.node.label}
           </text>
@@ -173,9 +153,25 @@ export function ForkPage() {
             <span>{result.error}</span>
           </div>
         ) : (
-          <div className="fork-scroll">
-            <ProcessTree processes={result.processes} />
-          </div>
+          <>
+            {(result.processes.some((p) => p.reparented) || result.processes.some((p) => p.zombie)) && (
+              <div className="fork-legend">
+                {result.processes.some((p) => p.reparented) && (
+                  <span className="legend-item">
+                    <span className="legend-dot orphan" /> orphan — adopted by systemd
+                  </span>
+                )}
+                {result.processes.some((p) => p.zombie) && (
+                  <span className="legend-item">
+                    <span className="legend-dot zombie" /> zombie — never reaped
+                  </span>
+                )}
+              </div>
+            )}
+            <div className="fork-scroll">
+              <ProcessTree processes={result.processes} />
+            </div>
+          </>
         )}
 
         <div className="fork-bottom">
