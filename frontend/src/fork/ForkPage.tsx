@@ -1,8 +1,15 @@
+import { cpp } from "@codemirror/lang-cpp";
+import CodeMirror from "@uiw/react-codemirror";
 import { Check, Copy, GitFork, Play, TriangleAlert } from "lucide-react";
 import { useMemo, useState } from "react";
+import { darkChrome, lightChrome, warmSyntax } from "../components/editorTheme";
 import { notify } from "../store/toastStore";
 import { validateForkSource } from "../validation";
 import { simulateFork, type ProcNode } from "./vm";
+
+// Line numbers matter here: parse errors say "line 3: …", so the gutter lets
+// the reader jump straight to the offending line.
+const forkExtensions = [cpp(), warmSyntax];
 
 const SAMPLE = `#include <stdio.h>
 #include <unistd.h>
@@ -106,7 +113,7 @@ function ProcessTree({ processes }: { processes: ProcNode[] }) {
   );
 }
 
-export function ForkPage() {
+export function ForkPage({ theme }: { theme: "light" | "dark" }) {
   const [source, setSource] = useState(SAMPLE);
   const [result, setResult] = useState(() => simulateFork(SAMPLE));
   const [copied, setCopied] = useState(false);
@@ -147,11 +154,13 @@ export function ForkPage() {
   return (
     <main className="fork-main">
       <section className="editor-pane">
-        <textarea
-          className="fork-editor"
-          spellCheck={false}
+        <CodeMirror
+          className="editor"
           value={source}
-          onChange={(e) => setSource(e.target.value)}
+          onChange={setSource}
+          extensions={forkExtensions}
+          basicSetup={{ foldGutter: false, autocompletion: false }}
+          theme={theme === "dark" ? darkChrome : lightChrome}
           aria-label="C source using fork()"
         />
         <div className="fork-run-row">

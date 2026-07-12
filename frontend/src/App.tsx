@@ -151,6 +151,17 @@ export default function App() {
           </span>
           Shinso <span className="tagline">step-by-step C++ visualizer</span>
         </h1>
+        <nav className="main-nav" aria-label="mode">
+          <button className={mode === "code" ? "active" : ""} onClick={() => setMode("code")}>
+            <SquareCode size={14} aria-hidden="true" /> Tracer
+          </button>
+          <button className={mode === "ds" ? "active" : ""} onClick={() => setMode("ds")}>
+            <Shapes size={14} aria-hidden="true" /> DS &amp; Algorithms
+          </button>
+          <button className={mode === "fork" ? "active" : ""} onClick={() => setMode("fork")}>
+            <GitFork size={14} aria-hidden="true" /> C fork()
+          </button>
+        </nav>
         <div className="header-actions">
           <button
             className="icon-btn theme-toggle"
@@ -159,17 +170,6 @@ export default function App() {
           >
             {theme === "dark" ? <Sun size={14} aria-hidden="true" /> : <Moon size={14} aria-hidden="true" />}
           </button>
-          <div className="mode-switch" role="tablist" aria-label="mode">
-            <button className={mode === "code" ? "active" : ""} onClick={() => setMode("code")}>
-              <SquareCode size={13} aria-hidden="true" /> C++ Tracer
-            </button>
-            <button className={mode === "ds" ? "active" : ""} onClick={() => setMode("ds")}>
-              <Shapes size={13} aria-hidden="true" /> Data Structures
-            </button>
-            <button className={mode === "fork" ? "active" : ""} onClick={() => setMode("fork")}>
-              <GitFork size={13} aria-hidden="true" /> C fork()
-            </button>
-          </div>
           {mode === "code" && trace === null && (
             <select
               defaultValue={DEFAULT_SAMPLE}
@@ -220,7 +220,7 @@ export default function App() {
           {mode === "ds" ? (
             <DSPage />
           ) : mode === "fork" ? (
-            <ForkPage />
+            <ForkPage theme={theme} />
           ) : (
             <>
               <main>

@@ -3,12 +3,14 @@ import {
   ArrowUpDown,
   ChevronFirst,
   CircleDot,
+  Cpu,
   Eye,
   Gauge,
   GitBranch,
   GraduationCap,
   Hash,
   Info,
+  LayoutGrid,
   Layers,
   ListPlus,
   Link2,
@@ -27,6 +29,7 @@ import {
   StepForward,
   Trash2,
   Triangle,
+  Workflow,
   X,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ComponentType } from "react";
@@ -95,6 +98,8 @@ import {
   type TreeNode,
 } from "../../ds/engine";
 import { DSView } from "./DSView";
+import { SchedLab } from "./SchedLab";
+import { ThreadsLab } from "./ThreadsLab";
 
 type Structure =
   | "list"
@@ -108,6 +113,19 @@ type Structure =
   | "graph"
   | "array"
   | "search";
+
+/** Everything selectable on the topic grid: data structures plus the OS labs. */
+type Topic = Structure | "sched" | "threads";
+
+type Category = "Data structures" | "Algorithms" | "Operating systems";
+
+const CATEGORY: Record<Topic, Category> = {
+  list: "Data structures", stack: "Data structures", queue: "Data structures",
+  bst: "Data structures", avl: "Data structures", rb: "Data structures",
+  heap: "Data structures", hash: "Data structures", graph: "Data structures",
+  array: "Algorithms", search: "Algorithms",
+  sched: "Operating systems", threads: "Operating systems",
+};
 
 const MAX_BATCH = 24; // more values than this per op makes the lesson unwatchable
 const MAX_BULK = 32; // bulk editor cap — beyond this the canvas stops being readable
@@ -195,6 +213,36 @@ const STRUCTURES: StructureMeta[] = [
   },
 ];
 
+// OS labs live outside StructureMeta — they bring their own toolbars and
+// canvases, so they only need card/tab metadata here.
+interface OsTopicMeta {
+  key: "sched" | "threads";
+  label: string;
+  icon: ComponentType<{ size?: number | string }>;
+  intro: string;
+  complexity: string[];
+}
+
+const OS_TOPICS: OsTopicMeta[] = [
+  {
+    key: "sched", label: "CPU Scheduling", icon: Cpu,
+    intro: "FCFS, SJF, SRTF, LJF, LRTF, HRRN, Priority (both flavors), and Round Robin — animated Gantt charts, ready queues, and every metric an exam can ask for.",
+    complexity: ["9 algorithms", "TAT / WT / RT + averages", "compare-all table"],
+  },
+  {
+    key: "threads", label: "Threads: ULT vs KLT", icon: Workflow,
+    intro: "User-level vs kernel-level threads: the three mapping models, and what really happens to sibling threads when one blocks in a syscall.",
+    complexity: ["Many-to-One", "One-to-One", "Many-to-Many"],
+  },
+];
+
+const ALL_TOPICS: { key: Topic; label: string; icon: ComponentType<{ size?: number | string }>; intro: string; complexity: string[] }[] = [
+  ...STRUCTURES.map((s) => ({ key: s.key as Topic, label: s.label, icon: s.icon, intro: s.intro, complexity: s.complexity })),
+  ...OS_TOPICS.map((s) => ({ key: s.key as Topic, label: s.label, icon: s.icon, intro: s.intro, complexity: s.complexity })),
+];
+
+const CATEGORIES: Category[] = ["Data structures", "Algorithms", "Operating systems"];
+
 const empty = (s: Structure): DSData => {
   if (s === "list") return { kind: "list", nodes: [] };
   if (s === "stack") return { kind: "stack", items: [] };
@@ -242,7 +290,11 @@ const SPEEDS = [
 type HashMode = "chain" | Probe;
 
 export function DSPage() {
-  const [structure, setStructure] = useState<Structure>("list");
+  // null = the VisuAlgo-style topic grid; a key = that lab is open.
+  const [topic, setTopic] = useState<Topic | null>(null);
+  // Data-structure code paths only run when the open topic IS a structure;
+  // the "list" fallback keeps types tight and is never rendered otherwise.
+  const structure: Structure = topic !== null && topic !== "sched" && topic !== "threads" ? topic : "list";
   const dataRef = useRef<Record<Structure, DSData>>({
     list: empty("list"),
     stack: empty("stack"),
@@ -265,7 +317,7 @@ export function DSPage() {
   const [edgeB, setEdgeB] = useState("");
   const [bulkOpen, setBulkOpen] = useState(false);
   const [bulkText, setBulkText] = useState("");
-  const [infoOpen, setInfoOpen] = useState(() => !loadSeen()["list"]);
+  const [infoOpen, setInfoOpen] = useState(false);
   const [hashMode, setHashMode] = useState<HashMode>("chain");
 
   const emptyHash = (mode: HashMode): DSData => (mode === "chain" ? empty("hash") : emptyOA(mode));
@@ -527,26 +579,79 @@ export function DSPage() {
     search: [["Add", (d, v) => arrayPush(d as never, v)]],
   };
 
-  const switchTo = (s: Structure) => {
-    setStructure(s);
+  const switchTo = (t: Topic) => {
+    setTopic(t);
     setFrames([]);
     setIdx(0);
     setPlaying(false);
     setBulkOpen(false);
     setBulkText("");
-    setInfoOpen(!loadSeen()[s]);
+    setInfoOpen(t !== "sched" && t !== "threads" && !loadSeen()[t]);
   };
+
+  // ---------- topic grid (home) ----------
+  if (topic === null) {
+    return (
+      <div className="ds-home">
+        <div className="ds-home-inner">
+          <header className="ds-home-head">
+            <h2>Pick a topic</h2>
+            <p>Every card is a hands-on lab: build the thing, run its operations, and scrub through each step like a debugger.</p>
+          </header>
+          {CATEGORIES.map((cat) => (
+            <section key={cat} className="ds-home-section">
+              <h3 className="ds-cat">{cat}</h3>
+              <div className="ds-grid">
+                {ALL_TOPICS.filter((t) => CATEGORY[t.key] === cat).map((t) => (
+                  <button key={t.key} className="ds-card" onClick={() => switchTo(t.key)}>
+                    <span className="ds-card-icon"><t.icon size={18} aria-hidden="true" /></span>
+                    <span className="ds-card-body">
+                      <span className="ds-card-title">{t.label}</span>
+                      <span className="ds-card-intro">{t.intro}</span>
+                      <span className="ds-complexity">
+                        {t.complexity.map((c) => (
+                          <span key={c} className="ds-chip">{c}</span>
+                        ))}
+                      </span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const tabs = (
+    <nav className="ds-tabs">
+      <button className="ds-tab home-tab" onClick={() => setTopic(null)} title="back to all topics">
+        <LayoutGrid size={13} aria-hidden="true" />
+        Topics
+      </button>
+      {ALL_TOPICS.map((t) => (
+        <button key={t.key} className={`ds-tab${t.key === topic ? " active" : ""}`} onClick={() => switchTo(t.key)}>
+          <t.icon size={13} aria-hidden="true" />
+          {t.label}
+        </button>
+      ))}
+    </nav>
+  );
+
+  // ---------- OS labs: they own their toolbar, stage, and caption ----------
+  if (topic === "sched" || topic === "threads") {
+    return (
+      <div className="ds-page">
+        {tabs}
+        {topic === "sched" ? <SchedLab /> : <ThreadsLab />}
+      </div>
+    );
+  }
 
   return (
     <div className="ds-page">
-      <nav className="ds-tabs">
-        {STRUCTURES.map((s) => (
-          <button key={s.key} className={`ds-tab${s.key === structure ? " active" : ""}`} onClick={() => switchTo(s.key)}>
-            <s.icon size={13} aria-hidden="true" />
-            {s.label}
-          </button>
-        ))}
-      </nav>
+      {tabs}
 
       <div className="ds-opbar">
         <input
