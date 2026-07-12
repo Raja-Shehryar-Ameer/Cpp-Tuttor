@@ -895,6 +895,46 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .pc-6 { background: #b45309; }
 .pc-7 { background: #6e6450; }
 
+/* ---------- page replacement lab ---------- */
+
+.ref-input { width: 100%; max-width: 46rem; font-family: var(--mono); }
+.page-grid-wrap { overflow-x: auto; padding: 0.3rem 0.2rem 0.2rem; }
+.page-grid { border-collapse: collapse; font-family: var(--mono); font-size: 0.82rem; }
+.page-grid th, .page-grid td {
+  border: 1.5px solid var(--panel-2); min-width: 2.1rem; height: 2rem;
+  padding: 0.12rem 0.3rem; text-align: center;
+  font-variant-numeric: tabular-nums; font-weight: 500;
+}
+.page-grid .pg-label {
+  border-color: transparent; text-align: right; padding-right: 0.55rem;
+  color: var(--muted); font-size: 0.7rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.page-grid thead th { border-color: transparent; padding-bottom: 0.35rem; }
+.page-grid .future { opacity: 0.22; }
+.page-grid .current-col { background: var(--hl-soft); }
+.page-grid td.load-cell { box-shadow: inset 0 0 0 2px var(--danger); font-weight: 700; }
+.page-grid td.hit-cell { box-shadow: inset 0 0 0 2px var(--ok); font-weight: 700; }
+.page-grid .pg-hit { color: var(--ok); font-weight: 700; border-color: transparent; }
+.page-grid .pg-fault { color: var(--danger); font-weight: 700; border-color: transparent; }
+.page-slot {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  border: 1.5px solid var(--panel-2); border-radius: 8px; padding: 0.22rem 0.5rem;
+  background: var(--panel);
+}
+.page-slot.hand { border: 2px solid var(--ink); }
+.page-slot.just-hit { border-color: var(--ok); }
+.page-slot.just-loaded { border-color: var(--danger); }
+.page-slot em, .pg-slot-name {
+  font-style: normal; color: var(--muted);
+  font-family: var(--mono); font-size: 0.68rem; font-variant-numeric: tabular-nums;
+}
+.pg-slot-name { font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+.page-slot .pg-hand { color: var(--text); font-weight: 700; }
+.pg-victim { color: var(--danger); border-color: var(--danger); }
+.warn-row td { background: var(--danger-soft); font-weight: 700; }
+.sweep-head { margin-top: 1.1rem; }
+
 /* ---------- threads lab ---------- */
 
 .threads-stage {

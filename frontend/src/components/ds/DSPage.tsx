@@ -16,6 +16,7 @@ import {
   Link2,
   ListOrdered,
   ListTree,
+  MemoryStick,
   Network,
   Pause,
   Pencil,
@@ -98,6 +99,7 @@ import {
   type TreeNode,
 } from "../../ds/engine";
 import { DSView } from "./DSView";
+import { PagingLab } from "./PagingLab";
 import { SchedLab } from "./SchedLab";
 import { ThreadsLab } from "./ThreadsLab";
 
@@ -115,7 +117,10 @@ type Structure =
   | "search";
 
 /** Everything selectable on the topic grid: data structures plus the OS labs. */
-type Topic = Structure | "sched" | "threads";
+type OsTopic = "sched" | "threads" | "paging";
+type Topic = Structure | OsTopic;
+
+const isOsTopic = (t: Topic): t is OsTopic => t === "sched" || t === "threads" || t === "paging";
 
 type Category = "Data structures" | "Algorithms" | "Operating systems";
 
@@ -124,7 +129,7 @@ const CATEGORY: Record<Topic, Category> = {
   bst: "Data structures", avl: "Data structures", rb: "Data structures",
   heap: "Data structures", hash: "Data structures", graph: "Data structures",
   array: "Algorithms", search: "Algorithms",
-  sched: "Operating systems", threads: "Operating systems",
+  sched: "Operating systems", threads: "Operating systems", paging: "Operating systems",
 };
 
 const MAX_BATCH = 24; // more values than this per op makes the lesson unwatchable
@@ -216,7 +221,7 @@ const STRUCTURES: StructureMeta[] = [
 // OS labs live outside StructureMeta — they bring their own toolbars and
 // canvases, so they only need card/tab metadata here.
 interface OsTopicMeta {
-  key: "sched" | "threads";
+  key: OsTopic;
   label: string;
   icon: ComponentType<{ size?: number | string }>;
   intro: string;
@@ -233,6 +238,11 @@ const OS_TOPICS: OsTopicMeta[] = [
     key: "threads", label: "Threads: ULT vs KLT", icon: Workflow,
     intro: "User-level vs kernel-level threads: the three mapping models, and what really happens to sibling threads when one blocks in a syscall.",
     complexity: ["Many-to-One", "One-to-One", "Many-to-Many"],
+  },
+  {
+    key: "paging", label: "Page Replacement", icon: MemoryStick,
+    intro: "FIFO, LRU, Optimal, Clock, and LFU fighting over a handful of frames — the textbook grid, hit/fault ratios, and the preset where MORE memory means MORE faults.",
+    complexity: ["5 algorithms", "hit / fault ratio", "Belady's anomaly"],
   },
 ];
 
@@ -294,7 +304,7 @@ export function DSPage() {
   const [topic, setTopic] = useState<Topic | null>(null);
   // Data-structure code paths only run when the open topic IS a structure;
   // the "list" fallback keeps types tight and is never rendered otherwise.
-  const structure: Structure = topic !== null && topic !== "sched" && topic !== "threads" ? topic : "list";
+  const structure: Structure = topic !== null && !isOsTopic(topic) ? topic : "list";
   const dataRef = useRef<Record<Structure, DSData>>({
     list: empty("list"),
     stack: empty("stack"),
@@ -586,7 +596,7 @@ export function DSPage() {
     setPlaying(false);
     setBulkOpen(false);
     setBulkText("");
-    setInfoOpen(t !== "sched" && t !== "threads" && !loadSeen()[t]);
+    setInfoOpen(!isOsTopic(t) && !loadSeen()[t]);
   };
 
   // ---------- topic grid (home) ----------
@@ -640,11 +650,11 @@ export function DSPage() {
   );
 
   // ---------- OS labs: they own their toolbar, stage, and caption ----------
-  if (topic === "sched" || topic === "threads") {
+  if (isOsTopic(topic)) {
     return (
       <div className="ds-page">
         {tabs}
-        {topic === "sched" ? <SchedLab /> : <ThreadsLab />}
+        {topic === "sched" ? <SchedLab /> : topic === "threads" ? <ThreadsLab /> : <PagingLab />}
       </div>
     );
   }
