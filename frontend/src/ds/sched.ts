@@ -289,13 +289,14 @@ export function schedQuizzes(run: SchedRun): TickQuiz[] {
     if (!tick.running) continue;
     const prev = run.ticks[tick.t - 1];
     if (prev && prev.running === tick.running) continue; // no dispatch this tick
-    // Candidates are everyone who could have been picked: the winner plus the
-    // ready queue snapshot (which excludes the running process).
-    const candidates = [tick.running, ...tick.ready];
-    if (candidates.length < 2) continue; // nothing to predict
-    const choices = [...new Set(candidates)].sort().slice(0, 5);
+    // Candidates: the winner plus the ready-queue snapshot (running excluded).
+    // The winner is pinned into the choice set BEFORE capping at 5, so a
+    // process whose name happens to sort late never gets sliced out — that
+    // silently forfeited the quiz.
+    const others = [...new Set(tick.ready)].filter((n) => n !== tick.running);
+    if (others.length === 0) continue; // only one candidate — nothing to predict
+    const choices = [tick.running, ...others].slice(0, 5).sort();
     const answer = choices.indexOf(tick.running);
-    if (answer < 0) continue;
     out.push({
       tick: tick.t,
       quiz: {

@@ -45,16 +45,23 @@ function randomLink(): LabLink {
       };
     case 2: {
       const nv = 2 + rand(8);
+      const directed = Math.random() < 0.5;
       const verts = Array.from({ length: nv }, (_, i) => i + 1);
+      // Dedup exactly as the decoder does (it now rejects parallel edges).
       const edges: [number, number, number][] = [];
+      const seen = new Set<string>();
       for (let k = 0; k < nv; k += 1) {
         const a = 1 + rand(nv);
         const b = 1 + rand(nv);
-        if (a !== b) edges.push([a, b, 1 + rand(99)]);
+        if (a === b) continue;
+        const key = directed ? `${a}>${b}` : a < b ? `${a}-${b}` : `${b}-${a}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        edges.push([a, b, 1 + rand(99)]);
       }
       return {
         lab: "wgraph",
-        directed: Math.random() < 0.5,
+        directed,
         verts,
         edges,
         ...(Math.random() < 0.7 ? { algo: pick(WGRAPH_ALGOS).key, from: 1, to: nv } : {}),
@@ -92,6 +99,9 @@ const garbage: string[] = [
   btoa(JSON.stringify({ lab: "wgraph", directed: false, verts: [1, 1], edges: [] })),
   btoa(JSON.stringify({ lab: "wgraph", directed: false, verts: [1, 2], edges: [[1, 9, 5]] })),
   btoa(JSON.stringify({ lab: "wgraph", directed: false, verts: [1, 2], edges: [[1, 2, 0]] })),
+  // duplicate/parallel edges are impossible through the UI → must be rejected
+  btoa(JSON.stringify({ lab: "wgraph", directed: false, verts: [1, 2], edges: [[1, 2, 5], [1, 2, 7]] })),
+  btoa(JSON.stringify({ lab: "wgraph", directed: false, verts: [1, 2], edges: [[1, 2, 5], [2, 1, 7]] })),
   btoa(JSON.stringify({ lab: "sortrace", a: "bogo", b: "merge", values: [1, 2] })),
   btoa(JSON.stringify({ lab: "sortrace", a: "bubble", b: "merge", values: [1] })),
   btoa(JSON.stringify({ lab: "sortrace", a: "bubble", b: "merge", values: [1, 1e300] })),

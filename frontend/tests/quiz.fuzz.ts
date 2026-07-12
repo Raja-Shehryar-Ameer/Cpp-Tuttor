@@ -41,6 +41,18 @@ for (let t = 0; t < 400; t += 1) {
   const algo = SCHED_ALGOS[rand(SCHED_ALGOS.length)].key;
   const run = schedule(algo, procs, 1 + rand(4));
   const quizzes = schedQuizzes(run);
+  // Every dispatch with at least one OTHER ready process must produce a quiz —
+  // the winner is never sliced out just because its name sorts late.
+  const quizTicks = new Set(quizzes.map((q) => q.tick));
+  for (const st of run.ticks) {
+    if (!st.running) continue;
+    const prev = run.ticks[st.t - 1];
+    if (prev && prev.running === st.running) continue;
+    const others = new Set(st.ready.filter((n) => n !== st.running));
+    if (others.size >= 1 && !quizTicks.has(st.t)) {
+      fail("sched: dispatch with ready candidates dropped its quiz", st.t, algo, st.ready);
+    }
+  }
   const seen = new Set<number>();
   for (const { tick, quiz } of quizzes) {
     if (seen.has(tick)) fail("sched: duplicate quiz tick", tick);
@@ -56,6 +68,20 @@ for (let t = 0; t < 400; t += 1) {
     // every quiz tick is a real dispatch: running changed (or started)
     const prev = run.ticks[tick - 1];
     if (prev && prev.running === state.running) fail("sched: quiz on non-dispatch tick", tick, algo);
+  }
+}
+
+// ---- sched spot check: 8 processes at t=0, winner must survive the cap ----
+{
+  // FCFS at t=0 dispatches P1 while P2..P8 wait — 7 other candidates. The
+  // choice set caps at 5 but must still contain P1 (the correct answer).
+  const many: ProcSpec[] = Array.from({ length: 8 }, (_, i) => ({ name: `P${i + 1}`, arrival: 0, burst: 3, priority: 1 }));
+  const run = schedule("fcfs", many, 2);
+  const q0 = schedQuizzes(run).find((q) => q.tick === 0);
+  if (!q0) fail("sched spot: first dispatch produced no quiz despite 7 waiting");
+  else {
+    if (q0.quiz.choices.length > 5) fail("sched spot: choice set exceeds cap", q0.quiz.choices);
+    if (q0.quiz.choices[q0.quiz.answer] !== "P1") fail("sched spot: winner sliced out of choices", q0.quiz);
   }
 }
 

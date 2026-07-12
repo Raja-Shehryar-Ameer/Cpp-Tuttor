@@ -71,11 +71,17 @@ export function decodeLab(raw: string): LabLink | null {
       if (new Set(verts).size !== verts.length) return null;
       if (!Array.isArray(x.edges) || x.edges.length > MAX_WG_EDGES) return null;
       const edges: [number, number, number][] = [];
+      // Duplicate/parallel edges are impossible to build through the UI
+      // (wgraphAddEdge dedupes), so a crafted link carrying them is malformed.
+      const seenEdges = new Set<string>();
       for (const e of x.edges as unknown[]) {
         if (!Array.isArray(e) || e.length !== 3) return null;
         const [a, b, w] = e as unknown[];
         if (!intIn(a, V_MIN, V_MAX) || !intIn(b, V_MIN, V_MAX) || !intIn(w, WEIGHT_MIN, WEIGHT_MAX)) return null;
         if (a === b || !verts.includes(a) || !verts.includes(b)) return null;
+        const key = x.directed ? `${a}>${b}` : a < b ? `${a}-${b}` : `${b}-${a}`;
+        if (seenEdges.has(key)) return null;
+        seenEdges.add(key);
         edges.push([a, b, w]);
       }
       if (x.algo !== undefined && !WGRAPH_ALGOS.some((m) => m.key === x.algo)) return null;
