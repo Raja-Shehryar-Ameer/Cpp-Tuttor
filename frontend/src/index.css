@@ -618,6 +618,11 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
   display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap;
   padding: 0.75rem 1.4rem; background: var(--panel); border-bottom: 2px solid var(--ink);
 }
+/* Graph Algorithms: a separate run bar under the build bar, so the
+   algorithms never crowd the structure ops. */
+.ds-opbar.wg-run { padding-top: 0.55rem; padding-bottom: 0.55rem; background: var(--bg); }
+.ds-opbar.wg-run .sched-hint { flex: 1; min-width: 220px; }
+.wg-vert { min-width: 4.2rem; }
 .ds-input {
   background: var(--panel); color: var(--text); border: 2px solid var(--ink);
   border-radius: 6px; padding: 0.42rem 0.6rem; font-size: 0.875rem; font-family: var(--mono);
@@ -726,6 +731,27 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .ds-link { stroke: var(--arrow); }
 .ds-arrow-head { fill: var(--arrow); }
 .ds-link, .ds-edge { transition: d 0.6s var(--ease-glide), stroke 0.3s ease; }
+
+/* Weighted edges (Graph Algorithms lab): highlightable like nodes. */
+.ds-wedge {
+  stroke: var(--ink); stroke-width: 2; fill: none;
+  transition: d 0.6s var(--ease-glide), stroke 0.3s ease, stroke-width 0.3s ease;
+}
+.ds-wedge.hl { stroke: var(--hl); stroke-width: 3.5; }
+.ds-wedge.ok { stroke: var(--ok); stroke-width: 3.5; }
+.ds-wedge.bad { stroke: var(--danger); stroke-width: 3.5; stroke-dasharray: 6 4; }
+.ds-wlabel-bg { fill: var(--panel); stroke: var(--faint); stroke-width: 1.2; transition: stroke 0.3s ease; }
+.ds-wlabel { font-size: 0.7rem; font-weight: 700; fill: var(--text); font-family: var(--mono); }
+.ds-wlabel-g.hl .ds-wlabel-bg { stroke: var(--hl); stroke-width: 2; fill: var(--hl-soft); }
+.ds-wlabel-g.ok .ds-wlabel-bg { stroke: var(--ok); stroke-width: 2; fill: var(--ok-soft); }
+.ds-wlabel-g.bad .ds-wlabel-bg { stroke: var(--danger); stroke-width: 2; fill: var(--danger-soft); }
+.ds-nlabel {
+  font-size: 0.66rem; font-weight: 700; fill: var(--accent-ink);
+  font-family: var(--mono); font-variant-numeric: tabular-nums;
+  /* halo so the caption survives edges passing under the node */
+  paint-order: stroke; stroke: var(--panel); stroke-width: 3.5px; stroke-linejoin: round;
+}
+.ds-node.bad .ds-nlabel { fill: var(--danger); }
 .ds-floor { stroke-width: 3.5; stroke-linecap: round; }
 .ds-tag { font-size: 0.72rem; fill: var(--muted); font-family: var(--mono); }
 .ds-tomb { font-size: 0.95rem; fill: var(--danger); }

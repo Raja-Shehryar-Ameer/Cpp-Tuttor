@@ -98,6 +98,26 @@ import {
   type Probe,
   type TreeNode,
 } from "../../ds/engine";
+import {
+  MAX_WG_EDGES,
+  MAX_WG_VERTICES,
+  WEIGHT_MAX,
+  WEIGHT_MIN,
+  WGRAPH_ALGOS,
+  wgraphAddEdge,
+  wgraphAddNode,
+  wgraphDijkstra,
+  wgraphKruskal,
+  wgraphPathBfs,
+  wgraphPrim,
+  wgraphRemoveEdge,
+  wgraphRemoveNode,
+  wgraphSetDirected,
+  wgraphTopo,
+  wgraphTraverse,
+  type WAlgo,
+  type WGraph,
+} from "../../ds/wgraph";
 import { DSView } from "./DSView";
 import { PagingLab } from "./PagingLab";
 import { SchedLab } from "./SchedLab";
@@ -113,6 +133,7 @@ type Structure =
   | "heap"
   | "hash"
   | "graph"
+  | "wgraph"
   | "array"
   | "search";
 
@@ -128,7 +149,7 @@ const CATEGORY: Record<Topic, Category> = {
   list: "Data structures", stack: "Data structures", queue: "Data structures",
   bst: "Data structures", avl: "Data structures", rb: "Data structures",
   heap: "Data structures", hash: "Data structures", graph: "Data structures",
-  array: "Algorithms", search: "Algorithms",
+  array: "Algorithms", search: "Algorithms", wgraph: "Algorithms",
   sched: "Operating systems", threads: "Operating systems", paging: "Operating systems",
 };
 
@@ -205,6 +226,12 @@ const STRUCTURES: StructureMeta[] = [
     bulkPlaceholder: "1 2\n2 3\n3 1\n4", bulkHint: "one edge per line as “A B” — a lone number adds an isolated vertex",
   },
   {
+    key: "wgraph", label: "Graph Algorithms", icon: Route,
+    intro: "Weighted edges, directed or not — run Dijkstra, Prim, Kruskal, topological sort, BFS, and DFS, and watch every decision narrated.",
+    complexity: ["Dijkstra O((V+E) log V)", "MST: Prim / Kruskal", "Topo sort O(V+E)"],
+    bulkPlaceholder: "1 2 5\n2 3 2\n3 1 4\n3 4 7", bulkHint: "one edge per line as “A B w” (weight optional, defaults 1) — a lone number adds a vertex",
+  },
+  {
     key: "array", label: "Sorting", icon: ArrowUpDown,
     intro: "Load some values, then pick an algorithm and watch every comparison and swap, one step at a time.",
     complexity: ["Bubble/Insertion O(n²)", "Merge/Heap O(n log n)", "Quick O(n log n) avg"],
@@ -258,6 +285,7 @@ const empty = (s: Structure): DSData => {
   if (s === "stack") return { kind: "stack", items: [] };
   if (s === "queue") return { kind: "queue", items: [] };
   if (s === "graph") return { kind: "graph", nodes: [], edges: [] };
+  if (s === "wgraph") return { kind: "wgraph", nodes: [], edges: [], directed: false };
   if (s === "heap") return { kind: "heap", items: [] };
   if (s === "hash") return { kind: "hash", buckets: Array.from({ length: HASH_BUCKETS }, () => []) };
   if (s === "array" || s === "search") return { kind: "array", items: [] };
@@ -315,6 +343,7 @@ export function DSPage() {
     heap: empty("heap"),
     hash: empty("hash"),
     graph: empty("graph"),
+    wgraph: empty("wgraph"),
     array: empty("array"),
     search: empty("search"),
   });
@@ -325,6 +354,10 @@ export function DSPage() {
   const [value, setValue] = useState("");
   const [edgeA, setEdgeA] = useState("");
   const [edgeB, setEdgeB] = useState("");
+  const [edgeW, setEdgeW] = useState("");
+  const [wgAlgo, setWgAlgo] = useState<WAlgo>("dijkstra");
+  const [wgFrom, setWgFrom] = useState("");
+  const [wgTo, setWgTo] = useState("");
   const [bulkOpen, setBulkOpen] = useState(false);
   const [bulkText, setBulkText] = useState("");
   const [infoOpen, setInfoOpen] = useState(false);
@@ -452,14 +485,71 @@ export function DSPage() {
     });
   };
 
+  /** Build a small random weighted graph in one hop: spanning tree + extras. */
+  const wgRandom = () => {
+    const directed = (dataRef.current.wgraph as WGraph).directed;
+    let d: WGraph = { kind: "wgraph", nodes: [], edges: [], directed };
+    const apply = (frames: Frame[]) => {
+      if (frames.length > 0) d = frames[frames.length - 1].data as WGraph;
+    };
+    const n = 5 + Math.floor(Math.random() * 3); // 5..7 vertices
+    for (let v = 1; v <= n; v += 1) apply(wgraphAddNode(d, v));
+    for (let v = 2; v <= n; v += 1) apply(wgraphAddEdge(d, 1 + Math.floor(Math.random() * (v - 1)), v, 1 + Math.floor(Math.random() * 20)));
+    for (let k = 0; k < n - 2; k += 1) {
+      const a = 1 + Math.floor(Math.random() * n);
+      const b = 1 + Math.floor(Math.random() * n);
+      if (a !== b) apply(wgraphAddEdge(d, a, b, 1 + Math.floor(Math.random() * 20)));
+    }
+    dataRef.current.wgraph = d;
+    setFrames([{ data: d, hl: [], note: `Random ${directed ? "directed " : ""}graph: ${d.nodes.length} vertices, ${d.edges.length} weighted edges. Pick an algorithm below and press Run.` }]);
+    setIdx(0);
+    setPlaying(false);
+  };
+
   const randomFill = () => {
+    if (structure === "wgraph") {
+      wgRandom();
+      return;
+    }
     const pool = new Set<number>();
     while (pool.size < 6) pool.add(1 + Math.floor(Math.random() * 99));
     setValue([...pool].join(", "));
   };
 
+  /** Run the selected weighted-graph algorithm, validating its inputs first. */
+  const runWgAlgo = () => {
+    const meta = WGRAPH_ALGOS.find((a) => a.key === wgAlgo)!;
+    const from = vertexOf(wgFrom);
+    const to = vertexOf(wgTo);
+    if (meta.needsFrom && from === null) {
+      say(`${meta.short} needs a start vertex — pick one in the “from” box.`);
+      return;
+    }
+    if (meta.needsTo === "yes" && to === null) {
+      say(`${meta.short} needs a target too — pick one in the “to” box.`);
+      return;
+    }
+    run((d) => {
+      const g = d as WGraph;
+      switch (wgAlgo) {
+        case "bfs": case "dfs": return wgraphTraverse(g, from!, wgAlgo);
+        case "path": return wgraphPathBfs(g, from!, to!);
+        case "dijkstra": return wgraphDijkstra(g, from!, to ?? undefined);
+        case "prim": return wgraphPrim(g, from!);
+        case "kruskal": return wgraphKruskal(g);
+        case "topo": return wgraphTopo(g);
+      }
+    });
+  };
+
   const reset = () => {
-    dataRef.current[structure] = structure === "hash" ? emptyHash(hashMode) : empty(structure);
+    if (structure === "wgraph") {
+      // The directed/undirected setting is a mode, not data — it survives reset.
+      const directed = (dataRef.current.wgraph as WGraph).directed;
+      dataRef.current.wgraph = { kind: "wgraph", nodes: [], edges: [], directed };
+    } else {
+      dataRef.current[structure] = structure === "hash" ? emptyHash(hashMode) : empty(structure);
+    }
     setFrames([]);
     setIdx(0);
     setPlaying(false);
@@ -532,6 +622,55 @@ export function DSPage() {
       setFrames(lesson);
       setIdx(0);
       setPlaying(lesson.length > 1);
+    } else if (structure === "wgraph") {
+      const lines = bulkText.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+      if (lines.length === 0) {
+        say("The editor is empty — one edge per line as “A B w” (weight optional), or a lone number for a vertex.");
+        return;
+      }
+      const directed = (dataRef.current.wgraph as WGraph).directed;
+      let d: WGraph = { kind: "wgraph", nodes: [], edges: [], directed };
+      let bad = 0;
+      const lesson: Frame[] = [];
+      const land = (produced: Frame[]) => {
+        if (produced.length === 0) return;
+        const last = produced[produced.length - 1];
+        d = last.data as WGraph;
+        lesson.push(last);
+      };
+      for (const line of lines) {
+        const { values } = parseValues(line);
+        if (values.length === 0) {
+          bad += 1;
+        } else if (values.length === 1) {
+          if (d.nodes.length >= MAX_WG_VERTICES && !d.nodes.some((n) => n.value === values[0])) {
+            say(`That's more than ${MAX_WG_VERTICES} vertices — keep the graph small enough to trace by hand.`);
+            return;
+          }
+          land(wgraphAddNode(d, values[0]));
+        } else {
+          const [a, b, w] = values;
+          if (a === b) { bad += 1; continue; }
+          const newVerts = [a, b].filter((v) => !d.nodes.some((n) => n.value === v)).length;
+          if (d.nodes.length + newVerts > MAX_WG_VERTICES) {
+            say(`That's more than ${MAX_WG_VERTICES} vertices — keep the graph small enough to trace by hand.`);
+            return;
+          }
+          if (d.edges.length >= MAX_WG_EDGES) {
+            say(`That's more than ${MAX_WG_EDGES} edges — the drawing would turn into spaghetti.`);
+            return;
+          }
+          land(wgraphAddEdge(d, a, b, w ?? 1));
+        }
+      }
+      dataRef.current.wgraph = d;
+      lesson.push({
+        data: d, hl: [],
+        note: `Loaded ${d.nodes.length} ${d.nodes.length === 1 ? "vertex" : "vertices"} and ${d.edges.length} weighted ${d.edges.length === 1 ? "edge" : "edges"}${bad ? ` (skipped ${bad} unreadable ${bad === 1 ? "line" : "lines"})` : ""}. Pick an algorithm below and press Run.`,
+      });
+      setFrames(lesson);
+      setIdx(0);
+      setPlaying(lesson.length > 1);
     } else {
       const { values, outOfRange } = parseValues(bulkText);
       if (outOfRange.length > 0) {
@@ -585,6 +724,7 @@ export function DSPage() {
     heap: [["Insert", (d, v) => heapInsert(d as never, v)]],
     hash: [["Insert", (d, v) => (hashMode === "chain" ? hashInsert(d as never, v) : oaHashInsert(d as never, v))]],
     graph: [["Add vertex", (d, v) => graphAddNode(d as never, v)]],
+    wgraph: [["Add vertex", (d, v) => wgraphAddNode(d as never, v)]],
     array: [["Add", (d, v) => arrayPush(d as never, v)]],
     search: [["Add", (d, v) => arrayPush(d as never, v)]],
   };
@@ -843,6 +983,37 @@ export function DSPage() {
             </button>
           </>
         )}
+        {structure === "wgraph" && (
+          <>
+            <button onClick={() => runEach((d, v) => wgraphRemoveNode(d as never, v))}>
+              <Trash2 size={13} /> Remove vertex
+            </button>
+            <label className="ds-mode" title="directed edges point A→B; MST needs undirected, topo sort needs directed">
+              edges:
+              <select
+                value={(dataRef.current.wgraph as WGraph).directed ? "directed" : "undirected"}
+                onChange={(e) => run((d) => wgraphSetDirected(d as WGraph, e.target.value === "directed"))}
+              >
+                <option value="undirected">undirected</option>
+                <option value="directed">directed</option>
+              </select>
+            </label>
+            <span className="ds-edge-inputs">
+              <input className="ds-input small" value={edgeA} placeholder="A" onChange={(e) => setEdgeA(e.target.value)} />
+              <ArrowLeftRight size={12} aria-hidden="true" />
+              <input className="ds-input small" value={edgeB} placeholder="B" onChange={(e) => setEdgeB(e.target.value)} />
+              <input
+                className="ds-input small"
+                value={edgeW}
+                placeholder="w"
+                title={`edge weight ${WEIGHT_MIN}–${WEIGHT_MAX} (blank = 1)`}
+                onChange={(e) => setEdgeW(e.target.value)}
+              />
+              <button onClick={() => runEdge(true, (d, a, b) => wgraphAddEdge(d as never, a, b, vertexOf(edgeW) ?? 1))}>Add edge</button>
+              <button onClick={() => runEdge(true, (d, a, b) => wgraphRemoveEdge(d as never, a, b))}>Remove edge</button>
+            </span>
+          </>
+        )}
         {structure === "graph" && (
           <>
             <button onClick={() => runEach((d, v) => graphRemoveNode(d as never, v))}>
@@ -882,6 +1053,45 @@ export function DSPage() {
           <Info size={14} />
         </button>
       </div>
+
+      {structure === "wgraph" && (() => {
+        // Second bar: the algorithms, kept apart from the build ops so neither
+        // crowds the other (same split as Sorting vs the structures).
+        const wgMeta = WGRAPH_ALGOS.find((a) => a.key === wgAlgo)!;
+        const verts = [...(dataRef.current.wgraph as WGraph).nodes].sort((a, b) => a.value - b.value);
+        const vertSelect = (val: string, set: (s: string) => void, ph: string) => (
+          <select className="wg-vert" value={verts.some((n) => String(n.value) === val) ? val : ""} onChange={(e) => set(e.target.value)}>
+            <option value="">{ph}</option>
+            {verts.map((n) => (
+              <option key={n.id} value={n.value}>{n.value}</option>
+            ))}
+          </select>
+        );
+        return (
+          <div className="ds-opbar wg-run">
+            <label className="ds-mode">
+              algorithm:
+              <select value={wgAlgo} onChange={(e) => setWgAlgo(e.target.value as WAlgo)}>
+                {WGRAPH_ALGOS.map((a) => (
+                  <option key={a.key} value={a.key}>{a.label}</option>
+                ))}
+              </select>
+            </label>
+            {wgMeta.needsFrom && (
+              <label className="ds-mode">from: {vertSelect(wgFrom, setWgFrom, "pick…")}</label>
+            )}
+            {wgMeta.needsTo !== "no" && (
+              <label className="ds-mode">
+                to: {vertSelect(wgTo, setWgTo, wgMeta.needsTo === "optional" ? "(all)" : "pick…")}
+              </label>
+            )}
+            <button className="primary" onClick={runWgAlgo}>
+              <Play size={13} /> Run
+            </button>
+            <span className="sched-hint">{wgMeta.blurb}</span>
+          </div>
+        );
+      })()}
 
       {bulkOpen && (
         <div className="ds-bulk">

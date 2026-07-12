@@ -15,12 +15,22 @@ export interface ListNode {
   value: number;
 }
 
+/** Weighted edge for the "wgraph" kind. a/b are node IDS; the edge has an id
+    of its own (same allocator as nodes) so frames can highlight edges too. */
+export interface WEdge {
+  id: number;
+  a: number;
+  b: number;
+  w: number;
+}
+
 export type DSData =
   | { kind: "list"; nodes: ListNode[] }
   | { kind: "stack"; items: ListNode[] }
   | { kind: "queue"; items: ListNode[] }
   | { kind: "tree"; root: TreeNode | null }
   | { kind: "graph"; nodes: ListNode[]; edges: [number, number][] }
+  | { kind: "wgraph"; nodes: ListNode[]; edges: WEdge[]; directed: boolean }
   | { kind: "heap"; items: ListNode[] }
   | { kind: "hash"; buckets: ListNode[][] }
   | { kind: "oahash"; slots: (ListNode | "tomb" | null)[]; probe: "linear" | "quadratic" }
@@ -35,10 +45,16 @@ export interface Frame {
   bad?: number[];
   /** ids drawn in the inverted "pivot" style (quick sort's anchor value) */
   pivot?: number[];
+  /** per-node captions drawn under the circle (id → "d=7", "in: 2", …) */
+  labels?: Record<number, string>;
   note: string;
 }
 
 let nextId = 1;
+
+/** Sibling engine modules (wgraph, btree) share the id space so FLIP keys
+    stay globally unique across every structure. */
+export const allocId = (): number => nextId++;
 const fresh = (value: number): ListNode => ({ id: nextId++, value });
 
 const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;

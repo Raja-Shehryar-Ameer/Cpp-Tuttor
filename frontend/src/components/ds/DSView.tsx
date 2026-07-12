@@ -1,6 +1,6 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useId, useLayoutEffect, useRef } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import type { DSData, Frame, TreeNode } from "../../ds/engine";
+import type { DSData, Frame, TreeNode, WEdge } from "../../ds/engine";
 
 // SVG <line> endpoints cannot be CSS-transitioned, so every edge is a
 // two-point <path>: its `d` glides along with the node transforms.
@@ -407,6 +407,126 @@ function GraphScene({
   );
 }
 
+/** Weighted graph for the Graph Algorithms lab: labeled edges that can be
+    highlighted like nodes, optional arrowheads in directed mode, and per-node
+    caption labels ("d=7", "in: 2") that travel with their vertex. */
+function WGraphScene({
+  frame,
+  nodes,
+  edges,
+  directed,
+}: {
+  frame: Frame;
+  nodes: { id: number; value: number }[];
+  edges: WEdge[];
+  directed: boolean;
+}) {
+  // Arrowhead marker id must be unique per mounted scene (race views mount
+  // two); fill follows the edge's stroke so hl/ok/bad tint the head too.
+  const arrowId = useId();
+  const SPACING = 78;
+  const radius = Math.max(120, (nodes.length * SPACING) / (2 * Math.PI));
+  const pad = 70;
+  const cx = radius + pad;
+  const cy = radius + pad;
+  const w = Math.max(520, 2 * (radius + pad));
+  const h = Math.max(340, 2 * (radius + pad));
+  const placed = nodes.map((n, i) => {
+    const angle = (2 * Math.PI * i) / Math.max(nodes.length, 1) - Math.PI / 2;
+    return { ...n, x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) };
+  });
+  const lifts = useLifts(
+    placed.map((p) => ({ key: p.id, cx: p.x, cy: p.y, w: 42, h: 42 })),
+    () => 52,
+  );
+  const at = new Map(placed.map((p) => [p.id, p]));
+
+  const edgeClass = (id: number): string => {
+    let cls = "ds-wedge";
+    if (frame.hl.includes(id)) cls += " hl";
+    if (frame.ok?.includes(id)) cls += " ok";
+    if (frame.bad?.includes(id)) cls += " bad";
+    return cls;
+  };
+
+  // Geometry per edge: endpoints pulled back to the circle rims (so arrowheads
+  // land on the rim, not the center), antiparallel twins nudged apart so
+  // A→B and B→A never draw on top of each other.
+  const drawn = edges.flatMap((e) => {
+    const pa = at.get(e.a);
+    const pb = at.get(e.b);
+    if (!pa || !pb) return [];
+    const dx = pb.x - pa.x;
+    const dy = pb.y - pa.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len;
+    const uy = dy / len;
+    const twin = directed && edges.some((o) => o.a === e.b && o.b === e.a);
+    const off = twin ? 7 : 0; // each direction computes its own side
+    const trim = directed ? 25 : 21; // rim + a little room for the arrowhead
+    const x1 = pa.x + ux * 21 + uy * off;
+    const y1 = pa.y + uy * 21 - ux * off;
+    const x2 = pb.x - ux * trim + uy * off;
+    const y2 = pb.y - uy * trim - ux * off;
+    // Weight label sits beside the midpoint, offset perpendicular off the line.
+    const lx = (x1 + x2) / 2 + uy * 13;
+    const ly = (y1 + y2) / 2 - ux * 13;
+    return [{ e, x1, y1, x2, y2, lx, ly }];
+  });
+
+  return (
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ maxWidth: "100%", height: "auto" }}>
+      <defs>
+        <marker id={arrowId} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="context-stroke" />
+        </marker>
+      </defs>
+      {drawn.map(({ e, x1, y1, x2, y2 }) => {
+        const d = `M ${x1} ${y1} L ${x2} ${y2}`;
+        return (
+          <path
+            key={`e${e.id}`}
+            className={edgeClass(e.id)}
+            d={d}
+            style={{ d: `path("${d}")` } as CSSProperties}
+            markerEnd={directed ? `url(#${arrowId})` : undefined}
+          />
+        );
+      })}
+      {placed.map((p) => (
+        <GlideG key={p.id} x={p.x} y={p.y} lift={lifts.get(p.id)} className={nodeClass(p.id, frame)}>
+          <circle className="ds-circle" r={21} />
+          <text className="ds-value" y={5.5}>
+            {p.value}
+          </text>
+          {frame.labels?.[p.id] !== undefined && (
+            <text className="ds-nlabel" y={38} textAnchor="middle">
+              {frame.labels[p.id]}
+            </text>
+          )}
+        </GlideG>
+      ))}
+      {drawn.map(({ e, lx, ly }) => {
+        const txt = String(e.w);
+        const lw = 12 + txt.length * 7;
+        return (
+          <GlideG key={-e.id} x={lx} y={ly} className={`ds-wlabel-g${edgeClass(e.id).replace("ds-wedge", "")}`}>
+            <rect className="ds-wlabel-bg" x={-lw / 2} y={-9} width={lw} height={18} rx={5} />
+            <text className="ds-wlabel" y={4.5} textAnchor="middle">
+              {txt}
+            </text>
+          </GlideG>
+        );
+      })}
+      {placed.length === 0 && (
+        <text className="ds-tag" x={30} y={60}>
+          (no vertices yet — bulk load edges like “1 2 5”, one per line)
+        </text>
+      )}
+    </svg>
+  );
+}
+
 function HeapScene({ frame, items }: { frame: Frame; items: { id: number; value: number }[] }) {
   const n = items.length;
   const depthMax = n ? Math.floor(Math.log2(n)) : 0;
@@ -642,6 +762,8 @@ export function DSView({ frame }: { frame: Frame }) {
       return <TreeScene frame={frame} root={data.root} />;
     case "graph":
       return <GraphScene frame={frame} nodes={data.nodes} edges={data.edges} />;
+    case "wgraph":
+      return <WGraphScene frame={frame} nodes={data.nodes} edges={data.edges} directed={data.directed} />;
     case "heap":
       return <HeapScene frame={frame} items={data.items} />;
     case "hash":
