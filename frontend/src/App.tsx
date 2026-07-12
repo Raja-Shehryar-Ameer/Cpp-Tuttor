@@ -16,10 +16,13 @@ import { fetchSharedTrace, requestTrace } from "./api/client";
 import { Controls } from "./components/Controls";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { StdoutPane } from "./components/StdoutPane";
+import { ToastHost } from "./components/Toast";
 import { MemoryDiagram } from "./components/diagram/MemoryDiagram";
 import { usePlayback } from "./hooks/usePlayback";
 import { SAMPLES } from "./samples";
+import { notify } from "./store/toastStore";
 import { useTraceStore } from "./store/traceStore";
+import { validateTracerSource } from "./validation";
 
 // Code-split the heavy corners: CodeMirror only loads for the tracer, the
 // lesson engine only for the playground — first paint pays for neither.
@@ -74,10 +77,22 @@ export default function App() {
         setTraceId(shared);
         setCode(sharedTrace.sourceCode);
       })
-      .catch((error: Error) => useTraceStore.getState().setRequestError(error.message));
+      .catch((error: Error) => {
+        useTraceStore.getState().setRequestError(error.message);
+        notify.error(error.message);
+      });
   }, []);
 
   const visualize = async () => {
+    // Catch the obvious problems here — instant feedback instead of a
+    // compile-in-Docker round-trip that ends the same way.
+    const check = validateTracerSource(code);
+    if (check.errors.length > 0) {
+      check.errors.forEach((m) => notify.error(m));
+      return;
+    }
+    check.warnings.forEach((m) => notify.warning(m));
+
     setLoading(true);
     setRequestError(null);
     try {
@@ -85,8 +100,16 @@ export default function App() {
       setTrace(result.trace);
       setTraceId(result.traceId);
       updatePermalink(result.traceId);
+      if (result.trace.status === "ok") {
+        notify.success(`Trace ready — ${result.trace.steps.length} step${result.trace.steps.length === 1 ? "" : "s"}.`);
+      } else if (result.trace.steps.length > 0) {
+        // Partial trace (crash, timeout, step limit): playable, but say why.
+        notify.warning(result.trace.error ?? `Trace ended early (${result.trace.status}).`);
+      }
     } catch (error) {
-      setRequestError(error instanceof Error ? error.message : "Request failed.");
+      const message = error instanceof Error ? error.message : "Request failed.";
+      setRequestError(message);
+      notify.error(message);
     } finally {
       setLoading(false);
     }
@@ -100,13 +123,19 @@ export default function App() {
   };
 
   const copyLink = async () => {
-    await navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1500);
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      notify.success("Share link copied to the clipboard.");
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      notify.error("The browser blocked clipboard access — copy the address bar URL instead.");
+    }
   };
 
   return (
     <div className="app">
+      <ToastHost />
       <header>
         <h1>
           <span className="logo-mark">

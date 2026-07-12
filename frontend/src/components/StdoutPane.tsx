@@ -1,6 +1,7 @@
 import { Check, CircleAlert, Copy, Terminal } from "lucide-react";
 import { useState } from "react";
 import { useCurrentStep, useTraceStore } from "../store/traceStore";
+import { notify } from "../store/toastStore";
 
 export function StdoutPane() {
   const step = useCurrentStep();
@@ -16,7 +17,7 @@ export function StdoutPane() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      // clipboard blocked (insecure origin / denied) — leave the icon unchanged
+      notify.error("The browser blocked clipboard access — select the output and copy manually.");
     }
   };
 

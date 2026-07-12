@@ -730,6 +730,43 @@ button.toggled { background: var(--accent-soft); border-color: var(--accent); co
   border-radius: 8px; padding: 0.6rem 0.8rem; font-size: 0.85rem;
 }
 
+/* ---------- toasts ---------- */
+
+.toast-host {
+  position: fixed; right: 1rem; bottom: 1rem; z-index: 200;
+  display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end;
+  pointer-events: none; /* clicks fall through except on the toasts themselves */
+}
+.toast {
+  pointer-events: auto;
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  max-width: min(26rem, calc(100vw - 2rem));
+  background: var(--panel); color: var(--text);
+  border: 1px solid var(--border-strong); border-radius: 10px;
+  padding: 0.55rem 0.6rem 0.55rem 0.75rem; box-shadow: var(--shadow-lift);
+  font-size: 0.83rem; line-height: 1.4;
+  animation: toast-in 0.22s var(--ease-out);
+}
+.toast svg:first-child { flex: none; margin-top: 0.1rem; }
+.toast-msg { flex: 1; }
+.toast-close {
+  flex: none; padding: 0.15rem; border: none; background: none;
+  color: var(--muted); border-radius: 5px; box-shadow: none;
+}
+.toast-close:hover:not(:disabled) { background: var(--panel-2); border: none; box-shadow: none; color: var(--text); }
+.toast-success { border-color: var(--ok); }
+.toast-success svg:first-child { color: var(--ok); }
+.toast-error { border-color: var(--danger); background: var(--danger-soft); }
+.toast-error svg:first-child { color: var(--danger); }
+.toast-warning { border-color: var(--hl); background: var(--hl-soft); }
+.toast-warning svg:first-child { color: var(--hl); }
+.toast-info { border-color: var(--accent); }
+.toast-info svg:first-child { color: var(--accent); }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
 /* ---------- responsive ---------- */
 
 /* Narrow window: editor stacks above the diagram instead of beside it. */

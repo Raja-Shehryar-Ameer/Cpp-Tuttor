@@ -1,5 +1,7 @@
 import { Check, Copy, GitFork, Play, TriangleAlert } from "lucide-react";
 import { useMemo, useState } from "react";
+import { notify } from "../store/toastStore";
+import { validateForkSource } from "../validation";
 import { simulateFork, type ProcNode } from "./vm";
 
 const SAMPLE = `#include <stdio.h>
@@ -109,14 +111,36 @@ export function ForkPage() {
   const [result, setResult] = useState(() => simulateFork(SAMPLE));
   const [copied, setCopied] = useState(false);
 
-  const run = () => setResult(simulateFork(source));
+  const run = () => {
+    const check = validateForkSource(source);
+    if (check.errors.length > 0) {
+      check.errors.forEach((m) => notify.error(m));
+      return; // keep the previous tree on screen instead of blanking it
+    }
+    check.warnings.forEach((m) => notify.warning(m));
+
+    const next = simulateFork(source);
+    setResult(next);
+    if (next.error) {
+      notify.error(`Couldn't parse the program — ${next.error}.`);
+    } else {
+      const zombies = next.processes.filter((p) => p.zombie).length;
+      const orphans = next.processes.filter((p) => p.reparented).length;
+      const extras = [zombies > 0 && `${zombies} zombie${zombies > 1 ? "s" : ""}`, orphans > 0 && `${orphans} orphan${orphans > 1 ? "s" : ""}`]
+        .filter(Boolean)
+        .join(", ");
+      const n = next.processes.length;
+      notify.success(`${n} process${n === 1 ? "" : "es"}${extras ? ` — ${extras}` : ""}.`);
+    }
+  };
+
   const copyOut = async () => {
     try {
       await navigator.clipboard.writeText(result.output);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      /* clipboard blocked */
+      notify.error("The browser blocked clipboard access — select the output and copy manually.");
     }
   };
 

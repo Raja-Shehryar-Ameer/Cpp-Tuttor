@@ -7,17 +7,23 @@
 
 // ------------------------------ lexer ---------------------------------------
 
-type Tok = { t: string; v: string };
+type Tok = { t: string; v: string; line: number };
 
 const KEYWORDS = new Set(["int", "pid_t", "char", "void", "if", "else", "for", "while", "return", "break", "continue"]);
 
 function lex(src: string): Tok[] {
   const toks: Tok[] = [];
   let i = 0;
+  let line = 1; // 1-based, so errors match editor gutters
   const n = src.length;
-  const push = (t: string, v: string) => toks.push({ t, v });
+  const push = (t: string, v: string) => toks.push({ t, v, line });
   while (i < n) {
     const c = src[i];
+    if (c === "\n") {
+      line++;
+      i++;
+      continue;
+    }
     if (c === "#") {
       while (i < n && src[i] !== "\n") i++; // preprocessor line — skip
       continue;
@@ -28,11 +34,14 @@ function lex(src: string): Tok[] {
     }
     if (c === "/" && src[i + 1] === "*") {
       i += 2;
-      while (i < n && !(src[i] === "*" && src[i + 1] === "/")) i++;
+      while (i < n && !(src[i] === "*" && src[i + 1] === "/")) {
+        if (src[i] === "\n") line++;
+        i++;
+      }
       i += 2;
       continue;
     }
-    if (c === " " || c === "\t" || c === "\r" || c === "\n") {
+    if (c === " " || c === "\t" || c === "\r") {
       i++;
       continue;
     }
@@ -43,7 +52,10 @@ function lex(src: string): Tok[] {
         if (src[i] === "\\") {
           s += src[i] + src[i + 1];
           i += 2;
-        } else s += src[i++];
+        } else {
+          if (src[i] === "\n") line++;
+          s += src[i++];
+        }
       }
       i++;
       push("str", s);
@@ -129,7 +141,11 @@ class Parser {
   private eat(t: string, v?: string): Tok {
     const tok = this.toks[this.p];
     if (tok.t !== t || (v !== undefined && tok.v !== v))
-      throw new Error(`expected ${v ?? t} but found "${tok.v || tok.t}"`);
+      throw new Error(
+        tok.t === "eof"
+          ? `expected ${v ?? t} but the program ended — check for a missing brace or semicolon`
+          : `line ${tok.line}: expected ${v ?? t} but found "${tok.v || tok.t}"`,
+      );
     this.p++;
     return tok;
   }
@@ -151,7 +167,7 @@ class Parser {
       }
       this.next();
     }
-    throw new Error("no main() function found");
+    throw new Error("no main() function found — the simulator starts from int main()");
   }
 
   private block(): Stmt & { k: "block" } {
@@ -374,7 +390,12 @@ class Parser {
       }
       return { k: "var", name };
     }
-    throw new Error(`unexpected token "${this.peek().v || this.peek().t}"`);
+    const tok = this.peek();
+    throw new Error(
+      tok.t === "eof"
+        ? "the program ended mid-expression — check for a missing brace or value"
+        : `line ${tok.line}: unexpected "${tok.v || tok.t}" in an expression`,
+    );
   }
 }
 
