@@ -8,6 +8,8 @@
 //  - LFU breaks frequency ties by evicting the page loaded earliest (FIFO).
 //  - Optimal breaks "never needed again" ties by the lowest frame index.
 
+import type { Quiz } from "./engine.ts";
+
 export type PageAlgo = "fifo" | "lru" | "opt" | "clock" | "lfu";
 
 export interface PageAlgoMeta {
@@ -205,6 +207,39 @@ export function pageReplace(algo: PageAlgo, refs: number[], frameCount: number):
     algo, frameCount, refs, steps, faults, hits,
     hitRatio: refs.length > 0 ? hits / refs.length : 0,
   };
+}
+
+export interface StepQuizzes {
+  /** predict mode pauses BEFORE this step (0-based index into run.steps) */
+  step: number;
+  quizzes: Quiz[];
+}
+
+/** Hit-or-fault for every reference, plus "which page is evicted?" whenever a
+    fault hits full memory. Pure — derived from a finished run. */
+export function pagingQuizzes(run: PageRun): StepQuizzes[] {
+  const short = PAGE_ALGOS.find((a) => a.key === run.algo)!.short;
+  return run.steps.map((s, i) => {
+    const quizzes: Quiz[] = [{
+      prompt: `#${s.i}: page ${s.page} is referenced — hit or fault?`,
+      choices: ["Hit", "Fault"],
+      answer: s.hit ? 0 : 1,
+      explain: s.note,
+    }];
+    if (s.victim !== null) {
+      const before = i > 0 ? run.steps[i - 1].frames : run.steps[i].frames.map(() => null);
+      const resident = before.filter((p): p is number => p !== null);
+      if (resident.length >= 2 && resident.includes(s.victim)) {
+        quizzes.push({
+          prompt: `Memory is full — which page does ${short} evict?`,
+          choices: resident.map(String),
+          answer: resident.indexOf(s.victim),
+          explain: s.note,
+        });
+      }
+    }
+    return { step: i, quizzes };
+  });
 }
 
 /** Classroom presets — each one exists to provoke a specific exam question. */

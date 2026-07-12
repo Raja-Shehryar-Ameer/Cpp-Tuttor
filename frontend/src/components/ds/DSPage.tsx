@@ -29,6 +29,7 @@ import {
   Shuffle,
   StepBack,
   StepForward,
+  Target,
   Trash2,
   Triangle,
   Workflow,
@@ -120,6 +121,7 @@ import {
 } from "../../ds/wgraph";
 import { DSView } from "./DSView";
 import { PagingLab } from "./PagingLab";
+import { PredictChips, QuizPanel, usePredictScore } from "./predict";
 import { SchedLab } from "./SchedLab";
 import { ThreadsLab } from "./ThreadsLab";
 
@@ -368,6 +370,11 @@ export function DSPage() {
   const [wgAlgo, setWgAlgo] = useState<WAlgo>("dijkstra");
   const [wgFrom, setWgFrom] = useState("");
   const [wgTo, setWgTo] = useState("");
+  // Predict mode (Graph Algorithms only): pause before each decision frame.
+  const [predictOn, setPredictOn] = useState(false);
+  const [quizAt, setQuizAt] = useState<number | null>(null);
+  const quizDone = useRef(new Set<number>());
+  const predict = usePredictScore();
   const [bulkOpen, setBulkOpen] = useState(false);
   const [bulkText, setBulkText] = useState("");
   const [infoOpen, setInfoOpen] = useState(false);
@@ -409,25 +416,47 @@ export function DSPage() {
   const data = dataRef.current[structure];
   const frame: Frame = frames[idx] ?? { data, hl: [], note: meta.intro };
 
+  const idxRef = useRef(idx);
+  idxRef.current = idx;
+
+  /** Predict gate: true when advancing INTO frame `target` must pause and ask. */
+  const gated = (target: number): boolean =>
+    predictOn && structure === "wgraph" && frames[target]?.quiz !== undefined && !quizDone.current.has(target);
+
   useEffect(() => {
     if (!playing) return;
     const t = window.setInterval(() => {
-      setIdx((i) => {
-        if (i + 1 >= frames.length) {
-          setPlaying(false);
-          return i;
-        }
-        return i + 1;
-      });
+      const next = idxRef.current + 1;
+      if (next >= frames.length) {
+        setPlaying(false);
+        return;
+      }
+      if (gated(next)) {
+        setPlaying(false);
+        setQuizAt(next);
+        return;
+      }
+      setIdx(next);
     }, SPEEDS[speed].ms);
     return () => window.clearInterval(t);
-  }, [playing, frames.length, speed]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, frames, speed, predictOn]);
+
+  /** Scrubbing or restarting abandons a pending question without penalty. */
+  const dismissQuiz = () => {
+    if (quizAt !== null) {
+      quizDone.current.add(quizAt);
+      setQuizAt(null);
+    }
+  };
 
   /** One-frame teacher message without touching the stored structure. */
   const say = (note: string) => {
     setFrames([{ data: dataRef.current[structure], hl: [], bad: [], note }]);
     setIdx(0);
     setPlaying(false);
+    quizDone.current = new Set();
+    setQuizAt(null);
   };
 
   const run = (makeFrames: (d: DSData) => Frame[]) => {
@@ -437,6 +466,8 @@ export function DSPage() {
     setFrames(produced);
     setIdx(0);
     setPlaying(produced.length > 1);
+    quizDone.current = new Set();
+    setQuizAt(null);
   };
 
   /** Run one op per typed value, chaining lessons ("5, 3, 8" inserts all three). */
@@ -1140,6 +1171,18 @@ export function DSPage() {
             <button className="primary" onClick={runWgAlgo}>
               <Play size={13} /> Run
             </button>
+            <button
+              className={predictOn ? "toggled" : ""}
+              title="pause before every decision and ask you to predict it"
+              onClick={() => {
+                setPredictOn((p) => !p);
+                predict.reset();
+                dismissQuiz();
+              }}
+            >
+              <Target size={13} /> Predict
+            </button>
+            <PredictChips state={predict.state} />
             <span className="sched-hint">{wgMeta.blurb}</span>
           </div>
         );
@@ -1188,6 +1231,19 @@ export function DSPage() {
         <DSView frame={frame} />
       </div>
 
+      {quizAt !== null && frames[quizAt]?.quiz && (
+        <QuizPanel
+          quiz={frames[quizAt].quiz!}
+          onAnswer={predict.answer}
+          onContinue={() => {
+            quizDone.current.add(quizAt);
+            setIdx(quizAt);
+            setQuizAt(null);
+            setPlaying(true);
+          }}
+        />
+      )}
+
       <div className="ds-caption">
         <span className="ds-teacher">
           <GraduationCap size={16} aria-hidden="true" />
@@ -1197,16 +1253,28 @@ export function DSPage() {
         </p>
         {frames.length > 1 && (
           <div className="transport ds-transport">
-            <button onClick={() => setIdx(0)} disabled={idx === 0} title="restart lesson">
+            <button onClick={() => { dismissQuiz(); setIdx(0); }} disabled={idx === 0} title="restart lesson">
               <ChevronFirst size={15} />
             </button>
-            <button onClick={() => setIdx((i) => Math.max(0, i - 1))} disabled={idx === 0} title="previous step">
+            <button onClick={() => { dismissQuiz(); setIdx((i) => Math.max(0, i - 1)); }} disabled={idx === 0} title="previous step">
               <StepBack size={15} />
             </button>
             <button className="play-btn" onClick={() => setPlaying(!playing)} title="play / pause">
               {playing ? <Pause size={15} /> : <Play size={15} />}
             </button>
-            <button onClick={() => setIdx((i) => Math.min(frames.length - 1, i + 1))} disabled={idx >= frames.length - 1} title="next step">
+            <button
+              onClick={() => {
+                const next = Math.min(frames.length - 1, idx + 1);
+                if (gated(next)) {
+                  setPlaying(false);
+                  setQuizAt(next);
+                  return;
+                }
+                setIdx(next);
+              }}
+              disabled={idx >= frames.length - 1}
+              title="next step"
+            >
               <StepForward size={15} />
             </button>
             <input
@@ -1218,6 +1286,7 @@ export function DSPage() {
               title="scrub through the lesson"
               onChange={(e) => {
                 setPlaying(false);
+                dismissQuiz();
                 setIdx(Number(e.target.value));
               }}
             />

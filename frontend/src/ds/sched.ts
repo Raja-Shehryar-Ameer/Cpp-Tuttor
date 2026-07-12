@@ -8,6 +8,8 @@
 //  - A preempted process re-enters the ready queue BEHIND processes that
 //    arrived at that same tick (the common exam convention for RR).
 
+import type { Quiz } from "./engine.ts";
+
 export interface ProcSpec {
   name: string;
   arrival: number;
@@ -271,6 +273,41 @@ export function schedule(algo: SchedAlgo, specs: ProcSpec[], quantum = 2): Sched
     cpuUtilization: makespan > 0 ? (makespan - idle) / makespan : 0,
     throughput: makespan > 0 ? metrics.length / makespan : 0,
   };
+}
+
+export interface TickQuiz {
+  /** predict mode pauses BEFORE this tick and asks */
+  tick: number;
+  quiz: Quiz;
+}
+
+/** One question per dispatch decision: "who gets the CPU next?" Pure —
+    derived entirely from a finished run, so it is fuzz-testable. */
+export function schedQuizzes(run: SchedRun): TickQuiz[] {
+  const out: TickQuiz[] = [];
+  for (const tick of run.ticks) {
+    if (!tick.running) continue;
+    const prev = run.ticks[tick.t - 1];
+    if (prev && prev.running === tick.running) continue; // no dispatch this tick
+    // Candidates are everyone who could have been picked: the winner plus the
+    // ready queue snapshot (which excludes the running process).
+    const candidates = [tick.running, ...tick.ready];
+    if (candidates.length < 2) continue; // nothing to predict
+    const choices = [...new Set(candidates)].sort().slice(0, 5);
+    const answer = choices.indexOf(tick.running);
+    if (answer < 0) continue;
+    out.push({
+      tick: tick.t,
+      quiz: {
+        prompt: `t=${tick.t}: the CPU picks its next process — who runs?`,
+        choices,
+        answer,
+        explain: tick.events.find((e) => e.includes("gets the CPU") || e.includes("preempts"))
+          ?? `${tick.running} is dispatched at t=${tick.t}.`,
+      },
+    });
+  }
+  return out;
 }
 
 /** Classroom presets — each one exists to provoke a specific exam question. */

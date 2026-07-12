@@ -303,12 +303,23 @@ export function wgraphDijkstra(d: WGraph, srcV: number, dstV?: number): Frame[] 
     }
     if (u === null) break;
     const front = frontier(); // snapshot BEFORE settling, so u is still listed
+    const cands = d.nodes
+      .filter((n) => !settled.has(n.id) && dist.get(n.id)! < Infinity)
+      .sort((a, b) => a.value - b.value);
     settled.add(u);
     const via = parentEdge.get(u);
     frames.push(snap(d, `Frontier: ${front || "—"}${front ? " — " : ""}${valueOf(d, u)} has the smallest distance (${dist.get(u)}) → settle it${via ? ` via ${edgeName(d, via)}` : ""}. Nothing cheaper can appear later.`, {
       hl: settledIds(),
       ok: [u, ...(via ? [via.id] : [])],
       labels: labels(),
+      ...(cands.length >= 2 ? {
+        quiz: {
+          prompt: "Dijkstra settles one vertex now — which one?",
+          choices: cands.map((n) => `${n.value} (d=${dist.get(n.id)})`),
+          answer: cands.findIndex((n) => n.id === u),
+          explain: `${valueOf(d, u)} carries the smallest tentative distance (${dist.get(u)}) — and a settled distance can never improve, so it is safe to lock in.`,
+        },
+      } : {}),
     }));
     if (dst && u === dst.id) break;
     for (const { edge, to } of adj.get(u) ?? []) {
@@ -384,6 +395,14 @@ export function wgraphPrim(d: WGraph, startV: number): Frame[] {
     frames.push(snap(d, `Crossing edges: ${cut.map((e) => `${edgeName(d, e)}(${e.w})`).join(", ")} — the cheapest is ${edgeName(d, best)} (${best.w}).`, {
       hl: [...cut.map((e) => e.id), ...inTree, ...treeEdges],
       ok: [best.id],
+      ...(cut.length >= 2 ? {
+        quiz: {
+          prompt: "Prim adds one crossing edge to the tree — which one?",
+          choices: cut.map((e) => `${edgeName(d, e)} (${e.w})`),
+          answer: cut.indexOf(best),
+          explain: `${edgeName(d, best)} is the CHEAPEST edge leaving the tree (${best.w}) — the greedy cut rule guarantees it belongs to some MST.`,
+        },
+      } : {}),
     }));
     inTree.add(joining);
     treeEdges.push(best.id);
@@ -434,10 +453,19 @@ export function wgraphKruskal(d: WGraph): Frame[] {
   for (const e of sorted) {
     const ra = find(e.a);
     const rb = find(e.b);
+    const quiz = {
+      prompt: `Next sorted edge: ${edgeName(d, e)} (${e.w}) — take it?`,
+      choices: ["Accept — the endpoints are in different components", "Reject — it would close a cycle"],
+      answer: ra !== rb ? 0 : 1,
+      explain: ra !== rb
+        ? `${valueOf(d, e.a)} is in ${compOf(e.a)} and ${valueOf(d, e.b)} in ${compOf(e.b)} — joining two components can never make a cycle.`
+        : `Both endpoints already sit in ${compOf(e.a)} — a second route between them would be a cycle, and trees have none.`,
+    };
     if (ra !== rb) {
       frames.push(snap(d, `${edgeName(d, e)} (${e.w}): ${valueOf(d, e.a)} is in ${compOf(e.a)}, ${valueOf(d, e.b)} in ${compOf(e.b)} — different components, ACCEPT and union them.`, {
         hl: [...mst],
         ok: [e.id, e.a, e.b],
+        quiz,
       }));
       parent.set(ra, rb);
       mst.push(e.id);
@@ -447,6 +475,7 @@ export function wgraphKruskal(d: WGraph): Frame[] {
       frames.push(snap(d, `${edgeName(d, e)} (${e.w}): both endpoints are already in ${compOf(e.a)} — it would close a cycle, REJECT.`, {
         hl: [...mst],
         bad: [e.id],
+        quiz,
       }));
     }
   }

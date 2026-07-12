@@ -972,6 +972,31 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .warn-row td { background: var(--danger-soft); font-weight: 700; }
 .sweep-head { margin-top: 1.1rem; }
 
+/* ---------- predict mode ---------- */
+
+.quiz-panel {
+  display: flex; gap: 0.7rem; align-items: flex-start;
+  margin: 0 1.4rem 0.8rem; padding: 0.85rem 1rem;
+  background: var(--panel); border: 2px solid var(--ink); border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+.quiz-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; flex: none; border-radius: 8px;
+  background: var(--hl-soft); color: var(--hl-ink); border: 2px solid var(--hl);
+}
+.quiz-body { flex: 1; min-width: 0; }
+.quiz-prompt { margin: 0.15rem 0 0.55rem; font-weight: 700; }
+.quiz-choices { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.quiz-choices button.quiz-right { border-color: var(--ok); background: var(--ok-soft); }
+.quiz-choices button.quiz-wrong { border-color: var(--danger); background: var(--danger-soft); }
+.quiz-choices button.quiz-dim { opacity: 0.45; }
+.quiz-choices button:disabled { cursor: default; }
+.quiz-after { display: flex; align-items: center; gap: 0.8rem; margin-top: 0.65rem; flex-wrap: wrap; }
+.quiz-explain { margin: 0; font-size: 0.85rem; color: var(--muted); flex: 1; min-width: 220px; }
+.quiz-explain strong { color: var(--text); }
+.quiz-chip { border-color: var(--hl); }
+
 /* ---------- threads lab ---------- */
 
 .threads-stage {

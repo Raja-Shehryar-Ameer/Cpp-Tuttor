@@ -9,22 +9,25 @@ import {
   Shuffle,
   StepBack,
   StepForward,
+  Target,
   Trash2,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MAX_ARRIVAL,
   MAX_BURST,
   MAX_PROCS,
   SCHED_ALGOS,
   SCHED_PRESETS,
+  schedQuizzes,
   schedule,
   type ProcSpec,
   type SchedAlgo,
   type SchedRun,
 } from "../../ds/sched";
 import { notify } from "../../store/toastStore";
+import { PredictChips, QuizPanel, usePredictScore } from "./predict";
 
 // Process colors: warm, high-contrast, no blue/purple. Index-stable so P1 is
 // always the same color across Gantt, queue chips, and the metrics table.
@@ -50,22 +53,50 @@ export function SchedLab() {
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [compare, setCompare] = useState(false);
+  // Predict mode: pause before each dispatch decision and ask who runs next.
+  const [predictOn, setPredictOn] = useState(false);
+  const [quizAt, setQuizAt] = useState<number | null>(null);
+  const quizDone = useRef(new Set<number>());
+  const predict = usePredictScore();
 
   const meta = SCHED_ALGOS.find((a) => a.key === algo)!;
+
+  const quizByTick = useMemo(
+    () => new Map(run ? schedQuizzes(run).map((q) => [q.tick, q.quiz]) : []),
+    [run],
+  );
+
+  const tickRef = useRef(tick);
+  tickRef.current = tick;
+
+  const gated = (target: number): boolean =>
+    predictOn && quizByTick.has(target) && !quizDone.current.has(target);
+
+  const dismissQuiz = () => {
+    if (quizAt !== null) {
+      quizDone.current.add(quizAt);
+      setQuizAt(null);
+    }
+  };
 
   useEffect(() => {
     if (!playing || !run) return;
     const t = window.setInterval(() => {
-      setTick((i) => {
-        if (i + 1 > run.makespan) {
-          setPlaying(false);
-          return i;
-        }
-        return i + 1;
-      });
+      const next = tickRef.current + 1;
+      if (next > run.makespan) {
+        setPlaying(false);
+        return;
+      }
+      if (gated(next)) {
+        setPlaying(false);
+        setQuizAt(next);
+        return;
+      }
+      setTick(next);
     }, SPEEDS[speed].ms);
     return () => window.clearInterval(t);
-  }, [playing, run, speed]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, run, speed, predictOn]);
 
   const editProc = (i: number, field: keyof ProcSpec, raw: string) => {
     setRun(null);
@@ -149,6 +180,8 @@ export function SchedLab() {
     setTick(0);
     setPlaying(true);
     setCompare(false);
+    quizDone.current = new Set();
+    setQuizAt(null);
   };
 
   // Comparison table: the same workload pushed through every algorithm.
@@ -196,6 +229,18 @@ export function SchedLab() {
         <button className="primary" onClick={runNow}>
           <Play size={13} /> Schedule
         </button>
+        <button
+          className={predictOn ? "toggled" : ""}
+          title="pause before every dispatch and ask you who runs next"
+          onClick={() => {
+            setPredictOn((p) => !p);
+            predict.reset();
+            dismissQuiz();
+          }}
+        >
+          <Target size={13} /> Predict
+        </button>
+        <PredictChips state={predict.state} />
         <button className={compare ? "toggled" : ""} onClick={() => { if (!compare && !validate()) return; setCompare((c) => !c); setRun(null); setPlaying(false); }}
           title="run this workload through every algorithm and compare the averages">
           <Scale size={13} /> Compare all
@@ -378,21 +423,46 @@ export function SchedLab() {
         )}
       </div>
 
+      {quizAt !== null && quizByTick.has(quizAt) && (
+        <QuizPanel
+          quiz={quizByTick.get(quizAt)!}
+          onAnswer={predict.answer}
+          onContinue={() => {
+            quizDone.current.add(quizAt);
+            setTick(quizAt);
+            setQuizAt(null);
+            setPlaying(true);
+          }}
+        />
+      )}
+
       <div className="ds-caption">
         <span className="ds-teacher"><Cpu size={16} aria-hidden="true" /></span>
         <p key={note} className="ds-note">{note}</p>
         {shown && (
           <div className="transport ds-transport">
-            <button onClick={() => setTick(0)} disabled={now === 0} title="restart">
+            <button onClick={() => { dismissQuiz(); setTick(0); }} disabled={now === 0} title="restart">
               <ChevronFirst size={15} />
             </button>
-            <button onClick={() => setTick((i) => Math.max(0, i - 1))} disabled={now === 0} title="previous tick">
+            <button onClick={() => { dismissQuiz(); setTick((i) => Math.max(0, i - 1)); }} disabled={now === 0} title="previous tick">
               <StepBack size={15} />
             </button>
             <button className="play-btn" onClick={() => { if (now >= shown.makespan) setTick(0); setPlaying(!playing); }} title="play / pause">
               {playing ? <Pause size={15} /> : <Play size={15} />}
             </button>
-            <button onClick={() => setTick((i) => Math.min(shown.makespan, i + 1))} disabled={now >= shown.makespan} title="next tick">
+            <button
+              onClick={() => {
+                const next = Math.min(shown.makespan, now + 1);
+                if (gated(next)) {
+                  setPlaying(false);
+                  setQuizAt(next);
+                  return;
+                }
+                setTick(next);
+              }}
+              disabled={now >= shown.makespan}
+              title="next tick"
+            >
               <StepForward size={15} />
             </button>
             <input
@@ -402,7 +472,7 @@ export function SchedLab() {
               max={shown.makespan}
               value={now}
               title="scrub through time"
-              onChange={(e) => { setPlaying(false); setTick(Number(e.target.value)); }}
+              onChange={(e) => { setPlaying(false); dismissQuiz(); setTick(Number(e.target.value)); }}
             />
             <button className="speed-btn" onClick={() => setSpeed((s) => (s + 1) % SPEEDS.length)} title="playback speed">
               <Gauge size={13} /> {SPEEDS[speed].label}

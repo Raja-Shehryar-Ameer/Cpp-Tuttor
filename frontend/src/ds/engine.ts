@@ -46,6 +46,16 @@ export type DSData =
   | { kind: "oahash"; slots: (ListNode | "tomb" | null)[]; probe: "linear" | "quadratic" }
   | { kind: "array"; items: ListNode[] };
 
+/** A predict-mode question. Attached to the frame that REVEALS the answer,
+    so a paused player can ask it before showing that frame. */
+export interface Quiz {
+  prompt: string;
+  choices: string[];
+  /** index into choices */
+  answer: number;
+  explain: string;
+}
+
 export interface Frame {
   data: DSData;
   /** node ids drawn highlighted (the teacher's pointer) */
@@ -57,6 +67,8 @@ export interface Frame {
   pivot?: number[];
   /** per-node captions drawn under the circle (id → "d=7", "in: 2", …) */
   labels?: Record<number, string>;
+  /** predict mode pauses BEFORE this frame and asks */
+  quiz?: Quiz;
   note: string;
 }
 

@@ -8,9 +8,10 @@ import {
   Shuffle,
   StepBack,
   StepForward,
+  Target,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MAX_FRAMES,
   MAX_PAGE,
@@ -18,10 +19,12 @@ import {
   PAGE_ALGOS,
   PAGE_PRESETS,
   pageReplace,
+  pagingQuizzes,
   type PageAlgo,
   type PageRun,
 } from "../../ds/paging";
 import { notify } from "../../store/toastStore";
+import { PredictChips, QuizPanel, usePredictScore } from "./predict";
 
 // Page chips reuse the scheduler's warm process palette (.pc-0 … .pc-7),
 // keyed by page number so page 7 is the same color everywhere it appears.
@@ -55,22 +58,52 @@ export function PagingLab() {
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [compare, setCompare] = useState(false);
+  // Predict mode: every reference asks hit-or-fault; full-memory faults also
+  // ask which page gets evicted. quizPos = [step index, question index].
+  const [predictOn, setPredictOn] = useState(false);
+  const [quizPos, setQuizPos] = useState<[number, number] | null>(null);
+  const quizDone = useRef(new Set<number>());
+  const predict = usePredictScore();
 
   const meta = PAGE_ALGOS.find((a) => a.key === algo)!;
+
+  const quizzesByStep = useMemo(
+    () => (run ? pagingQuizzes(run).map((s) => s.quizzes) : []),
+    [run],
+  );
+
+  const tickRef = useRef(tick);
+  tickRef.current = tick;
+
+  /** Advancing to tick `target` reveals step target-1. */
+  const gated = (target: number): boolean =>
+    predictOn && target >= 1 && (quizzesByStep[target - 1]?.length ?? 0) > 0 && !quizDone.current.has(target - 1);
+
+  const dismissQuiz = () => {
+    if (quizPos !== null) {
+      quizDone.current.add(quizPos[0]);
+      setQuizPos(null);
+    }
+  };
 
   useEffect(() => {
     if (!playing || !run) return;
     const t = window.setInterval(() => {
-      setTick((i) => {
-        if (i + 1 > run.steps.length) {
-          setPlaying(false);
-          return i;
-        }
-        return i + 1;
-      });
+      const next = tickRef.current + 1;
+      if (next > run.steps.length) {
+        setPlaying(false);
+        return;
+      }
+      if (gated(next)) {
+        setPlaying(false);
+        setQuizPos([next - 1, 0]);
+        return;
+      }
+      setTick(next);
     }, SPEEDS[speed].ms);
     return () => window.clearInterval(t);
-  }, [playing, run, speed]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, run, speed, predictOn]);
 
   const invalidate = () => {
     setRun(null);
@@ -105,6 +138,8 @@ export function PagingLab() {
     setTick(0);
     setPlaying(true);
     setCompare(false);
+    quizDone.current = new Set();
+    setQuizPos(null);
   };
 
   const loadPreset = (name: string) => {
@@ -177,6 +212,18 @@ export function PagingLab() {
         <button className="primary" onClick={runNow}>
           <Play size={13} /> Run
         </button>
+        <button
+          className={predictOn ? "toggled" : ""}
+          title="pause before every reference and ask hit-or-fault (and who gets evicted)"
+          onClick={() => {
+            setPredictOn((p) => !p);
+            predict.reset();
+            dismissQuiz();
+          }}
+        >
+          <Target size={13} /> Predict
+        </button>
+        <PredictChips state={predict.state} />
         <button
           className={compare ? "toggled" : ""}
           onClick={() => {
@@ -366,15 +413,33 @@ export function PagingLab() {
         )}
       </div>
 
+      {quizPos !== null && quizzesByStep[quizPos[0]]?.[quizPos[1]] && (
+        <QuizPanel
+          quiz={quizzesByStep[quizPos[0]][quizPos[1]]}
+          onAnswer={predict.answer}
+          onContinue={() => {
+            const [step, qi] = quizPos;
+            if (qi + 1 < quizzesByStep[step].length) {
+              setQuizPos([step, qi + 1]); // second question: who gets evicted?
+              return;
+            }
+            quizDone.current.add(step);
+            setQuizPos(null);
+            setTick(step + 1);
+            setPlaying(true);
+          }}
+        />
+      )}
+
       <div className="ds-caption">
         <span className="ds-teacher"><MemoryStick size={16} aria-hidden="true" /></span>
         <p key={note} className="ds-note">{note}</p>
         {shown && (
           <div className="transport ds-transport">
-            <button onClick={() => setTick(0)} disabled={now === 0} title="restart">
+            <button onClick={() => { dismissQuiz(); setTick(0); }} disabled={now === 0} title="restart">
               <ChevronFirst size={15} />
             </button>
-            <button onClick={() => setTick((i) => Math.max(0, i - 1))} disabled={now === 0} title="previous reference">
+            <button onClick={() => { dismissQuiz(); setTick((i) => Math.max(0, i - 1)); }} disabled={now === 0} title="previous reference">
               <StepBack size={15} />
             </button>
             <button
@@ -384,7 +449,19 @@ export function PagingLab() {
             >
               {playing ? <Pause size={15} /> : <Play size={15} />}
             </button>
-            <button onClick={() => setTick((i) => Math.min(shown.steps.length, i + 1))} disabled={now >= shown.steps.length} title="next reference">
+            <button
+              onClick={() => {
+                const next = Math.min(shown.steps.length, now + 1);
+                if (gated(next)) {
+                  setPlaying(false);
+                  setQuizPos([next - 1, 0]);
+                  return;
+                }
+                setTick(next);
+              }}
+              disabled={now >= shown.steps.length}
+              title="next reference"
+            >
               <StepForward size={15} />
             </button>
             <input
@@ -394,7 +471,7 @@ export function PagingLab() {
               max={shown.steps.length}
               value={now}
               title="scrub through the reference string"
-              onChange={(e) => { setPlaying(false); setTick(Number(e.target.value)); }}
+              onChange={(e) => { setPlaying(false); dismissQuiz(); setTick(Number(e.target.value)); }}
             />
             <button className="speed-btn" onClick={() => setSpeed((s) => (s + 1) % SPEEDS.length)} title="playback speed">
               <Gauge size={13} /> {SPEEDS[speed].label}
