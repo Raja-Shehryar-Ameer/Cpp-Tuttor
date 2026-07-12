@@ -820,48 +820,8 @@ export function graphAddEdge(
   return [snap(data, `Edge ${a} — ${b} added (undirected: each is now the other's neighbour).`, { hl: [na.id, nb.id], ok: [na.id, nb.id] })];
 }
 
-export function graphTraverse(
-  d: { nodes: ListNode[]; edges: [number, number][] },
-  start: number,
-  mode: "bfs" | "dfs",
-): Frame[] {
-  const data: DSData = { kind: "graph", nodes: clone(d.nodes), edges: clone(d.edges) };
-  const startNode = data.nodes.find((n) => n.value === start);
-  if (!startNode) return [snap(data, `Vertex ${start} does not exist — add it first.`, { bad: [] })];
-
-  const adj = new Map<number, number[]>();
-  for (const [a, b] of data.edges) {
-    adj.set(a, [...(adj.get(a) ?? []), b]);
-    adj.set(b, [...(adj.get(b) ?? []), a]);
-  }
-  const label = (id: number) => data.nodes.find((n) => n.id === id)?.value;
-
-  const frames: Frame[] = [];
-  const visited: number[] = [];
-  const work: number[] = [startNode.id];
-  const seen = new Set([startNode.id]);
-  frames.push(snap(data, mode === "bfs"
-    ? `BFS from ${start}: explore level by level using a QUEUE.`
-    : `DFS from ${start}: dive as deep as possible first, using a STACK.`, { hl: [startNode.id] }));
-  while (work.length) {
-    const id = mode === "bfs" ? (work.shift() as number) : (work.pop() as number);
-    visited.push(id);
-    const neighbours = (adj.get(id) ?? []).filter((n) => !seen.has(n));
-    neighbours.forEach((n) => seen.add(n));
-    work.push(...neighbours);
-    frames.push(
-      snap(data, neighbours.length
-        ? `Visit ${label(id)} and ${mode === "bfs" ? "enqueue" : "push"} its unseen neighbours: ${neighbours.map(label).join(", ")}.`
-        : `Visit ${label(id)} — no new neighbours from here.`, { hl: [...visited], ok: [id] }),
-    );
-  }
-  frames.push(
-    snap(data, `Traversal complete. Order: ${visited.map(label).join(" → ")}${
-      visited.length < data.nodes.length ? " (unreached vertices are in a different component)" : ""
-    }.`, { ok: [...visited] }),
-  );
-  return frames;
-}
+// BFS/DFS and shortest-path narration moved to wgraph.ts (the Graph
+// Algorithms lab) — the plain Graph card is structure-building only.
 
 export function graphRemoveNode(d: { nodes: ListNode[]; edges: [number, number][] }, value: number): Frame[] {
   const node = d.nodes.find((n) => n.value === value);
@@ -896,53 +856,6 @@ export function graphUpdateNode(d: { nodes: ListNode[]; edges: [number, number][
   const frames = [snap(data, `Renaming vertex ${from} to ${to} — labels are just data; the edges don't care.`, { hl: [node.id] })];
   node.value = to;
   frames.push(snap(data, `Done: same vertex, same neighbours, new label ${to}.`, { hl: [node.id], ok: [node.id] }));
-  return frames;
-}
-
-export function graphPath(d: { nodes: ListNode[]; edges: [number, number][] }, a: number, b: number): Frame[] {
-  const data: DSData = { kind: "graph", nodes: clone(d.nodes), edges: clone(d.edges) };
-  const na = data.nodes.find((n) => n.value === a);
-  const nb = data.nodes.find((n) => n.value === b);
-  if (!na || !nb) return [snap(data, `Both endpoints must exist — add them first.`, { bad: [] })];
-  if (na === nb) return [snap(data, `Start and goal are the same vertex — a path of 0 edges.`, { ok: [na.id] })];
-
-  const adj = new Map<number, number[]>();
-  for (const [x, y] of data.edges) {
-    adj.set(x, [...(adj.get(x) ?? []), y]);
-    adj.set(y, [...(adj.get(y) ?? []), x]);
-  }
-  const label = (id: number) => data.nodes.find((n) => n.id === id)?.value;
-
-  const frames: Frame[] = [
-    snap(data, `SHORTEST PATH ${a} → ${b}: BFS explores level by level, so the FIRST time it reaches ${b} is via a fewest-edges route.`, { hl: [na.id] }),
-  ];
-  const parent = new Map<number, number>();
-  const q = [na.id];
-  const seen = new Set([na.id]);
-  let found = false;
-  while (q.length && !found) {
-    const id = q.shift() as number;
-    for (const nx of adj.get(id) ?? []) {
-      if (seen.has(nx)) continue;
-      seen.add(nx);
-      parent.set(nx, id);
-      q.push(nx);
-      if (nx === nb.id) {
-        found = true;
-        break;
-      }
-    }
-    frames.push(snap(data, found
-      ? `Expanding ${label(id)} discovers ${b} — stop the search.`
-      : `Expand ${label(id)} — everything reached so far is at most ${seen.size - 1} hop(s) deep.`, { hl: [...seen] }));
-  }
-  if (!found) {
-    frames.push(snap(data, `The frontier died out without reaching ${b} — it lives in a different component; NO path exists.`, { bad: [] }));
-    return frames;
-  }
-  const path = [nb.id];
-  while (path[0] !== na.id) path.unshift(parent.get(path[0]) as number);
-  frames.push(snap(data, `Walk the parent links back: ${path.map(label).join(" → ")} — ${path.length - 1} edge(s), provably the minimum.`, { ok: path }));
   return frames;
 }
 

@@ -47,10 +47,8 @@ import {
   bstUpdate,
   graphAddEdge,
   graphAddNode,
-  graphPath,
   graphRemoveEdge,
   graphRemoveNode,
-  graphTraverse,
   graphUpdateNode,
   emptyOA,
   HASH_BUCKETS,
@@ -221,8 +219,8 @@ const STRUCTURES: StructureMeta[] = [
   },
   {
     key: "graph", label: "Graph", icon: Network,
-    intro: "Vertices and edges. Build one, then run BFS or DFS and watch the frontier spread.",
-    complexity: ["BFS O(V+E)", "DFS O(V+E)", "Space O(V+E)"],
+    intro: "The structure itself: vertices and an adjacency list. Build and reshape it here — to RUN algorithms on a graph, open Graph Algorithms.",
+    complexity: ["Add vertex O(1)", "Remove vertex O(V+E)", "Adjacency list O(V+E)"],
     bulkPlaceholder: "1 2\n2 3\n3 1\n4", bulkHint: "one edge per line as “A B” — a lone number adds an isolated vertex",
   },
   {
@@ -617,7 +615,7 @@ export function DSPage() {
       dataRef.current.graph = d;
       lesson.push({
         data: d, hl: [],
-        note: `Loaded ${seen.size} ${seen.size === 1 ? "vertex" : "vertices"} and ${edgeCount} ${edgeCount === 1 ? "edge" : "edges"}${bad ? ` (skipped ${bad} unreadable ${bad === 1 ? "line" : "lines"})` : ""}. Try BFS or DFS from a vertex.`,
+        note: `Loaded ${seen.size} ${seen.size === 1 ? "vertex" : "vertices"} and ${edgeCount} ${edgeCount === 1 ? "edge" : "edges"}${bad ? ` (skipped ${bad} unreadable ${bad === 1 ? "line" : "lines"})` : ""}. To traverse it, head to the Graph Algorithms card.`,
       });
       setFrames(lesson);
       setIdx(0);
@@ -1028,11 +1026,6 @@ export function DSPage() {
               <input className="ds-input small" value={edgeB} placeholder="B" onChange={(e) => setEdgeB(e.target.value)} />
               <button onClick={() => runEdge(true, (d, a, b) => graphAddEdge(d as never, a, b))}>Add edge</button>
               <button onClick={() => runEdge(true, (d, a, b) => graphRemoveEdge(d as never, a, b))}>Remove edge</button>
-              <button onClick={() => runEdge(false, (d, a) => graphTraverse(d as never, a, "bfs"))}>BFS from A</button>
-              <button onClick={() => runEdge(false, (d, a) => graphTraverse(d as never, a, "dfs"))}>DFS from A</button>
-              <button onClick={() => runEdge(true, (d, a, b) => graphPath(d as never, a, b))}>
-                <Route size={13} /> Path A→B
-              </button>
             </span>
           </>
         )}
