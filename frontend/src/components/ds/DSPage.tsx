@@ -18,6 +18,7 @@ import {
   ListTree,
   MemoryStick,
   Network,
+  Rows3,
   Pause,
   Pencil,
   Play,
@@ -96,6 +97,7 @@ import {
   type Probe,
   type TreeNode,
 } from "../../ds/engine";
+import { BT_ORDERS, btInsert, btRemove, btSearch, emptyBTree } from "../../ds/btree";
 import {
   MAX_WG_EDGES,
   MAX_WG_VERTICES,
@@ -130,6 +132,7 @@ type Structure =
   | "rb"
   | "heap"
   | "hash"
+  | "btree"
   | "graph"
   | "wgraph"
   | "array"
@@ -146,7 +149,8 @@ type Category = "Data structures" | "Algorithms" | "Operating systems";
 const CATEGORY: Record<Topic, Category> = {
   list: "Data structures", stack: "Data structures", queue: "Data structures",
   bst: "Data structures", avl: "Data structures", rb: "Data structures",
-  heap: "Data structures", hash: "Data structures", graph: "Data structures",
+  heap: "Data structures", hash: "Data structures", btree: "Data structures",
+  graph: "Data structures",
   array: "Algorithms", search: "Algorithms", wgraph: "Algorithms",
   sched: "Operating systems", threads: "Operating systems", paging: "Operating systems",
 };
@@ -218,6 +222,12 @@ const STRUCTURES: StructureMeta[] = [
     bulkPlaceholder: "7, 14, 21, 3, 10", bulkHint: `keys land in bucket (key mod ${HASH_BUCKETS}) — same-bucket keys chain up`,
   },
   {
+    key: "btree", label: "B-Trees", icon: Rows3,
+    intro: "The disk-friendly search tree: wide nodes holding several keys each, splitting upward as they fill. Switch to B+ mode to see values pushed to a linked leaf level — the shape inside every database index.",
+    complexity: ["Search O(log n)", "Insert O(log n)", "Delete O(log n) — borrow/merge"],
+    bulkPlaceholder: "10, 20, 5, 6, 12, 30, 7, 17", bulkHint: "values inserted in order — watch nodes overflow and split upward",
+  },
+  {
     key: "graph", label: "Graph", icon: Network,
     intro: "The structure itself: vertices and an adjacency list. Build and reshape it here — to RUN algorithms on a graph, open Graph Algorithms.",
     complexity: ["Add vertex O(1)", "Remove vertex O(V+E)", "Adjacency list O(V+E)"],
@@ -284,6 +294,7 @@ const empty = (s: Structure): DSData => {
   if (s === "queue") return { kind: "queue", items: [] };
   if (s === "graph") return { kind: "graph", nodes: [], edges: [] };
   if (s === "wgraph") return { kind: "wgraph", nodes: [], edges: [], directed: false };
+  if (s === "btree") return emptyBTree(3, false);
   if (s === "heap") return { kind: "heap", items: [] };
   if (s === "hash") return { kind: "hash", buckets: Array.from({ length: HASH_BUCKETS }, () => []) };
   if (s === "array" || s === "search") return { kind: "array", items: [] };
@@ -340,6 +351,7 @@ export function DSPage() {
     rb: empty("rb"),
     heap: empty("heap"),
     hash: empty("hash"),
+    btree: empty("btree"),
     graph: empty("graph"),
     wgraph: empty("wgraph"),
     array: empty("array"),
@@ -360,6 +372,23 @@ export function DSPage() {
   const [bulkText, setBulkText] = useState("");
   const [infoOpen, setInfoOpen] = useState(false);
   const [hashMode, setHashMode] = useState<HashMode>("chain");
+  const [btOrder, setBtOrder] = useState(3);
+  const [btPlus, setBtPlus] = useState(false);
+
+  /** Variant/degree changes reset the tree — old shapes aren't valid under new rules. */
+  const switchBTree = (order: number, plus: boolean) => {
+    setBtOrder(order);
+    setBtPlus(plus);
+    dataRef.current.btree = emptyBTree(order, plus);
+    setFrames([{
+      data: dataRef.current.btree, hl: [],
+      note: plus
+        ? `B+ tree, max degree ${order}: every VALUE lives in a leaf, internal nodes hold routing copies, and the leaves chain left-to-right. Fresh tree.`
+        : `B-tree, max degree ${order}: up to ${order - 1} keys per node, values stored everywhere, splits push the median up. Fresh tree.`,
+    }]);
+    setIdx(0);
+    setPlaying(false);
+  };
 
   const emptyHash = (mode: HashMode): DSData => (mode === "chain" ? empty("hash") : emptyOA(mode));
 
@@ -545,6 +574,8 @@ export function DSPage() {
       // The directed/undirected setting is a mode, not data — it survives reset.
       const directed = (dataRef.current.wgraph as WGraph).directed;
       dataRef.current.wgraph = { kind: "wgraph", nodes: [], edges: [], directed };
+    } else if (structure === "btree") {
+      dataRef.current.btree = emptyBTree(btOrder, btPlus);
     } else {
       dataRef.current[structure] = structure === "hash" ? emptyHash(hashMode) : empty(structure);
     }
@@ -688,7 +719,9 @@ export function DSPage() {
       const op = structure === "list"
         ? (d: DSData, v: number) => listInsertBack(d as never, v)
         : insertOps[structure][0][1];
-      let d = structure === "hash" ? emptyHash(hashMode) : empty(structure);
+      let d = structure === "hash" ? emptyHash(hashMode)
+        : structure === "btree" ? emptyBTree(btOrder, btPlus)
+        : empty(structure);
       // One highlighted frame per value: the playback shows each value
       // finding its place (rotations, sifting, probing already applied).
       const lesson: Frame[] = [];
@@ -721,6 +754,7 @@ export function DSPage() {
     rb: [["Insert", (d, v) => rbInsert(rootOf(d), v)]],
     heap: [["Insert", (d, v) => heapInsert(d as never, v)]],
     hash: [["Insert", (d, v) => (hashMode === "chain" ? hashInsert(d as never, v) : oaHashInsert(d as never, v))]],
+    btree: [["Insert", (d, v) => btInsert(d as never, v)]],
     graph: [["Add vertex", (d, v) => graphAddNode(d as never, v)]],
     wgraph: [["Add vertex", (d, v) => wgraphAddNode(d as never, v)]],
     array: [["Add", (d, v) => arrayPush(d as never, v)]],
@@ -979,6 +1013,31 @@ export function DSPage() {
             <button onClick={() => runEach((d, v) => searchBinary(d as never, v))}>
               <SearchCheck size={13} /> Binary search
             </button>
+          </>
+        )}
+        {structure === "btree" && (
+          <>
+            <button onClick={() => runEach((d, v) => btRemove(d as never, v))}>
+              <Trash2 size={13} /> Delete
+            </button>
+            <button onClick={() => runEach((d, v) => btSearch(d as never, v))}>
+              <Search size={13} /> Search
+            </button>
+            <label className="ds-mode" title="B stores values everywhere; B+ keeps them all in linked leaves">
+              variant:
+              <select value={btPlus ? "bplus" : "b"} onChange={(e) => switchBTree(btOrder, e.target.value === "bplus")}>
+                <option value="b">B-tree</option>
+                <option value="bplus">B+ tree</option>
+              </select>
+            </label>
+            <label className="ds-mode" title="max children per node; max keys = degree − 1">
+              degree:
+              <select value={btOrder} onChange={(e) => switchBTree(Number(e.target.value), btPlus)}>
+                {BT_ORDERS.map((o) => (
+                  <option key={o} value={o}>{o}</option>
+                ))}
+              </select>
+            </label>
           </>
         )}
         {structure === "wgraph" && (

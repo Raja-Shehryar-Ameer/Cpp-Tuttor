@@ -715,6 +715,17 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   transition: fill 0.3s ease;
 }
 /* the teacher's highlighter is amber; green = success, red = trouble */
+/* B-tree scene: the node frame is a quiet container; keys are the actors.
+   B+ separators read muted so routing copies don't look like data.
+   (Declared BEFORE the hl/ok/bad rules so state flashes still win.) */
+.ds-bnode { fill: var(--panel-2); stroke: var(--ink); stroke-width: 2; }
+.ds-node.ds-sep .ds-box { fill: var(--stack-bg); stroke-dasharray: 4 3; }
+.ds-node.ds-sep .ds-value { fill: var(--stack-ink); }
+.ds-bchain {
+  stroke: var(--arrow); stroke-width: 1.8; fill: none; stroke-dasharray: 5 4;
+  transition: d 0.6s var(--ease-glide);
+}
+
 .ds-node.hl .ds-box, .ds-node.hl .ds-circle, .ds-node.hl .ds-bar { stroke: var(--hl); stroke-width: 3; fill: var(--hl-soft); }
 .ds-node.ok .ds-box, .ds-node.ok .ds-circle, .ds-node.ok .ds-bar { stroke: var(--ok); stroke-width: 3; fill: var(--ok-soft); }
 .ds-node.bad .ds-box, .ds-node.bad .ds-circle, .ds-node.bad .ds-bar { stroke: var(--danger); stroke-width: 3; fill: var(--danger-soft); }

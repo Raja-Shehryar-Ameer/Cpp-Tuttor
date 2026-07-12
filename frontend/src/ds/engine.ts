@@ -24,6 +24,15 @@ export interface WEdge {
   w: number;
 }
 
+/** Multi-key node for B-trees and B+ trees. Keys are ListNodes so a single
+    key can FLIP-glide between nodes during splits, borrows, and merges.
+    children.length === 0 means leaf; otherwise children.length === keys.length + 1. */
+export interface BNode {
+  id: number;
+  keys: ListNode[];
+  children: BNode[];
+}
+
 export type DSData =
   | { kind: "list"; nodes: ListNode[] }
   | { kind: "stack"; items: ListNode[] }
@@ -31,6 +40,7 @@ export type DSData =
   | { kind: "tree"; root: TreeNode | null }
   | { kind: "graph"; nodes: ListNode[]; edges: [number, number][] }
   | { kind: "wgraph"; nodes: ListNode[]; edges: WEdge[]; directed: boolean }
+  | { kind: "btree"; root: BNode | null; order: number; plus: boolean }
   | { kind: "heap"; items: ListNode[] }
   | { kind: "hash"; buckets: ListNode[][] }
   | { kind: "oahash"; slots: (ListNode | "tomb" | null)[]; probe: "linear" | "quadratic" }

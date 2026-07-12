@@ -1,6 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useRef } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import type { DSData, Frame, TreeNode, WEdge } from "../../ds/engine";
+import type { BNode, DSData, Frame, TreeNode, WEdge } from "../../ds/engine";
 
 // SVG <line> endpoints cannot be CSS-transitioned, so every edge is a
 // two-point <path>: its `d` glides along with the node transforms.
@@ -407,6 +407,104 @@ function GraphScene({
   );
 }
 
+/** B-tree / B+ tree: multi-key nodes sized by their key count. Every KEY is
+    its own GlideG at GLOBAL coordinates, so a median physically glides from
+    child to parent during a split (nesting keys inside a node's GlideG would
+    double-animate them). B+ trees draw the derived leaf chain as arrows. */
+function BTreeScene({ frame, root, plus }: { frame: Frame; root: BNode | null; plus: boolean }) {
+  const chainId = useId();
+  const KW = 38; // key pitch: 34px box + 4px gap
+
+  interface PKey { id: number; value: number; x: number; y: number; sep: boolean }
+  const nodes: { id: number; x: number; y: number; w: number }[] = [];
+  const keys: PKey[] = [];
+  const links: { id: number; x1: number; y1: number; x2: number; y2: number }[] = [];
+  const leaves: { id: number; x: number; y: number; w: number }[] = [];
+  let cursor = 26;
+  let maxDepth = 0;
+
+  const place = (n: BNode, depth: number): { cx: number; y: number } => {
+    maxDepth = Math.max(maxDepth, depth);
+    const w = Math.max(n.keys.length, 1) * KW + 6;
+    const y = 30 + depth * 88;
+    let x: number;
+    if (n.children.length === 0) {
+      x = cursor;
+      cursor += w + 22;
+    } else {
+      const kids = n.children.map((c) => place(c, depth + 1));
+      x = (kids[0].cx + kids[kids.length - 1].cx) / 2 - w / 2;
+      kids.forEach((kid, i) => {
+        // connector leaves the parent at the gap before key i (clamped to the rim)
+        const gx = Math.min(Math.max(x + 4 + i * KW, x + 6), x + w - 6);
+        links.push({ id: n.children[i].id, x1: gx, y1: y + 38, x2: kid.cx, y2: kid.y });
+      });
+    }
+    nodes.push({ id: n.id, x, y, w });
+    n.keys.forEach((k, j) => keys.push({ id: k.id, value: k.value, x: x + 4 + j * KW, y: y + 3, sep: plus && n.children.length > 0 }));
+    if (n.children.length === 0) leaves.push({ id: n.id, x, y, w });
+    return { cx: x + w / 2, y };
+  };
+  if (root) place(root, 0);
+
+  const w = Math.max(460, cursor + 8);
+  const h = Math.max(240, 30 + (maxDepth + 1) * 88 + 10);
+  const lifts = useLifts(
+    keys.map((k) => ({ key: k.id, cx: k.x + 17, cy: k.y + 16, w: 34, h: 32 })),
+    () => 46,
+  );
+
+  return (
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ maxWidth: "100%", height: "auto" }}>
+      <defs>
+        <marker id={chainId} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="context-stroke" />
+        </marker>
+      </defs>
+      {links.map((l) => (
+        <Edge key={`l${l.id}`} className="ds-edge" x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} />
+      ))}
+      {plus && leaves.slice(0, -1).map((leaf, i) => {
+        const next = leaves[i + 1];
+        const d = `M ${leaf.x + leaf.w + 2} ${leaf.y + 19} L ${next.x - 3} ${next.y + 19}`;
+        return (
+          <path
+            key={`c${leaf.id}`}
+            className="ds-bchain"
+            d={d}
+            style={{ d: `path("${d}")` } as CSSProperties}
+            markerEnd={`url(#${chainId})`}
+          />
+        );
+      })}
+      {nodes.map((n) => (
+        <GlideG key={n.id} x={n.x} y={n.y} className="ds-bnode-g">
+          <rect className="ds-bnode" width={n.w} height={38} rx={9} />
+        </GlideG>
+      ))}
+      {keys.map((k) => (
+        <GlideG
+          key={k.id}
+          x={k.x}
+          y={k.y}
+          lift={lifts.get(k.id)}
+          className={`${nodeClass(k.id, frame)}${k.sep ? " ds-sep" : ""}`}
+        >
+          <rect className="ds-box" width={34} height={32} rx={7} />
+          <text className="ds-value" x={17} y={21}>
+            {k.value}
+          </text>
+        </GlideG>
+      ))}
+      {!root && (
+        <text className="ds-tag" x={30} y={60}>
+          (empty tree — insert some values and watch the splits)
+        </text>
+      )}
+    </svg>
+  );
+}
+
 /** Weighted graph for the Graph Algorithms lab: labeled edges that can be
     highlighted like nodes, optional arrowheads in directed mode, and per-node
     caption labels ("d=7", "in: 2") that travel with their vertex. */
@@ -764,6 +862,8 @@ export function DSView({ frame }: { frame: Frame }) {
       return <GraphScene frame={frame} nodes={data.nodes} edges={data.edges} />;
     case "wgraph":
       return <WGraphScene frame={frame} nodes={data.nodes} edges={data.edges} directed={data.directed} />;
+    case "btree":
+      return <BTreeScene frame={frame} root={data.root} plus={data.plus} />;
     case "heap":
       return <HeapScene frame={frame} items={data.items} />;
     case "hash":
