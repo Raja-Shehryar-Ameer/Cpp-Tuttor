@@ -1,54 +1,57 @@
-/* Neo-brutalist system: warm cream paper, near-black ink, hard offset shadows
-   (no blur, ever), 2px ink borders, and press-down button physics. One loud
-   accent — yellow — for actions; orange is the teacher's highlighter, green
-   means success, red means trouble. Fonts: Archivo Black for display, Space
-   Grotesk for UI, JetBrains Mono for code (loaded from index.html). */
+/* Neo-brutalist system: clean near-white paper, graphite ink (never pure
+   black), hard offset shadows (no blur, ever), 2px ink borders, and
+   press-down button physics. One professional accent — jade green — for
+   actions; amber is the teacher's highlighter, green means success, red
+   means trouble. Fonts: Archivo Black for display, Space Grotesk for UI,
+   JetBrains Mono for code (loaded from index.html). */
 
 :root {
   color-scheme: light;
-  --bg: #f7f0de;
-  --panel: #fffcf3;
-  --panel-2: #f0e7cf;
-  --ink: #1a150d;
-  --border: #1a150d;
-  --border-strong: #1a150d;
-  --text: #1a150d;
-  --muted: #6e6450;
-  --faint: #a79a79;
-  --accent: #ffc71f;
-  --accent-ink: #8a6400;
-  --accent-soft: #ffedb3;
-  --on-accent: #1a150d;
-  --arrow: #1a150d;
-  --hl: #f08c00;
-  --hl-soft: #ffdfb0;
-  --line-hl: #fff3c2;
-  --line-hl-bar: #ffc71f;
-  --danger: #d6392b;
-  --danger-soft: #ffdcd2;
-  --ok: #2b8a3e;
-  --ok-soft: #d4efd9;
-  --warn-flash: #ffe28a;
-  --dot: #ded2b0;
-  --shadow: 3px 3px 0 var(--ink);
-  --shadow-lift: 6px 6px 0 var(--ink);
-  --ring: 0 0 0 3px var(--accent);
-  --stack-bg: #ece4cc;
-  --stack-ink: #6e6450;
-  --heap-bg: #fbedbe;
-  --heap-ink: #8a6400;
-  --heap-card: #fffcf3;
-  --rb-black: #1a150d;
-  --rb-black-line: #1a150d;
-  --rb-red: #d6392b;
+  --bg: #f6f6f3;
+  --panel: #ffffff;
+  --panel-2: #ecece6;
+  --ink: #2a2924;
+  --border: #2a2924;
+  --border-strong: #2a2924;
+  --text: #232220;
+  --muted: #676459;
+  --faint: #a3a094;
+  --accent: #1f8a54;
+  --accent-ink: #176b41;
+  --accent-soft: #d9efe2;
+  --on-accent: #ffffff;
+  --arrow: #2a2924;
+  --hl: #e08a00;
+  --hl-ink: #925a00;
+  --hl-soft: #fae8c8;
+  --line-hl: #e2f1e8;
+  --line-hl-bar: #1f8a54;
+  --danger: #d13b2e;
+  --danger-soft: #fbe2dd;
+  --ok: #3f7d20;
+  --ok-soft: #e2efd8;
+  --warn-flash: #f7e9b5;
+  --dot: #dddcd4;
+  --shadow-color: #2a2924;
+  --shadow: 3px 3px 0 var(--shadow-color);
+  --shadow-lift: 6px 6px 0 var(--shadow-color);
+  --ring: 0 0 0 3px var(--accent-soft), 0 0 0 4.5px var(--accent);
+  --stack-bg: #eeeee8;
+  --stack-ink: #6b685d;
+  --heap-bg: #e7f1e9;
+  --heap-ink: #2e7050;
+  --heap-card: #ffffff;
+  --rb-black: #2a2924;
+  --rb-black-line: #2a2924;
+  --rb-red: #d13b2e;
   --rb-red-line: #9c2618;
-  --syn-keyword: #c4520a;
-  --syn-type: #8a6400;
-  --syn-string: #2b8a3e;
-  --syn-number: #c92a2a;
-  --syn-comment: #a79a79;
-  --syn-meta: #6e6450;
-  --chevron: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%231a150d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  --syn-keyword: #b45309;
+  --syn-type: #4d7c0f;
+  --syn-string: #15803d;
+  --syn-number: #c0362c;
+  --syn-comment: #a3a094;
+  --syn-meta: #676459;
+  --chevron: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%232a2924' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
   --ease-glide: cubic-bezier(0.25, 0.8, 0.3, 1);
   --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
   --mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
@@ -56,53 +59,55 @@
   font-family: "Space Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
-/* Dark: warm charcoal, sand-colored outlines so the comic-book edge survives,
-   shadows drop to true black. Same loud yellow. */
+/* Dark: graphite, not black — soft light outlines keep the comic-book edge,
+   shadows go a step darker than the background. Same jade accent. */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #211c11;
-  --panel: #2b2515;
-  --panel-2: #37301b;
-  --ink: #e9ddbb;
-  --border: #e9ddbb;
-  --border-strong: #e9ddbb;
-  --text: #f4ecd6;
-  --muted: #b0a280;
-  --faint: #7a6f53;
-  --accent: #ffc72b;
-  --accent-ink: #ffd75e;
-  --accent-soft: #4d3d10;
-  --on-accent: #1a150d;
-  --arrow: #e9ddbb;
-  --hl: #ff9f1a;
-  --hl-soft: #4c3208;
-  --line-hl: #423711;
-  --line-hl-bar: #ffc72b;
-  --danger: #ff7059;
-  --danger-soft: #4e2116;
-  --ok: #58c06b;
-  --ok-soft: #21391f;
-  --warn-flash: #574712;
-  --dot: #383019;
-  --shadow: 3px 3px 0 #0d0a04;
-  --shadow-lift: 6px 6px 0 #0d0a04;
-  --ring: 0 0 0 3px var(--accent);
-  --stack-bg: #272112;
-  --stack-ink: #b0a280;
-  --heap-bg: #3a3012;
-  --heap-ink: #e3b94e;
-  --heap-card: #2b2515;
-  --rb-black: #4a4232;
-  --rb-black-line: #e9ddbb;
-  --rb-red: #d0453a;
+  --bg: #26251f;
+  --panel: #2e2d26;
+  --panel-2: #3a3931;
+  --ink: #d9d6c9;
+  --border: #d9d6c9;
+  --border-strong: #d9d6c9;
+  --text: #edebe1;
+  --muted: #a8a595;
+  --faint: #757263;
+  --accent: #46bd82;
+  --accent-ink: #7dd3a8;
+  --accent-soft: #1f3b2c;
+  --on-accent: #17251d;
+  --arrow: #d9d6c9;
+  --hl: #e3a23d;
+  --hl-ink: #ecc27c;
+  --hl-soft: #423313;
+  --line-hl: #27392e;
+  --line-hl-bar: #46bd82;
+  --danger: #ee6a58;
+  --danger-soft: #46231c;
+  --ok: #74b455;
+  --ok-soft: #2b3a22;
+  --warn-flash: #4c421d;
+  --dot: #35342c;
+  --shadow-color: #14130e;
+  --shadow: 3px 3px 0 var(--shadow-color);
+  --shadow-lift: 6px 6px 0 var(--shadow-color);
+  --ring: 0 0 0 3px var(--accent-soft), 0 0 0 4.5px var(--accent);
+  --stack-bg: #2a2922;
+  --stack-ink: #a8a595;
+  --heap-bg: #283227;
+  --heap-ink: #8cc9a4;
+  --heap-card: #2e2d26;
+  --rb-black: #4b4a40;
+  --rb-black-line: #d9d6c9;
+  --rb-red: #cf4a3c;
   --rb-red-line: #8e2a1e;
-  --syn-keyword: #ff9f1a;
-  --syn-type: #e3b94e;
-  --syn-string: #58c06b;
-  --syn-number: #ff7059;
-  --syn-comment: #7a6f53;
-  --syn-meta: #b0a280;
-  --chevron: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23e9ddbb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  --syn-keyword: #e3a23d;
+  --syn-type: #b5c765;
+  --syn-string: #62c887;
+  --syn-number: #f07862;
+  --syn-comment: #7c796a;
+  --syn-meta: #a8a595;
+  --chevron: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23d9d6c9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 
 * { box-sizing: border-box; }
@@ -171,9 +176,8 @@ button {
 }
 button:hover:not(:disabled) {
   transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0 var(--ink);
+  box-shadow: 4px 4px 0 var(--shadow-color);
 }
-:root[data-theme="dark"] button:hover:not(:disabled) { box-shadow: 4px 4px 0 #0d0a04; }
 button:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: none; }
 button:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
 button.primary {
@@ -343,7 +347,7 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 }
 .leak-tag {
   display: inline-flex; align-items: center; gap: 0.25rem;
-  color: var(--accent-ink); font-size: 0.68rem; font-family: inherit; font-weight: 700;
+  color: var(--hl-ink); font-size: 0.68rem; font-family: inherit; font-weight: 700;
   background: var(--hl-soft); border: 1.5px solid var(--hl); border-radius: 4px; padding: 0.1rem 0.45rem;
   animation: fade-in 0.25s ease-out;
 }
@@ -468,9 +472,9 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 }
 .stdout-copy {
   padding: 0.22rem 0.5rem; font-size: 0.72rem; gap: 0.3rem;
-  border-radius: 4px; border-width: 1.5px; box-shadow: 2px 2px 0 var(--ink);
+  border-radius: 4px; border-width: 1.5px; box-shadow: 2px 2px 0 var(--shadow-color);
 }
-.stdout-copy:hover:not(:disabled) { box-shadow: 3px 3px 0 var(--ink); }
+.stdout-copy:hover:not(:disabled) { box-shadow: 3px 3px 0 var(--shadow-color); }
 /* Fixed height: the output scrolls internally so the footer never grows
    upward into the diagram as stdout accumulates across steps. */
 .stdout-pane pre {
@@ -555,9 +559,8 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
   border: 2px solid var(--ink); background: var(--panel);
   border-radius: 6px; color: var(--muted); padding: 0.4rem 0.8rem;
   position: relative; gap: 0.35rem; white-space: nowrap; font-weight: 600;
-  box-shadow: 2px 2px 0 var(--ink); font-size: 0.83rem;
+  box-shadow: 2px 2px 0 var(--shadow-color); font-size: 0.83rem;
 }
-:root[data-theme="dark"] .ds-tab { box-shadow: 2px 2px 0 #0d0a04; }
 .ds-tab:hover:not(:disabled) { color: var(--text); }
 .ds-tab.active {
   background: var(--accent); color: var(--on-accent); font-weight: 700;
@@ -655,17 +658,17 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   font-family: var(--mono); font-size: 0.9rem; fill: var(--text); text-anchor: middle;
   transition: fill 0.3s ease;
 }
-/* the teacher's highlighter is orange; green = success, red = trouble */
+/* the teacher's highlighter is amber; green = success, red = trouble */
 .ds-node.hl .ds-box, .ds-node.hl .ds-circle, .ds-node.hl .ds-bar { stroke: var(--hl); stroke-width: 3; fill: var(--hl-soft); }
 .ds-node.ok .ds-box, .ds-node.ok .ds-circle, .ds-node.ok .ds-bar { stroke: var(--ok); stroke-width: 3; fill: var(--ok-soft); }
 .ds-node.bad .ds-box, .ds-node.bad .ds-circle, .ds-node.bad .ds-bar { stroke: var(--danger); stroke-width: 3; fill: var(--danger-soft); }
 .ds-node.rb-red .ds-circle { fill: var(--rb-red); stroke: var(--rb-red-line); }
 .ds-node.rb-red .ds-value { fill: #fff6ef; }
 .ds-node.rb-black .ds-circle { fill: var(--rb-black); stroke: var(--rb-black-line); }
-.ds-node.rb-black .ds-value { fill: #f7f0de; }
+.ds-node.rb-black .ds-value { fill: #f6f6f3; }
 .ds-node.rb-red.hl .ds-circle, .ds-node.rb-black.hl .ds-circle { stroke: var(--hl); stroke-width: 3.5; }
 /* quick sort's pivot: solid ink, inverted text — unmistakable next to the
-   orange highlighter and the green sorted zone */
+   amber highlighter and the green sorted zone */
 .ds-node.pivot .ds-box, .ds-node.pivot .ds-circle, .ds-node.pivot .ds-bar { fill: var(--text); stroke: var(--text); stroke-width: 2; }
 .ds-node.pivot .ds-value { fill: var(--bg); }
 .ds-link, .ds-edge, .ds-floor { stroke: var(--ink); stroke-width: 2; fill: none; }
@@ -720,7 +723,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 /* Nodes reuse the playground's .ds-node/.ds-circle/.ds-value/.ds-edge look —
    a process is just its label, like a BST node is just its key. */
 .fork-tree { flex: none; }
-/* Contrasting fills, not dashes: orange = orphan (adopted by init),
+/* Contrasting fills, not dashes: amber = orphan (adopted by init),
    red = zombie (never reaped) — same semantic palette as the playground. */
 .ds-circle.fork-orphan { fill: var(--hl-soft); stroke: var(--hl); stroke-width: 3; }
 .ds-circle.fork-zombie { fill: var(--danger-soft); stroke: var(--danger); stroke-width: 3; }
@@ -763,11 +766,10 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   max-width: min(26rem, calc(100vw - 2.5rem));
   background: var(--panel); color: var(--text);
   border: 2px solid var(--ink); border-radius: 8px;
-  padding: 0.6rem 0.65rem 0.6rem 0.8rem; box-shadow: 4px 4px 0 var(--ink);
+  padding: 0.6rem 0.65rem 0.6rem 0.8rem; box-shadow: 4px 4px 0 var(--shadow-color);
   font-size: 0.83rem; line-height: 1.4; font-weight: 500;
   animation: toast-in 0.22s var(--ease-out);
 }
-:root[data-theme="dark"] .toast { box-shadow: 4px 4px 0 #0d0a04; }
 .toast svg:first-child { flex: none; margin-top: 0.1rem; }
 .toast-msg { flex: 1; }
 .toast-close {
