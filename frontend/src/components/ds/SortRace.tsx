@@ -4,8 +4,10 @@
 
 import {
   ChevronFirst,
+  Download,
   Flag,
   Gauge,
+  Link2,
   Pause,
   Play,
   Shuffle,
@@ -26,6 +28,8 @@ import {
   type Frame,
   type ListNode,
 } from "../../ds/engine";
+import { writeLabParam } from "../../ds/permalink";
+import { exportSvgsPng } from "../../utils/exportPng";
 import { notify } from "../../store/toastStore";
 import { DSView } from "./DSView";
 
@@ -122,6 +126,27 @@ export function SortRace({ initial }: { initial?: { a: SortKey; b: SortKey; valu
     setLanes([mk(algoA), mk(algoB)]);
     setIdx(0);
     setPlaying(true);
+    writeLabParam({ lab: "sortrace", a: algoA, b: algoB, values });
+  };
+
+  const copyLink = async () => {
+    const { values, bad } = parseValues(valueText);
+    if (bad.length > 0 || values.length < 2) {
+      notify.error("Set up a valid race first, then copy its link.");
+      return;
+    }
+    writeLabParam({ lab: "sortrace", a: algoA, b: algoB, values });
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      notify.success("Shareable link copied — it reopens this race and auto-runs.");
+    } catch {
+      notify.info("Link is in the address bar — copy it from there.");
+    }
+  };
+
+  const exportPng = () => {
+    const svgs = [...document.querySelectorAll<SVGSVGElement>(".race-pane .ds-svg")];
+    if (svgs.length === 2) exportSvgsPng(svgs, `race-${algoA}-vs-${algoB}.png`);
   };
 
   const randomize = () => {
@@ -212,6 +237,16 @@ export function SortRace({ initial }: { initial?: { a: SortKey; b: SortKey; valu
           <Zap size={13} /> Race
         </button>
         <button onClick={randomize}><Shuffle size={13} /> Random</button>
+        {lanes && (
+          <>
+            <button onClick={copyLink} title="copy a link that reopens this race and auto-runs">
+              <Link2 size={13} /> Copy link
+            </button>
+            <button onClick={exportPng} title="download both panes as a PNG">
+              <Download size={13} /> PNG
+            </button>
+          </>
+        )}
       </div>
 
       <div className="sched-body">

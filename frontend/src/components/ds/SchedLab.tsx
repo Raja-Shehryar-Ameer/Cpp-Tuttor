@@ -1,7 +1,9 @@
 import {
   ChevronFirst,
   Cpu,
+  Download,
   Gauge,
+  Link2,
   Pause,
   Play,
   Plus,
@@ -27,6 +29,8 @@ import {
   type SchedAlgo,
   type SchedRun,
 } from "../../ds/sched";
+import { writeLabParam } from "../../ds/permalink";
+import { drawGanttPng } from "../../utils/exportPng";
 import { notify } from "../../store/toastStore";
 import { PredictChips, QuizPanel, usePredictScore } from "./predict";
 
@@ -146,18 +150,25 @@ function SchedResult({ run, procs, now }: { run: SchedRun; procs: ProcSpec[]; no
   );
 }
 
-export function SchedLab() {
-  const [procs, setProcs] = useState<ProcSpec[]>(DEFAULT_PROCS);
-  const [algo, setAlgo] = useState<SchedAlgo>("fcfs");
-  const [quantum, setQuantum] = useState(2);
+export interface SchedInitial {
+  algo: SchedAlgo;
+  q: number;
+  procs: ProcSpec[];
+  race?: SchedAlgo;
+}
+
+export function SchedLab({ initial }: { initial?: SchedInitial }) {
+  const [procs, setProcs] = useState<ProcSpec[]>(initial ? initial.procs : DEFAULT_PROCS);
+  const [algo, setAlgo] = useState<SchedAlgo>(initial?.algo ?? "fcfs");
+  const [quantum, setQuantum] = useState(initial?.q ?? 2);
   const [run, setRun] = useState<SchedRun | null>(null);
   const [tick, setTick] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [compare, setCompare] = useState(false);
   // Race mode: a second algorithm on the same workload, stacked under one scrubber.
-  const [race, setRace] = useState(false);
-  const [algoB, setAlgoB] = useState<SchedAlgo>("sjf");
+  const [race, setRace] = useState(initial?.race !== undefined);
+  const [algoB, setAlgoB] = useState<SchedAlgo>(initial?.race ?? "sjf");
   const [runB, setRunB] = useState<SchedRun | null>(null);
   // Predict mode: pause before each dispatch decision and ask who runs next.
   const [predictOn, setPredictOn] = useState(false);
@@ -289,6 +300,36 @@ export function SchedLab() {
     setCompare(false);
     quizDone.current = new Set();
     setQuizAt(null);
+    writeLabParam({ lab: "sched", algo, q: quantum, procs, ...(race ? { race: algoB } : {}) });
+  };
+
+  // Auto-run a permalink payload once on mount.
+  const autoRan = useRef(false);
+  useEffect(() => {
+    if (initial && !autoRan.current) {
+      autoRan.current = true;
+      setRun(schedule(initial.algo, initial.procs, initial.q));
+      setRunB(initial.race !== undefined ? schedule(initial.race, initial.procs, initial.q) : null);
+      setTick(0);
+      setPlaying(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const copyLink = async () => {
+    writeLabParam({ lab: "sched", algo, q: quantum, procs, ...(race ? { race: algoB } : {}) });
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      notify.success("Shareable link copied — it reopens this exact workload and auto-runs.");
+    } catch {
+      notify.info("Link is in the address bar — copy it from there.");
+    }
+  };
+
+  const exportPng = () => {
+    if (!run) return;
+    drawGanttPng(run, procs, `gantt-${run.algo}.png`);
+    if (runB) drawGanttPng(runB, procs, `gantt-${runB.algo}.png`);
   };
 
   // Comparison table: the same workload pushed through every algorithm.
@@ -395,7 +436,17 @@ export function SchedLab() {
           </select>
         </label>
         <button onClick={randomize}><Shuffle size={13} /> Random</button>
-        <button onClick={() => { setProcs(DEFAULT_PROCS.map((p) => ({ ...p }))); setRun(null); setRunB(null); setCompare(false); }}>
+        {run && (
+          <>
+            <button onClick={copyLink} title="copy a link that reopens this workload and auto-runs">
+              <Link2 size={13} /> Copy link
+            </button>
+            <button onClick={exportPng} title="download the Gantt chart as a PNG">
+              <Download size={13} /> PNG
+            </button>
+          </>
+        )}
+        <button onClick={() => { setProcs(DEFAULT_PROCS.map((p) => ({ ...p }))); setRun(null); setRunB(null); setCompare(false); writeLabParam(null); }}>
           <X size={13} /> Reset
         </button>
       </div>

@@ -50,7 +50,11 @@ function updatePermalink(traceId: string | null): void {
 }
 
 export default function App() {
-  const [mode, setMode] = useState<"code" | "ds" | "fork">("code");
+  // A `?lab=` permalink opens the DS mode straight away (no code→ds flash);
+  // DSPage owns decoding the payload. `?lab` and `?t` never coexist.
+  const [mode, setMode] = useState<"code" | "ds" | "fork">(() =>
+    new URLSearchParams(window.location.search).has("lab") ? "ds" : "code",
+  );
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const [code, setCode] = useState(SAMPLES[DEFAULT_SAMPLE]);
   const [stdin, setStdin] = useState("");
@@ -68,8 +72,11 @@ export default function App() {
   }, [theme]);
 
   // Shared permalink: ?t=<id> loads a stored trace without re-running code.
+  // A lab permalink takes precedence and is handled inside DSPage.
   useEffect(() => {
-    const shared = new URLSearchParams(window.location.search).get("t");
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("lab")) return;
+    const shared = params.get("t");
     if (!shared) return;
     fetchSharedTrace(shared)
       .then((sharedTrace) => {

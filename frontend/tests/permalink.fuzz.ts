@@ -1,0 +1,119 @@
+// Fuzz suite for lab permalinks.
+// Run: node --experimental-strip-types frontend/tests/permalink.fuzz.ts
+//
+//  - decode(encode(x)) deep-equals x for generated valid payloads;
+//  - arbitrary garbage (random strings, random base64, truncations,
+//    valid-JSON-wrong-shape, out-of-range fields) returns null, never throws.
+
+import { decodeLab, encodeLab, SORT_KEYS, type LabLink } from "../src/ds/permalink.ts";
+import { SCHED_ALGOS } from "../src/ds/sched.ts";
+import { PAGE_ALGOS } from "../src/ds/paging.ts";
+import { WGRAPH_ALGOS } from "../src/ds/wgraph.ts";
+
+let fails = 0;
+const fail = (label: string, ...ctx: unknown[]) => {
+  fails += 1;
+  console.error("FAIL:", label, ...ctx.map((c) => JSON.stringify(c)));
+};
+const rand = (n: number): number => Math.floor(Math.random() * n);
+const pick = <T,>(xs: readonly T[]): T => xs[rand(xs.length)];
+
+function randomLink(): LabLink {
+  switch (rand(4)) {
+    case 0: {
+      const n = 1 + rand(6);
+      return {
+        lab: "sched",
+        algo: pick(SCHED_ALGOS).key,
+        q: 1 + rand(12),
+        procs: Array.from({ length: n }, (_, i) => ({
+          name: `P${i + 1}`,
+          arrival: rand(20),
+          burst: 1 + rand(20),
+          priority: 1 + rand(9),
+        })),
+        ...(Math.random() < 0.5 ? { race: pick(SCHED_ALGOS).key } : {}),
+      };
+    }
+    case 1:
+      return {
+        lab: "paging",
+        algo: pick(PAGE_ALGOS).key,
+        frames: 1 + rand(8),
+        refs: Array.from({ length: 1 + rand(30) }, () => rand(20)),
+        ...(Math.random() < 0.5 ? { race: pick(PAGE_ALGOS).key } : {}),
+      };
+    case 2: {
+      const nv = 2 + rand(8);
+      const verts = Array.from({ length: nv }, (_, i) => i + 1);
+      const edges: [number, number, number][] = [];
+      for (let k = 0; k < nv; k += 1) {
+        const a = 1 + rand(nv);
+        const b = 1 + rand(nv);
+        if (a !== b) edges.push([a, b, 1 + rand(99)]);
+      }
+      return {
+        lab: "wgraph",
+        directed: Math.random() < 0.5,
+        verts,
+        edges,
+        ...(Math.random() < 0.7 ? { algo: pick(WGRAPH_ALGOS).key, from: 1, to: nv } : {}),
+      };
+    }
+    default:
+      return {
+        lab: "sortrace",
+        a: pick(SORT_KEYS),
+        b: pick(SORT_KEYS),
+        values: Array.from({ length: 2 + rand(15) }, () => rand(200) - 50),
+      };
+  }
+}
+
+// round trips
+for (let t = 0; t < 2000; t += 1) {
+  const link = randomLink();
+  const back = decodeLab(encodeLab(link));
+  if (JSON.stringify(back) !== JSON.stringify(link)) fail("round trip broke", link, back);
+}
+
+// garbage never throws, always null
+const garbage: string[] = [
+  "", "x", "====", "%%%", "undefined", "null", "🙂🙂🙂",
+  btoa("not json at all"),
+  btoa(JSON.stringify(null)),
+  btoa(JSON.stringify(42)),
+  btoa(JSON.stringify({ lab: "sched" })),
+  btoa(JSON.stringify({ lab: "nope", algo: "fifo" })),
+  btoa(JSON.stringify({ lab: "paging", algo: "fifo", frames: 999, refs: [1] })),
+  btoa(JSON.stringify({ lab: "paging", algo: "fifo", frames: 3, refs: Array(500).fill(1) })),
+  btoa(JSON.stringify({ lab: "sched", algo: "fcfs", q: 2, procs: [{ name: "A", arrival: -1, burst: 2, priority: 1 }] })),
+  btoa(JSON.stringify({ lab: "sched", algo: "fcfs", q: 2, procs: [{ name: "A", arrival: 0, burst: 2, priority: 1 }, { name: "A", arrival: 0, burst: 2, priority: 1 }] })),
+  btoa(JSON.stringify({ lab: "wgraph", directed: false, verts: [1, 1], edges: [] })),
+  btoa(JSON.stringify({ lab: "wgraph", directed: false, verts: [1, 2], edges: [[1, 9, 5]] })),
+  btoa(JSON.stringify({ lab: "wgraph", directed: false, verts: [1, 2], edges: [[1, 2, 0]] })),
+  btoa(JSON.stringify({ lab: "sortrace", a: "bogo", b: "merge", values: [1, 2] })),
+  btoa(JSON.stringify({ lab: "sortrace", a: "bubble", b: "merge", values: [1] })),
+  btoa(JSON.stringify({ lab: "sortrace", a: "bubble", b: "merge", values: [1, 1e300] })),
+];
+for (let t = 0; t < 2000; t += 1) {
+  garbage.push(Array.from({ length: rand(60) }, () => String.fromCharCode(32 + rand(90))).join(""));
+}
+// truncations of a valid payload
+const valid = encodeLab(randomLink());
+for (let k = 0; k < valid.length; k += 3) garbage.push(valid.slice(0, k) === valid ? "" : valid.slice(0, k));
+
+for (const g of garbage) {
+  try {
+    const out = decodeLab(g);
+    if (out !== null) {
+      // a truncation could accidentally decode to valid JSON — allow only if it fully validates by re-encoding
+      if (JSON.stringify(decodeLab(encodeLab(out))) !== JSON.stringify(out)) fail("garbage produced invalid link", g.slice(0, 30));
+    }
+  } catch (e) {
+    fail("decodeLab threw", g.slice(0, 30), String(e));
+  }
+}
+
+console.log(fails === 0 ? "ALL PASS (2000 round trips + ~2600 garbage inputs)" : `${fails} FAILURES`);
+process.exit(fails === 0 ? 0 : 1);

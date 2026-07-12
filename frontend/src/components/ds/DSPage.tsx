@@ -4,6 +4,7 @@ import {
   ChevronFirst,
   CircleDot,
   Cpu,
+  Download,
   Eye,
   Gauge,
   GitBranch,
@@ -120,6 +121,9 @@ import {
   type WAlgo,
   type WGraph,
 } from "../../ds/wgraph";
+import { readLabParam, writeLabParam } from "../../ds/permalink";
+import { exportSvgsPng } from "../../utils/exportPng";
+import { notify } from "../../store/toastStore";
 import { DSView } from "./DSView";
 import { PagingLab } from "./PagingLab";
 import { PredictChips, QuizPanel, usePredictScore } from "./predict";
@@ -348,8 +352,10 @@ const SPEEDS = [
 type HashMode = "chain" | Probe;
 
 export function DSPage() {
+  // A `?lab=` permalink decodes to an initial scenario (read once).
+  const initialLink = useRef(readLabParam()).current;
   // null = the VisuAlgo-style topic grid; a key = that lab is open.
-  const [topic, setTopic] = useState<Topic | null>(null);
+  const [topic, setTopic] = useState<Topic | null>(initialLink ? initialLink.lab : null);
   // Data-structure code paths only run when the open topic IS a structure;
   // the "list" fallback keeps types tight and is never rendered otherwise.
   const structure: Structure = topic !== null && !isLabTopic(topic) ? topic : "list";
@@ -584,6 +590,21 @@ export function DSPage() {
   };
 
   /** Run the selected weighted-graph algorithm, validating its inputs first. */
+  /** Serialize the current weighted graph + selected algorithm as a permalink. */
+  const wgLink = (algo: WAlgo, from: number | null, to: number | null): void => {
+    const g = dataRef.current.wgraph as WGraph;
+    const valById = new Map(g.nodes.map((n) => [n.id, n.value]));
+    writeLabParam({
+      lab: "wgraph",
+      directed: g.directed,
+      verts: g.nodes.map((n) => n.value),
+      edges: g.edges.map((e) => [valById.get(e.a)!, valById.get(e.b)!, e.w] as [number, number, number]),
+      algo,
+      ...(from !== null ? { from } : {}),
+      ...(to !== null ? { to } : {}),
+    });
+  };
+
   const runWgAlgo = () => {
     const meta = WGRAPH_ALGOS.find((a) => a.key === wgAlgo)!;
     const from = vertexOf(wgFrom);
@@ -607,6 +628,61 @@ export function DSPage() {
         case "topo": return wgraphTopo(g);
       }
     });
+    wgLink(wgAlgo, meta.needsFrom ? from : null, meta.needsTo !== "no" ? to : null);
+  };
+
+  // Auto-run a weighted-graph permalink once on mount: rebuild the graph from
+  // (value-keyed) edges, then fire the saved algorithm.
+  const autoRanWg = useRef(false);
+  useEffect(() => {
+    if (autoRanWg.current || initialLink?.lab !== "wgraph") return;
+    autoRanWg.current = true;
+    let g: WGraph = { kind: "wgraph", nodes: [], edges: [], directed: initialLink.directed };
+    const apply = (frames: Frame[]) => { if (frames.length) g = frames[frames.length - 1].data as WGraph; };
+    for (const v of initialLink.verts) apply(wgraphAddNode(g, v));
+    for (const [a, b, w] of initialLink.edges) apply(wgraphAddEdge(g, a, b, w));
+    dataRef.current.wgraph = g;
+    if (initialLink.algo) {
+      setWgAlgo(initialLink.algo);
+      if (initialLink.from !== undefined) setWgFrom(String(initialLink.from));
+      if (initialLink.to !== undefined) setWgTo(String(initialLink.to));
+      const from = initialLink.from ?? null;
+      const to = initialLink.to ?? null;
+      const produced = ((): Frame[] => {
+        switch (initialLink.algo) {
+          case "bfs": case "dfs": return wgraphTraverse(g, from!, initialLink.algo);
+          case "path": return wgraphPathBfs(g, from!, to!);
+          case "dijkstra": return wgraphDijkstra(g, from!, to ?? undefined);
+          case "prim": return wgraphPrim(g, from!);
+          case "kruskal": return wgraphKruskal(g);
+          case "topo": return wgraphTopo(g);
+        }
+      })();
+      dataRef.current.wgraph = produced[produced.length - 1].data;
+      setFrames(produced);
+      setPlaying(produced.length > 1);
+    } else {
+      setFrames([{ data: g, hl: [], note: `Loaded ${g.nodes.length} vertices and ${g.edges.length} weighted edges from a shared link. Pick an algorithm and press Run.` }]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /** Copy a link to the current weighted-graph scenario. */
+  const copyWgLink = async () => {
+    const meta = WGRAPH_ALGOS.find((a) => a.key === wgAlgo)!;
+    wgLink(wgAlgo, meta.needsFrom ? vertexOf(wgFrom) : null, meta.needsTo !== "no" ? vertexOf(wgTo) : null);
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      notify.success("Shareable link copied — it rebuilds this graph and runs the algorithm.");
+    } catch {
+      notify.info("Link is in the address bar — copy it from there.");
+    }
+  };
+
+  /** Export the current DS scene (whatever structure is showing) as a PNG. */
+  const exportScenePng = () => {
+    const svg = document.querySelector<SVGSVGElement>(".ds-canvas .ds-svg");
+    if (svg) exportSvgsPng([svg], `${structure}.png`);
   };
 
   const reset = () => {
@@ -622,6 +698,7 @@ export function DSPage() {
     setFrames([]);
     setIdx(0);
     setPlaying(false);
+    if (structure === "wgraph") writeLabParam(null);
   };
 
   const dismissInfo = () => {
@@ -802,6 +879,8 @@ export function DSPage() {
   };
 
   const switchTo = (t: Topic) => {
+    // Leaving a shared scenario clears its URL (one open lab = at most one link).
+    writeLabParam(null);
     setTopic(t);
     setFrames([]);
     setIdx(0);
@@ -866,7 +945,15 @@ export function DSPage() {
     return (
       <div className="ds-page">
         {tabs}
-        {topic === "sched" ? <SchedLab /> : topic === "threads" ? <ThreadsLab /> : topic === "paging" ? <PagingLab /> : <SortRace />}
+        {topic === "sched" ? (
+          <SchedLab initial={initialLink?.lab === "sched" ? initialLink : undefined} />
+        ) : topic === "threads" ? (
+          <ThreadsLab />
+        ) : topic === "paging" ? (
+          <PagingLab initial={initialLink?.lab === "paging" ? initialLink : undefined} />
+        ) : (
+          <SortRace initial={initialLink?.lab === "sortrace" ? initialLink : undefined} />
+        )}
       </div>
     );
   }
@@ -1138,6 +1225,11 @@ export function DSPage() {
         >
           <ListPlus size={13} /> Bulk load
         </button>
+        {frames.length > 0 && (
+          <button onClick={exportScenePng} title="download the current diagram as a PNG">
+            <Download size={13} /> PNG
+          </button>
+        )}
         <button onClick={reset} title="clear this structure">
           <X size={13} /> Reset
         </button>
@@ -1192,6 +1284,9 @@ export function DSPage() {
               <Target size={13} /> Predict
             </button>
             <PredictChips state={predict.state} />
+            <button onClick={copyWgLink} title="copy a link that rebuilds this graph and runs the algorithm">
+              <Link2 size={13} /> Copy link
+            </button>
             <span className="sched-hint">{wgMeta.blurb}</span>
           </div>
         );

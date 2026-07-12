@@ -1,6 +1,8 @@
 import {
   ChevronFirst,
+  Download,
   Gauge,
+  Link2,
   MemoryStick,
   Pause,
   Play,
@@ -24,6 +26,8 @@ import {
   type PageAlgo,
   type PageRun,
 } from "../../ds/paging";
+import { writeLabParam } from "../../ds/permalink";
+import { drawPageGridPng } from "../../utils/exportPng";
 import { notify } from "../../store/toastStore";
 import { PredictChips, QuizPanel, usePredictScore } from "./predict";
 
@@ -143,18 +147,25 @@ function parseRefs(raw: string): { refs: number[]; bad: string[] } {
   return { refs, bad };
 }
 
-export function PagingLab() {
-  const [refText, setRefText] = useState(DEFAULT_REFS);
-  const [algo, setAlgo] = useState<PageAlgo>("fifo");
-  const [frameCount, setFrameCount] = useState(3);
+export interface PagingInitial {
+  algo: PageAlgo;
+  frames: number;
+  refs: number[];
+  race?: PageAlgo;
+}
+
+export function PagingLab({ initial }: { initial?: PagingInitial }) {
+  const [refText, setRefText] = useState(initial ? initial.refs.join(" ") : DEFAULT_REFS);
+  const [algo, setAlgo] = useState<PageAlgo>(initial?.algo ?? "fifo");
+  const [frameCount, setFrameCount] = useState(initial?.frames ?? 3);
   const [run, setRun] = useState<PageRun | null>(null);
   const [tick, setTick] = useState(0); // 0 = before the first reference
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [compare, setCompare] = useState(false);
   // Race mode: a second algorithm on the same reference string, stacked grids.
-  const [race, setRace] = useState(false);
-  const [algoB, setAlgoB] = useState<PageAlgo>("lru");
+  const [race, setRace] = useState(initial?.race !== undefined);
+  const [algoB, setAlgoB] = useState<PageAlgo>(initial?.race ?? "lru");
   const [runB, setRunB] = useState<PageRun | null>(null);
   // Predict mode: every reference asks hit-or-fault; full-memory faults also
   // ask which page gets evicted. quizPos = [step index, question index].
@@ -240,6 +251,38 @@ export function PagingLab() {
     setCompare(false);
     quizDone.current = new Set();
     setQuizPos(null);
+    writeLabParam({ lab: "paging", algo, frames: frameCount, refs, ...(race ? { race: algoB } : {}) });
+  };
+
+  // Auto-run a permalink payload once on mount.
+  const autoRan = useRef(false);
+  useEffect(() => {
+    if (initial && !autoRan.current) {
+      autoRan.current = true;
+      setRun(pageReplace(initial.algo, initial.refs, initial.frames));
+      setRunB(initial.race !== undefined ? pageReplace(initial.race, initial.refs, initial.frames) : null);
+      setTick(0);
+      setPlaying(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const copyLink = async () => {
+    const refs = validate();
+    if (!refs) return;
+    writeLabParam({ lab: "paging", algo, frames: frameCount, refs, ...(race ? { race: algoB } : {}) });
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      notify.success("Shareable link copied — it reopens this reference string and auto-runs.");
+    } catch {
+      notify.info("Link is in the address bar — copy it from there.");
+    }
+  };
+
+  const exportPng = () => {
+    if (!run) return;
+    drawPageGridPng(run, `paging-${run.algo}.png`);
+    if (runB) drawPageGridPng(runB, `paging-${runB.algo}.png`);
   };
 
   const loadPreset = (name: string) => {
@@ -375,7 +418,17 @@ export function PagingLab() {
           </select>
         </label>
         <button onClick={randomize}><Shuffle size={13} /> Random</button>
-        <button onClick={() => { setRefText(DEFAULT_REFS); setFrameCount(3); invalidate(); setCompare(false); }}>
+        {run && (
+          <>
+            <button onClick={copyLink} title="copy a link that reopens this reference string and auto-runs">
+              <Link2 size={13} /> Copy link
+            </button>
+            <button onClick={exportPng} title="download the frames grid as a PNG">
+              <Download size={13} /> PNG
+            </button>
+          </>
+        )}
+        <button onClick={() => { setRefText(DEFAULT_REFS); setFrameCount(3); invalidate(); setCompare(false); writeLabParam(null); }}>
           <X size={13} /> Reset
         </button>
       </div>
