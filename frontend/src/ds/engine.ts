@@ -69,6 +69,8 @@ export interface Frame {
   labels?: Record<number, string>;
   /** predict mode pauses BEFORE this frame and asks */
   quiz?: Quiz;
+  /** cumulative op counters (sorting): comparisons and swaps/moves so far */
+  stats?: { comparisons: number; swaps: number };
   note: string;
 }
 
@@ -1246,13 +1248,16 @@ export function arrayUpdate(d: { items: ListNode[] }, from: number, to: number):
   return frames;
 }
 
-/** Frame helper: sorted-so-far ids stay green in every subsequent frame. */
+/** Frame helper: sorted-so-far ids stay green in every subsequent frame, and
+    every frame carries the cumulative comparison/swap counters (race mode
+    reads them live). */
 function sorter(items: ListNode[]) {
   const frames: Frame[] = [];
   const done: number[] = [];
+  const stats = { comparisons: 0, swaps: 0 };
   const shot = (note: string, extra: Partial<Frame> = {}) =>
-    frames.push(snap(arrData(items), note, { ...extra, ok: [...done, ...(extra.ok ?? [])] }));
-  return { frames, done, shot };
+    frames.push(snap(arrData(items), note, { ...extra, ok: [...done, ...(extra.ok ?? [])], stats: { ...stats } }));
+  return { frames, done, shot, stats };
 }
 
 const trivial = (items: ListNode[]): Frame[] => [
@@ -1262,14 +1267,16 @@ const trivial = (items: ListNode[]): Frame[] => [
 export function sortBubble(d: { items: ListNode[] }): Frame[] {
   const items = clone(d.items);
   if (items.length < 2) return trivial(items);
-  const { frames, done, shot } = sorter(items);
+  const { frames, done, shot, stats } = sorter(items);
   shot(`BUBBLE SORT: sweep left to right, swapping any neighbours that are out of order — big values bubble to the end.`);
   for (let end = items.length - 1; end > 0; end--) {
     let swapped = false;
     for (let j = 0; j < end; j++) {
+      stats.comparisons += 1;
       if (items[j].value > items[j + 1].value) {
         shot(`${items[j].value} > ${items[j + 1].value} — out of order: swap.`, { hl: [items[j].id, items[j + 1].id], bad: [items[j].id] });
         [items[j], items[j + 1]] = [items[j + 1], items[j]];
+        stats.swaps += 1;
         swapped = true;
         shot(`Swapped — ${items[j + 1].value} moves one step toward the end.`, { hl: [items[j].id, items[j + 1].id] });
       } else {
@@ -1292,34 +1299,40 @@ export function sortBubble(d: { items: ListNode[] }): Frame[] {
 export function sortInsertion(d: { items: ListNode[] }): Frame[] {
   const items = clone(d.items);
   if (items.length < 2) return trivial(items);
-  const { frames, shot } = sorter(items);
+  const { frames, shot, stats } = sorter(items);
   shot(`INSERTION SORT: grow a sorted prefix on the left; take each next value and walk it back to where it belongs.`);
   for (let i = 1; i < items.length; i++) {
     const key = items[i];
     shot(`Take ${key.value} (index ${i}) — insert it into the sorted prefix on its left.`, { hl: [key.id] });
     let j = i;
-    while (j > 0 && items[j - 1].value > items[j].value) {
+    const outOfOrder = (k: number): boolean => {
+      stats.comparisons += 1;
+      return items[k - 1].value > items[k].value;
+    };
+    while (j > 0 && outOfOrder(j)) {
       shot(`${items[j - 1].value} > ${key.value} — shift it right and step back.`, { hl: [items[j - 1].id, key.id], bad: [items[j - 1].id] });
       [items[j - 1], items[j]] = [items[j], items[j - 1]];
+      stats.swaps += 1;
       j--;
     }
     shot(j === i
       ? `${key.value} is already ≥ its left neighbour — it stays put; the prefix grew by one.`
       : `${key.value} slots in at index ${j} — the prefix is sorted again.`, { hl: [key.id], ok: [key.id] });
   }
-  frames.push(snap(arrData(items), `Every element has been inserted into place — array sorted.`, { ok: items.map((n) => n.id) }));
+  shot(`Every element has been inserted into place — array sorted.`, { ok: items.map((n) => n.id) });
   return frames;
 }
 
 export function sortSelection(d: { items: ListNode[] }): Frame[] {
   const items = clone(d.items);
   if (items.length < 2) return trivial(items);
-  const { frames, done, shot } = sorter(items);
+  const { frames, done, shot, stats } = sorter(items);
   shot(`SELECTION SORT: scan for the smallest remaining value, swap it to the front, repeat.`);
   for (let i = 0; i < items.length - 1; i++) {
     let min = i;
     shot(`Round ${i + 1}: assume ${items[i].value} is the minimum, then scan the rest.`, { hl: [items[i].id] });
     for (let j = i + 1; j < items.length; j++) {
+      stats.comparisons += 1;
       if (items[j].value < items[min].value) {
         shot(`${items[j].value} < ${items[min].value} — new minimum candidate.`, { hl: [items[j].id, items[min].id] });
         min = j;
@@ -1330,6 +1343,7 @@ export function sortSelection(d: { items: ListNode[] }): Frame[] {
     if (min !== i) {
       shot(`The smallest remaining is ${items[min].value} — swap it into index ${i}.`, { hl: [items[min].id, items[i].id], bad: [items[i].id] });
       [items[i], items[min]] = [items[min], items[i]];
+      stats.swaps += 1;
     }
     done.push(items[i].id);
     shot(`${items[i].value} is FINAL — the sorted prefix grows by one.`);
@@ -1342,7 +1356,7 @@ export function sortSelection(d: { items: ListNode[] }): Frame[] {
 export function sortQuick(d: { items: ListNode[] }): Frame[] {
   const items = clone(d.items);
   if (items.length < 2) return trivial(items);
-  const { frames, done, shot } = sorter(items);
+  const { frames, done, shot, stats } = sorter(items);
   shot(`QUICK SORT: pick a pivot, partition smaller values to its left and bigger to its right, then recurse on each side.`);
   const part = (lo: number, hi: number): void => {
     if (lo > hi) return;
@@ -1355,9 +1369,11 @@ export function sortQuick(d: { items: ListNode[] }): Frame[] {
     shot(`Partition [${lo}..${hi}]: the pivot is the last element, ${pivot.value} — drawn in ink so you never lose it.`, { pivot: [pivot.id] });
     let i = lo;
     for (let j = lo; j < hi; j++) {
+      stats.comparisons += 1;
       if (items[j].value < pivot.value) {
         if (i !== j) {
           [items[i], items[j]] = [items[j], items[i]];
+          stats.swaps += 1;
           shot(`${items[i].value} < pivot ${pivot.value} — swapped into the "smaller" zone at index ${i}.`, { hl: [items[i].id], pivot: [pivot.id] });
         } else {
           shot(`${items[j].value} < pivot ${pivot.value} — already inside the "smaller" zone.`, { hl: [items[j].id], pivot: [pivot.id] });
@@ -1367,6 +1383,7 @@ export function sortQuick(d: { items: ListNode[] }): Frame[] {
         shot(`${items[j].value} ≥ pivot ${pivot.value} — leave it on the right side.`, { hl: [items[j].id], pivot: [pivot.id] });
       }
     }
+    if (i !== hi) stats.swaps += 1;
     [items[i], items[hi]] = [items[hi], items[i]];
     done.push(pivot.id);
     shot(`Swap the pivot to the boundary: ${pivot.value} is now in its FINAL position — everything left is smaller, everything right is bigger.`, { pivot: [pivot.id] });
@@ -1381,8 +1398,8 @@ export function sortQuick(d: { items: ListNode[] }): Frame[] {
 export function sortMerge(d: { items: ListNode[] }): Frame[] {
   const items = clone(d.items);
   if (items.length < 2) return trivial(items);
-  const { frames, shot } = sorter(items);
-  shot(`MERGE SORT: split the array in half, sort each half, then MERGE the two sorted halves together.`);
+  const { frames, shot, stats } = sorter(items);
+  shot(`MERGE SORT: split the array in half, sort each half, then MERGE the two sorted halves together. (Its "swaps" are element MOVES.)`);
   const rec = (lo: number, hi: number): void => {
     if (lo >= hi) return;
     const mid = (lo + hi) >> 1;
@@ -1394,6 +1411,7 @@ export function sortMerge(d: { items: ListNode[] }): Frame[] {
     let m = mid;
     let j = mid + 1;
     while (i <= m && j <= hi) {
+      stats.comparisons += 1;
       if (items[i].value <= items[j].value) {
         shot(`${items[i].value} ≤ ${items[j].value} — the left element is already in place.`, { hl: [items[i].id, items[j].id] });
         i++;
@@ -1401,6 +1419,7 @@ export function sortMerge(d: { items: ListNode[] }): Frame[] {
         const leftVal = items[i].value;
         const [moved] = items.splice(j, 1);
         items.splice(i, 0, moved);
+        stats.swaps += 1;
         shot(`${moved.value} < ${leftVal} — slide it in front of the left run.`, { hl: [moved.id] });
         i++;
         m++;
@@ -1410,14 +1429,14 @@ export function sortMerge(d: { items: ListNode[] }): Frame[] {
     shot(`[${lo}..${hi}] merged.`, { ok: items.slice(lo, hi + 1).map((n) => n.id) });
   };
   rec(0, items.length - 1);
-  frames.push(snap(arrData(items), `All halves merged — array sorted. Merge sort ALWAYS costs O(n log n), even on hostile input.`, { ok: items.map((n) => n.id) }));
+  shot(`All halves merged — array sorted. Merge sort ALWAYS costs O(n log n), even on hostile input.`, { ok: items.map((n) => n.id) });
   return frames;
 }
 
 export function sortHeap(d: { items: ListNode[] }): Frame[] {
   const items = clone(d.items);
   if (items.length < 2) return trivial(items);
-  const { frames, done, shot } = sorter(items);
+  const { frames, done, shot, stats } = sorter(items);
   shot(`HEAP SORT: treat the array as a tree and arrange it into a MAX-heap, then repeatedly swap the biggest element to the end.`);
   const n0 = items.length;
   const sift = (start: number, n: number): void => {
@@ -1426,11 +1445,18 @@ export function sortHeap(d: { items: ListNode[] }): Frame[] {
       const l = 2 * i + 1;
       const r = 2 * i + 2;
       let big = i;
-      if (l < n && items[l].value > items[big].value) big = l;
-      if (r < n && items[r].value > items[big].value) big = r;
+      if (l < n) {
+        stats.comparisons += 1;
+        if (items[l].value > items[big].value) big = l;
+      }
+      if (r < n) {
+        stats.comparisons += 1;
+        if (items[r].value > items[big].value) big = r;
+      }
       if (big === i) return;
       shot(`Sift down at index ${i}: child ${items[big].value} beats parent ${items[i].value} — swap.`, { hl: [items[i].id, items[big].id] });
       [items[i], items[big]] = [items[big], items[i]];
+      stats.swaps += 1;
       i = big;
     }
   };
@@ -1439,6 +1465,7 @@ export function sortHeap(d: { items: ListNode[] }): Frame[] {
   for (let end = n0 - 1; end > 0; end--) {
     shot(`Swap the max ${items[0].value} into its FINAL slot, index ${end}.`, { hl: [items[0].id, items[end].id], bad: [items[0].id] });
     [items[0], items[end]] = [items[end], items[0]];
+    stats.swaps += 1;
     done.push(items[end].id);
     shot(`${items[end].value} is final. Repair the heap on the remaining ${end} element${end === 1 ? "" : "s"}.`);
     sift(0, end);

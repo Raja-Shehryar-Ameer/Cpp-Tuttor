@@ -8,6 +8,7 @@ import {
   Shuffle,
   StepBack,
   StepForward,
+  Swords,
   Target,
   X,
 } from "lucide-react";
@@ -38,6 +39,99 @@ const SPEEDS = [
 
 const DEFAULT_REFS = PAGE_PRESETS[0].refs.join(" ");
 
+/** One algorithm's frames×references grid (+ live panel and stat chips).
+    Extracted so race mode can stack two of them under one shared scrubber. */
+function PageGrid({ run, now, detail }: { run: PageRun; now: number; detail: boolean }) {
+  const meta = PAGE_ALGOS.find((a) => a.key === run.algo)!;
+  const clamped = Math.min(now, run.steps.length);
+  const step = clamped > 0 ? run.steps[clamped - 1] : null;
+  return (
+    <section className="sched-results">
+      <div className="sched-section-head">
+        <h3>Frames over time — {meta.short}</h3>
+        <span className="sched-hint">each column is memory AFTER that reference · ref {clamped} / {run.steps.length}</span>
+      </div>
+      <div className="page-grid-wrap">
+        <table className="page-grid">
+          <thead>
+            <tr>
+              <th className="pg-label">ref</th>
+              {run.steps.map((s, j) => (
+                <th key={j} className={j >= clamped ? "future" : j === clamped - 1 ? "current-col" : ""}>
+                  <span className={`proc-chip ${chipOf(s.page)}`}>{s.page}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: run.frameCount }, (_, slot) => (
+              <tr key={slot}>
+                <th className="pg-label">f{slot}</th>
+                {run.steps.map((s, j) => {
+                  const cls = [
+                    j >= clamped ? "future" : "",
+                    j === clamped - 1 ? "current-col" : "",
+                    s.slot === slot ? (s.hit ? "hit-cell" : "load-cell") : "",
+                  ].filter(Boolean).join(" ");
+                  return (
+                    <td key={j} className={cls}>{s.frames[slot] ?? "·"}</td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th className="pg-label" title="H = hit, F = fault">h/f</th>
+              {run.steps.map((s, j) => (
+                <td key={j} className={`${s.hit ? "pg-hit" : "pg-fault"}${j >= clamped ? " future" : ""}`}>
+                  {s.hit ? "H" : "F"}
+                </td>
+              ))}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {detail && (
+        <div className="sched-live">
+          <span className="sched-live-label">memory now</span>
+          {(step?.frames ?? Array.from({ length: run.frameCount }, () => null)).map((p, k) => (
+            <span
+              key={k}
+              className={`page-slot${step?.hand === k ? " hand" : ""}${step?.slot === k ? (step.hit ? " just-hit" : " just-loaded") : ""}`}
+              title={step?.hand === k ? "the clock hand points here" : undefined}
+            >
+              <span className="pg-slot-name">f{k}</span>
+              {p !== null ? (
+                <span className={`proc-chip ${chipOf(p)}`}>{p}</span>
+              ) : (
+                <span className="proc-chip gantt-idle">—</span>
+              )}
+              {step && <em>{step.info[k]}</em>}
+              {step?.hand === k && <em className="pg-hand">◄ hand</em>}
+            </span>
+          ))}
+          <span className="sched-live-label">so far</span>
+          <span className="ds-chip">{step?.faultsSoFar ?? 0} faults</span>
+          <span className="ds-chip">{step?.hitsSoFar ?? 0} hits</span>
+          {step?.victim !== null && step?.victim !== undefined && (
+            <span className="ds-chip pg-victim">evicted page {step.victim}</span>
+          )}
+        </div>
+      )}
+
+      <div className="sched-stats">
+        <span className="ds-chip">page faults {run.faults}</span>
+        <span className="ds-chip">hits {run.hits}</span>
+        <span className="ds-chip">hit ratio {(run.hitRatio * 100).toFixed(1)}%</span>
+        <span className="ds-chip">fault ratio {((1 - run.hitRatio) * 100).toFixed(1)}%</span>
+        {detail && <span className="ds-chip">hit ratio = hits ÷ references</span>}
+      </div>
+    </section>
+  );
+}
+
 function parseRefs(raw: string): { refs: number[]; bad: string[] } {
   const refs: number[] = [];
   const bad: string[] = [];
@@ -58,6 +152,10 @@ export function PagingLab() {
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [compare, setCompare] = useState(false);
+  // Race mode: a second algorithm on the same reference string, stacked grids.
+  const [race, setRace] = useState(false);
+  const [algoB, setAlgoB] = useState<PageAlgo>("lru");
+  const [runB, setRunB] = useState<PageRun | null>(null);
   // Predict mode: every reference asks hit-or-fault; full-memory faults also
   // ask which page gets evicted. quizPos = [step index, question index].
   const [predictOn, setPredictOn] = useState(false);
@@ -107,6 +205,7 @@ export function PagingLab() {
 
   const invalidate = () => {
     setRun(null);
+    setRunB(null);
     setPlaying(false);
   };
 
@@ -135,6 +234,7 @@ export function PagingLab() {
     const refs = validate();
     if (!refs) return;
     setRun(pageReplace(algo, refs, frameCount));
+    setRunB(race ? pageReplace(algoB, refs, frameCount) : null);
     setTick(0);
     setPlaying(true);
     setCompare(false);
@@ -179,12 +279,16 @@ export function PagingLab() {
   const now = shown ? Math.min(tick, shown.steps.length) : 0;
   const step = shown && now > 0 ? shown.steps[now - 1] : null;
   const finished = shown !== null && now >= shown.steps.length;
+  const metaB = PAGE_ALGOS.find((a) => a.key === algoB)!;
   const note = shown
-    ? step
-      ? finished
-        ? `${step.note} All done: ${shown.faults} fault${shown.faults === 1 ? "" : "s"}, ${shown.hits} hit${shown.hits === 1 ? "" : "s"} — hit ratio ${(shown.hitRatio * 100).toFixed(1)}%.`
-        : step.note
-      : `${shown.frameCount} empty frames, ${shown.refs.length} references queued — press play.`
+    ? runB && finished
+      ? `Race over: ${meta.short} ${shown.faults} fault${shown.faults === 1 ? "" : "s"} vs ${metaB.short} ${runB.faults} — ${
+          shown.faults === runB.faults ? "a dead heat" : `${shown.faults < runB.faults ? meta.short : metaB.short} wins with fewer faults`}.`
+      : step
+        ? finished
+          ? `${step.note} All done: ${shown.faults} fault${shown.faults === 1 ? "" : "s"}, ${shown.hits} hit${shown.hits === 1 ? "" : "s"} — hit ratio ${(shown.hitRatio * 100).toFixed(1)}%.`
+          : step.note
+        : `${shown.frameCount} empty frames, ${shown.refs.length} references queued — press play.`
     : meta.blurb;
 
   return (
@@ -213,16 +317,42 @@ export function PagingLab() {
           <Play size={13} /> Run
         </button>
         <button
-          className={predictOn ? "toggled" : ""}
-          title="pause before every reference and ask hit-or-fault (and who gets evicted)"
+          className={race ? "toggled" : ""}
+          title="run a second algorithm on the same reference string, stacked under one scrubber"
           onClick={() => {
-            setPredictOn((p) => !p);
-            predict.reset();
-            dismissQuiz();
+            setRace((r) => !r);
+            setRun(null);
+            setRunB(null);
+            setPlaying(false);
+            setCompare(false);
+            setPredictOn(false);
           }}
         >
-          <Target size={13} /> Predict
+          <Swords size={13} /> Race
         </button>
+        {race && (
+          <label className="ds-mode">
+            vs:
+            <select value={algoB} onChange={(e) => { setAlgoB(e.target.value as PageAlgo); setRun(null); setRunB(null); }}>
+              {PAGE_ALGOS.map((a) => (
+                <option key={a.key} value={a.key}>{a.short}</option>
+              ))}
+            </select>
+          </label>
+        )}
+        {!race && (
+          <button
+            className={predictOn ? "toggled" : ""}
+            title="pause before every reference and ask hit-or-fault (and who gets evicted)"
+            onClick={() => {
+              setPredictOn((p) => !p);
+              predict.reset();
+              dismissQuiz();
+            }}
+          >
+            <Target size={13} /> Predict
+          </button>
+        )}
         <PredictChips state={predict.state} />
         <button
           className={compare ? "toggled" : ""}
@@ -322,87 +452,10 @@ export function PagingLab() {
         )}
 
         {shown && (
-          <section className="sched-results">
-            <div className="sched-section-head">
-              <h3>Frames over time — {meta.short}</h3>
-              <span className="sched-hint">each column is memory AFTER that reference · ref {now} / {shown.steps.length}</span>
-            </div>
-            <div className="page-grid-wrap">
-              <table className="page-grid">
-                <thead>
-                  <tr>
-                    <th className="pg-label">ref</th>
-                    {shown.steps.map((s, j) => (
-                      <th key={j} className={j >= now ? "future" : j === now - 1 ? "current-col" : ""}>
-                        <span className={`proc-chip ${chipOf(s.page)}`}>{s.page}</span>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.from({ length: shown.frameCount }, (_, slot) => (
-                    <tr key={slot}>
-                      <th className="pg-label">f{slot}</th>
-                      {shown.steps.map((s, j) => {
-                        const cls = [
-                          j >= now ? "future" : "",
-                          j === now - 1 ? "current-col" : "",
-                          s.slot === slot ? (s.hit ? "hit-cell" : "load-cell") : "",
-                        ].filter(Boolean).join(" ");
-                        return (
-                          <td key={j} className={cls}>{s.frames[slot] ?? "·"}</td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <th className="pg-label" title="H = hit, F = fault">h/f</th>
-                    {shown.steps.map((s, j) => (
-                      <td key={j} className={`${s.hit ? "pg-hit" : "pg-fault"}${j >= now ? " future" : ""}`}>
-                        {s.hit ? "H" : "F"}
-                      </td>
-                    ))}
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
-
-            <div className="sched-live">
-              <span className="sched-live-label">memory now</span>
-              {(step?.frames ?? Array.from({ length: shown.frameCount }, () => null)).map((p, k) => (
-                <span
-                  key={k}
-                  className={`page-slot${step?.hand === k ? " hand" : ""}${step?.slot === k ? (step.hit ? " just-hit" : " just-loaded") : ""}`}
-                  title={step?.hand === k ? "the clock hand points here" : undefined}
-                >
-                  <span className="pg-slot-name">f{k}</span>
-                  {p !== null ? (
-                    <span className={`proc-chip ${chipOf(p)}`}>{p}</span>
-                  ) : (
-                    <span className="proc-chip gantt-idle">—</span>
-                  )}
-                  {step && <em>{step.info[k]}</em>}
-                  {step?.hand === k && <em className="pg-hand">◄ hand</em>}
-                </span>
-              ))}
-              <span className="sched-live-label">so far</span>
-              <span className="ds-chip">{step?.faultsSoFar ?? 0} faults</span>
-              <span className="ds-chip">{step?.hitsSoFar ?? 0} hits</span>
-              {step?.victim !== null && step?.victim !== undefined && (
-                <span className="ds-chip pg-victim">evicted page {step.victim}</span>
-              )}
-            </div>
-
-            <div className="sched-stats">
-              <span className="ds-chip">page faults {shown.faults}</span>
-              <span className="ds-chip">hits {shown.hits}</span>
-              <span className="ds-chip">hit ratio {(shown.hitRatio * 100).toFixed(1)}%</span>
-              <span className="ds-chip">fault ratio {((1 - shown.hitRatio) * 100).toFixed(1)}%</span>
-              <span className="ds-chip">hit ratio = hits ÷ references</span>
-            </div>
-          </section>
+          <div className={runB ? "race-stack" : undefined}>
+            <PageGrid run={shown} now={now} detail={!runB} />
+            {runB && <PageGrid run={runB} now={now} detail={false} />}
+          </div>
         )}
 
         {!shown && !compare && (

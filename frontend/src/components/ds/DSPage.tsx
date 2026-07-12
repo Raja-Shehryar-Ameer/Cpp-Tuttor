@@ -34,6 +34,7 @@ import {
   Triangle,
   Workflow,
   X,
+  Zap,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import {
@@ -122,6 +123,7 @@ import {
 import { DSView } from "./DSView";
 import { PagingLab } from "./PagingLab";
 import { PredictChips, QuizPanel, usePredictScore } from "./predict";
+import { SortRace } from "./SortRace";
 import { SchedLab } from "./SchedLab";
 import { ThreadsLab } from "./ThreadsLab";
 
@@ -140,11 +142,13 @@ type Structure =
   | "array"
   | "search";
 
-/** Everything selectable on the topic grid: data structures plus the OS labs. */
-type OsTopic = "sched" | "threads" | "paging";
-type Topic = Structure | OsTopic;
+/** Everything selectable on the topic grid: data structures plus the labs
+    that own their whole toolbar/stage/caption (OS labs + the sorting race). */
+type LabTopic = "sched" | "threads" | "paging" | "sortrace";
+type Topic = Structure | LabTopic;
 
-const isOsTopic = (t: Topic): t is OsTopic => t === "sched" || t === "threads" || t === "paging";
+const isLabTopic = (t: Topic): t is LabTopic =>
+  t === "sched" || t === "threads" || t === "paging" || t === "sortrace";
 
 type Category = "Data structures" | "Algorithms" | "Operating systems";
 
@@ -153,7 +157,7 @@ const CATEGORY: Record<Topic, Category> = {
   bst: "Data structures", avl: "Data structures", rb: "Data structures",
   heap: "Data structures", hash: "Data structures", btree: "Data structures",
   graph: "Data structures",
-  array: "Algorithms", search: "Algorithms", wgraph: "Algorithms",
+  array: "Algorithms", search: "Algorithms", wgraph: "Algorithms", sortrace: "Algorithms",
   sched: "Operating systems", threads: "Operating systems", paging: "Operating systems",
 };
 
@@ -255,17 +259,22 @@ const STRUCTURES: StructureMeta[] = [
   },
 ];
 
-// OS labs live outside StructureMeta — they bring their own toolbars and
+// Lab topics live outside StructureMeta — they bring their own toolbars and
 // canvases, so they only need card/tab metadata here.
-interface OsTopicMeta {
-  key: OsTopic;
+interface LabTopicMeta {
+  key: LabTopic;
   label: string;
   icon: ComponentType<{ size?: number | string }>;
   intro: string;
   complexity: string[];
 }
 
-const OS_TOPICS: OsTopicMeta[] = [
+const OS_TOPICS: LabTopicMeta[] = [
+  {
+    key: "sortrace", label: "Sorting Race", icon: Zap,
+    intro: "Two sorting algorithms, one array, side by side — live comparison and swap counters make the O(n²) vs O(n log n) gap something you can watch.",
+    complexity: ["2 algorithms in lockstep", "live op counters", "same input, fair fight"],
+  },
   {
     key: "sched", label: "CPU Scheduling", icon: Cpu,
     intro: "FCFS, SJF, SRTF, LJF, LRTF, HRRN, Priority (both flavors), and Round Robin — animated Gantt charts, ready queues, and every metric an exam can ask for.",
@@ -343,7 +352,7 @@ export function DSPage() {
   const [topic, setTopic] = useState<Topic | null>(null);
   // Data-structure code paths only run when the open topic IS a structure;
   // the "list" fallback keeps types tight and is never rendered otherwise.
-  const structure: Structure = topic !== null && !isOsTopic(topic) ? topic : "list";
+  const structure: Structure = topic !== null && !isLabTopic(topic) ? topic : "list";
   const dataRef = useRef<Record<Structure, DSData>>({
     list: empty("list"),
     stack: empty("stack"),
@@ -799,7 +808,7 @@ export function DSPage() {
     setPlaying(false);
     setBulkOpen(false);
     setBulkText("");
-    setInfoOpen(!isOsTopic(t) && !loadSeen()[t]);
+    setInfoOpen(!isLabTopic(t) && !loadSeen()[t]);
   };
 
   // ---------- topic grid (home) ----------
@@ -852,12 +861,12 @@ export function DSPage() {
     </nav>
   );
 
-  // ---------- OS labs: they own their toolbar, stage, and caption ----------
-  if (isOsTopic(topic)) {
+  // ---------- lab topics: they own their toolbar, stage, and caption ----------
+  if (isLabTopic(topic)) {
     return (
       <div className="ds-page">
         {tabs}
-        {topic === "sched" ? <SchedLab /> : topic === "threads" ? <ThreadsLab /> : <PagingLab />}
+        {topic === "sched" ? <SchedLab /> : topic === "threads" ? <ThreadsLab /> : topic === "paging" ? <PagingLab /> : <SortRace />}
       </div>
     );
   }
