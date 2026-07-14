@@ -15,6 +15,7 @@
 
 import { SCHED_ALGOS, schedQuizzes, schedule, type ProcSpec, type SchedRun } from "../src/ds/sched.ts";
 import { PAGE_ALGOS, pageReplace, pagingQuizzes } from "../src/ds/paging.ts";
+import { DEADLOCK_PRESETS, deadlockQuizzes, findRagCycle, procName, RES_NAMES, runDeadlock, type DeadlockSpec } from "../src/ds/deadlock.ts";
 import { makeRng, type Rng } from "../src/ds/rng.ts";
 import {
   wgraphAddEdge,
@@ -219,10 +220,116 @@ for (let t = 0; t < 300; t += 1) {
   }
 }
 
+// ---- deadlock ----
+for (let t = 0; t < 400; t += 1) {
+  currentSeed = BASE_SEED + 3000 + t;
+  const rng = makeRng(currentSeed);
+  const n = 1 + rng.int(7);
+  const m = 1 + rng.int(3);
+  const mode = rng.next() < 0.5 ? "banker" as const : "detect" as const;
+  const alloc = Array.from({ length: n }, () => Array.from({ length: m }, () => rng.int(5)));
+  const spec: DeadlockSpec = {
+    mode,
+    available: Array.from({ length: m }, () => rng.int(5)),
+    alloc,
+    ...(mode === "banker"
+      ? { max: alloc.map((row) => row.map((a) => a + rng.int(5))) }
+      : { request: Array.from({ length: n }, () => Array.from({ length: m }, () => rng.int(5))) }),
+  };
+  const run = runDeadlock(spec);
+
+  // safe ⟺ nobody is stuck; banker's safe sequence covers every process.
+  if (run.safe !== (run.stuck.length === 0)) fail("deadlock: safe flag disagrees with stuck set", run.safe, run.stuck);
+  if (mode === "banker" && run.safe !== (run.safeSeq.length === n)) fail("deadlock: banker safe ⟺ full sequence violated");
+  if (run.steps[run.steps.length - 1].kind !== "verdict") fail("deadlock: run does not end with a verdict step");
+
+  // Replay the safe sequence independently: every entry must fit in Work at
+  // its turn, and Work must end at Available + released allocations.
+  {
+    // (detect-mode pre-finished rows hold nothing, so skipping them releases nothing)
+    const work = [...spec.available];
+    for (const i of run.safeSeq) {
+      if (!run.need[i].every((x, j) => x <= work[j])) fail("deadlock: safe sequence entry does not fit Work", i, run.need[i], work);
+      for (let j = 0; j < m; j += 1) work[j] += spec.alloc[i][j];
+    }
+    const final = run.steps[run.steps.length - 1].work;
+    if (final.some((x, j) => x !== work[j])) fail("deadlock: final Work mismatch", final, work);
+    // nobody stuck could actually fit in the final Work
+    for (const i of run.stuck) {
+      if (run.need[i].every((x, j) => x <= final[j])) fail("deadlock: stuck process actually fits in final Work", i);
+    }
+  }
+
+  // Work never shrinks across steps.
+  for (let k = 1; k < run.steps.length; k += 1) {
+    const a = run.steps[k - 1].work;
+    const b = run.steps[k].work;
+    if (b.some((x, j) => x < a[j])) fail("deadlock: Work shrank", k, a, b);
+  }
+
+  // RAG cycle, when found, must follow real request/assignment edges among
+  // the stuck set, alternating process → resource → process.
+  const cyc = findRagCycle(run);
+  if (cyc) {
+    if (run.stuck.length === 0) fail("deadlock: cycle reported on a safe run");
+    for (let k = 0; k < cyc.nodes.length; k += 1) {
+      const from = cyc.nodes[k];
+      const to = cyc.nodes[(k + 1) % cyc.nodes.length];
+      const [fk, fi] = [from[0], Number(from.slice(1))];
+      const ti = Number(to.slice(1));
+      if (fk === "p") {
+        if (to[0] !== "r" || run.need[fi][ti] <= 0) fail("deadlock: bogus request edge in cycle", from, to);
+        if (!run.stuck.includes(fi)) fail("deadlock: cycle passes through a finished process", from);
+      } else {
+        if (to[0] !== "p" || spec.alloc[ti][fi] <= 0) fail("deadlock: bogus assignment edge in cycle", from, to);
+      }
+    }
+  }
+
+  // Quizzes: gate indices valid, answers match the run's ground truth.
+  for (const { step, quizzes } of deadlockQuizzes(run, rng)) {
+    const st = run.steps[step];
+    if (!st) { fail("deadlock: quiz step out of range", step); continue; }
+    for (const quiz of quizzes) {
+      checkShape(quiz, "deadlock");
+      const prev = run.steps[step - 1];
+      const picked = quiz.choices[quiz.answer];
+      if (quiz.kind === "can-finish") {
+        if ((quiz.answer === 0) !== st.canRun) fail("deadlock: can-finish answer wrong", step, st.canRun, quiz);
+      } else if (quiz.kind === "who-next") {
+        if (picked !== procName(st.proc!)) fail("deadlock: who-next answer is not the finishing process", picked, st.proc);
+        if (prev && prev.finish[st.proc!]) fail("deadlock: who-next names an already-finished process", st.proc);
+      } else if (quiz.kind === "need-cell") {
+        const letter = quiz.prompt.match(/\[([A-E])\]|units of ([A-E])/);
+        const j = RES_NAMES.indexOf((letter?.[1] ?? letter?.[2])!);
+        if (j < 0) fail("deadlock: need-cell prompt names no resource", quiz.prompt);
+        else if (Number(picked) !== run.need[st.proc!][j]) fail("deadlock: need-cell answer wrong", picked, run.need[st.proc!][j]);
+      } else if (quiz.kind === "verdict") {
+        if ((quiz.answer === 0) !== run.safe) fail("deadlock: verdict quiz disagrees with the run", quiz, run.safe);
+      } else {
+        fail("deadlock: unknown quiz kind", quiz.kind);
+      }
+    }
+  }
+}
+
+// ---- deadlock spot checks: the presets teach exactly what they claim ----
+{
+  currentSeed = BASE_SEED;
+  const [safe, unsafe, knot, blocked] = DEADLOCK_PRESETS.map((p) => runDeadlock(p.spec));
+  if (!safe.safe || safe.safeSeq.map(procName).join(",") !== "P1,P3,P4,P0,P2") {
+    fail("deadlock preset: textbook state should be safe via P1,P3,P4,P0,P2", safe.safeSeq);
+  }
+  if (unsafe.safe) fail("deadlock preset: 'one request too greedy' should be unsafe");
+  if (knot.safe) fail("deadlock preset: circular wait should deadlock");
+  if (!findRagCycle(knot)) fail("deadlock preset: circular wait should exhibit a RAG cycle");
+  if (!blocked.safe) fail("deadlock preset: 'blocked but not deadlocked' should resolve");
+}
+
 // ---- variety: every kind must have appeared somewhere across the trials ----
-for (const kind of ["dispatch", "wait-so-far", "remaining", "hit-fault", "evict", "faults-so-far", "lru-coldest", "settle-who", "settle-dist", "prim-edge", "kruskal-verdict"]) {
+for (const kind of ["dispatch", "wait-so-far", "remaining", "hit-fault", "evict", "faults-so-far", "lru-coldest", "settle-who", "settle-dist", "prim-edge", "kruskal-verdict", "can-finish", "who-next", "need-cell", "verdict"]) {
   if (!kindsSeen.has(kind)) fail(`variety: kind "${kind}" never appeared across all trials`);
 }
 
-console.log(fails === 0 ? "ALL PASS (400 sched + 400 paging + 300 wgraph trials)" : `${fails} FAILURES`);
+console.log(fails === 0 ? "ALL PASS (400 sched + 400 paging + 300 wgraph + 400 deadlock trials)" : `${fails} FAILURES`);
 process.exit(fails === 0 ? 0 : 1);
