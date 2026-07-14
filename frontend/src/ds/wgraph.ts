@@ -14,6 +14,7 @@
 // Extension kept explicit so `node --experimental-strip-types` can run the
 // fuzz suites against this module directly (tsconfig: allowImportingTsExtensions).
 import { allocId, type DSData, type Frame, type ListNode, type WEdge } from "./engine.ts";
+import { makeRng, numericChoices, pickVaried, type Rng } from "./rng.ts";
 
 export type WGraph = Extract<DSData, { kind: "wgraph" }>;
 
@@ -268,9 +269,10 @@ export function wgraphPathBfs(d: WGraph, fromV: number, toV: number): Frame[] {
 
 // ---------- Dijkstra ----------
 
-export function wgraphDijkstra(d: WGraph, srcV: number, dstV?: number): Frame[] {
+export function wgraphDijkstra(d: WGraph, srcV: number, dstV?: number, rng: Rng = makeRng()): Frame[] {
   const g = guard(d, WGRAPH_ALGOS.find((a) => a.key === "dijkstra")!);
   if (g) return g;
+  let lastKind: string | null = null;
   const src = byValue(d, srcV);
   if (!src) return missing(d, srcV);
   const dst = dstV !== undefined ? byValue(d, dstV) : undefined;
@@ -308,18 +310,39 @@ export function wgraphDijkstra(d: WGraph, srcV: number, dstV?: number): Frame[] 
       .sort((a, b) => a.value - b.value);
     settled.add(u);
     const via = parentEdge.get(u);
+    // Two question kinds compete at each settle gate: WHO settles, and at
+    // WHAT distance. The winner is pinned into the capped choice set, then
+    // everything shuffles — so choice order differs every run.
+    let quiz;
+    if (cands.length >= 2) {
+      const kinds = [];
+      const winner = cands.find((n) => n.id === u)!;
+      const others = rng.shuffle(cands.filter((n) => n.id !== u)).slice(0, 4);
+      const whoChoices = rng.shuffle([winner, ...others]).map((n) => `${n.value} (d=${dist.get(n.id)})`);
+      kinds.push({
+        kind: "settle-who",
+        prompt: "Dijkstra settles one vertex now — which one?",
+        choices: whoChoices,
+        answer: whoChoices.indexOf(`${winner.value} (d=${dist.get(winner.id)})`),
+        explain: `${valueOf(d, u)} carries the smallest tentative distance (${dist.get(u)}) — and a settled distance can never improve, so it is safe to lock in.`,
+      });
+      const distQ = dist.get(u)! > 0 ? numericChoices(dist.get(u)!, rng) : null;
+      if (distQ) {
+        kinds.push({
+          kind: "settle-dist",
+          prompt: `${valueOf(d, u)} settles now — what distance does it lock in?`,
+          ...distQ,
+          explain: `${valueOf(d, u)}'s tentative distance is ${dist.get(u)}${via ? ` (reached via ${edgeName(d, via)})` : ""} — the smallest on the frontier, so it becomes final.`,
+        });
+      }
+      quiz = pickVaried(kinds, lastKind, rng);
+      lastKind = quiz.kind;
+    }
     frames.push(snap(d, `Frontier: ${front || "—"}${front ? " — " : ""}${valueOf(d, u)} has the smallest distance (${dist.get(u)}) → settle it${via ? ` via ${edgeName(d, via)}` : ""}. Nothing cheaper can appear later.`, {
       hl: settledIds(),
       ok: [u, ...(via ? [via.id] : [])],
       labels: labels(),
-      ...(cands.length >= 2 ? {
-        quiz: {
-          prompt: "Dijkstra settles one vertex now — which one?",
-          choices: cands.map((n) => `${n.value} (d=${dist.get(n.id)})`),
-          answer: cands.findIndex((n) => n.id === u),
-          explain: `${valueOf(d, u)} carries the smallest tentative distance (${dist.get(u)}) — and a settled distance can never improve, so it is safe to lock in.`,
-        },
-      } : {}),
+      ...(quiz ? { quiz } : {}),
     }));
     if (dst && u === dst.id) break;
     for (const { edge, to } of adj.get(u) ?? []) {
@@ -375,7 +398,7 @@ export function wgraphDijkstra(d: WGraph, srcV: number, dstV?: number): Frame[] 
 
 // ---------- Prim ----------
 
-export function wgraphPrim(d: WGraph, startV: number): Frame[] {
+export function wgraphPrim(d: WGraph, startV: number, rng: Rng = makeRng()): Frame[] {
   const g = guard(d, WGRAPH_ALGOS.find((a) => a.key === "prim")!);
   if (g) return g;
   const start = byValue(d, startV);
@@ -392,14 +415,19 @@ export function wgraphPrim(d: WGraph, startV: number): Frame[] {
     let best = cut[0];
     for (const e of cut) if (e.w < best.w || (e.w === best.w && e.id < best.id)) best = e;
     const joining = inTree.has(best.a) ? best.b : best.a;
+    // Winner pinned into the capped choice set, then shuffled — a long cut
+    // list never slices out the answer or turns into a wall of buttons.
+    const cutOthers = rng.shuffle(cut.filter((e) => e !== best)).slice(0, 4);
+    const cutChoices = rng.shuffle([best, ...cutOthers]).map((e) => `${edgeName(d, e)} (${e.w})`);
     frames.push(snap(d, `Crossing edges: ${cut.map((e) => `${edgeName(d, e)}(${e.w})`).join(", ")} — the cheapest is ${edgeName(d, best)} (${best.w}).`, {
       hl: [...cut.map((e) => e.id), ...inTree, ...treeEdges],
       ok: [best.id],
       ...(cut.length >= 2 ? {
         quiz: {
+          kind: "prim-edge",
           prompt: "Prim adds one crossing edge to the tree — which one?",
-          choices: cut.map((e) => `${edgeName(d, e)} (${e.w})`),
-          answer: cut.indexOf(best),
+          choices: cutChoices,
+          answer: cutChoices.indexOf(`${edgeName(d, best)} (${best.w})`),
           explain: `${edgeName(d, best)} is the CHEAPEST edge leaving the tree (${best.w}) — the greedy cut rule guarantees it belongs to some MST.`,
         },
       } : {}),
@@ -454,6 +482,7 @@ export function wgraphKruskal(d: WGraph): Frame[] {
     const ra = find(e.a);
     const rb = find(e.b);
     const quiz = {
+      kind: "kruskal-verdict",
       prompt: `Next sorted edge: ${edgeName(d, e)} (${e.w}) — take it?`,
       choices: ["Accept — the endpoints are in different components", "Reject — it would close a cycle"],
       answer: ra !== rb ? 0 : 1,

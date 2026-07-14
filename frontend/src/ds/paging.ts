@@ -9,6 +9,7 @@
 //  - Optimal breaks "never needed again" ties by the lowest frame index.
 
 import type { Quiz } from "./engine.ts";
+import { makeRng, numericChoices, pickVaried, type Rng } from "./rng.ts";
 
 export type PageAlgo = "fifo" | "lru" | "opt" | "clock" | "lfu";
 
@@ -215,28 +216,80 @@ export interface StepQuizzes {
   quizzes: Quiz[];
 }
 
-/** Hit-or-fault for every reference, plus "which page is evicted?" whenever a
-    fault hits full memory. Pure — derived from a finished run. */
-export function pagingQuizzes(run: PageRun): StepQuizzes[] {
+/** Hit-or-fault for every reference, plus one varied second question when
+    the step offers material for it (eviction victim, running fault count,
+    LRU recency). Pure — derived from a finished run plus a caller-supplied
+    Rng, so a fixed seed reproduces the exact question set. */
+export function pagingQuizzes(run: PageRun, rng: Rng = makeRng()): StepQuizzes[] {
   const short = PAGE_ALGOS.find((a) => a.key === run.algo)!.short;
+  let lastKind: string | null = null;
   return run.steps.map((s, i) => {
     const quizzes: Quiz[] = [{
+      kind: "hit-fault",
       prompt: `#${s.i}: page ${s.page} is referenced — hit or fault?`,
       choices: ["Hit", "Fault"],
       answer: s.hit ? 0 : 1,
       explain: s.note,
     }];
-    if (s.victim !== null) {
-      const before = i > 0 ? run.steps[i - 1].frames : run.steps[i].frames.map(() => null);
-      const resident = before.filter((p): p is number => p !== null);
-      if (resident.length >= 2 && resident.includes(s.victim)) {
-        quizzes.push({
-          prompt: `Memory is full — which page does ${short} evict?`,
-          choices: resident.map(String),
-          answer: resident.indexOf(s.victim),
-          explain: s.note,
+
+    const before = i > 0 ? run.steps[i - 1].frames : run.steps[i].frames.map(() => null);
+    const resident = before.filter((p): p is number => p !== null);
+    const candidates: Quiz[] = [];
+
+    // Answer pinned into the choice set BEFORE capping at 5, then shuffled —
+    // the victim never gets sliced out of its own question.
+    const pinCap = (answer: number, pool: number[]): string[] =>
+      rng.shuffle([answer, ...rng.shuffle(pool.filter((p) => p !== answer)).slice(0, 4)]).map(String);
+
+    if (s.victim !== null && resident.length >= 2 && resident.includes(s.victim)) {
+      const choices = pinCap(s.victim, resident);
+      candidates.push({
+        kind: "evict",
+        prompt: `Memory is full — which page does ${short} evict?`,
+        choices,
+        answer: choices.indexOf(String(s.victim)),
+        explain: s.note,
+      });
+    }
+
+    if (i >= 3) {
+      const fq = numericChoices(s.faultsSoFar, rng);
+      if (fq) {
+        candidates.push({
+          kind: "faults-so-far",
+          prompt: `After reference #${s.i} (page ${s.page}), how many faults in total?`,
+          ...fq,
+          explain: `${s.note} That makes ${s.faultsSoFar} fault${s.faultsSoFar === 1 ? "" : "s"} so far.`,
         });
       }
+    }
+
+    if (run.algo === "lru" && resident.length >= 2) {
+      // A resident page's last touch is simply its last occurrence in the
+      // reference string — every reference to a resident page is a hit that
+      // refreshes recency, and a load is itself a reference.
+      const lastUse = (p: number): number => {
+        for (let k = i - 1; k >= 0; k -= 1) if (run.refs[k] === p) return k;
+        return -1;
+      };
+      const coldest = resident.reduce((a, b) => (lastUse(a) < lastUse(b) ? a : b));
+      const choices = pinCap(coldest, resident);
+      candidates.push({
+        kind: "lru-coldest",
+        prompt: `Before reference #${s.i}: which resident page is the LEAST recently used?`,
+        choices,
+        answer: choices.indexOf(String(coldest)),
+        explain: `Page ${coldest} was last touched at #${lastUse(coldest)} — the oldest touch among ${resident.join(", ")}, so LRU would evict it first.`,
+      });
+    }
+
+    // An eviction always earns a second question (it's the marquee decision);
+    // the softer kinds only fire occasionally so the journey stays playable.
+    const hasEvict = candidates.some((c) => c.kind === "evict");
+    if (candidates.length > 0 && (hasEvict || rng.next() < 0.3)) {
+      const second = pickVaried(candidates as (Quiz & { kind: string })[], lastKind, rng);
+      lastKind = second.kind;
+      quizzes.push(second);
     }
     return { step: i, quizzes };
   });

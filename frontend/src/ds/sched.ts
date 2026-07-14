@@ -9,6 +9,7 @@
 //    arrived at that same tick (the common exam convention for RR).
 
 import type { Quiz } from "./engine.ts";
+import { makeRng, numericChoices, pickVaried, type Rng } from "./rng.ts";
 
 export interface ProcSpec {
   name: string;
@@ -281,32 +282,74 @@ export interface TickQuiz {
   quiz: Quiz;
 }
 
-/** One question per dispatch decision: "who gets the CPU next?" Pure —
-    derived entirely from a finished run, so it is fuzz-testable. */
-export function schedQuizzes(run: SchedRun): TickQuiz[] {
+/** One question per dispatch decision, varied in type per gate. Pure —
+    derived entirely from a finished run plus a caller-supplied Rng, so a
+    fixed seed reproduces the exact question set in the fuzz suite while the
+    lab passes a fresh Rng per run for session-unique questions. */
+export function schedQuizzes(run: SchedRun, rng: Rng = makeRng()): TickQuiz[] {
   const out: TickQuiz[] = [];
+  const specByName = new Map(run.metrics.map((m) => [m.name, m]));
+  const ranSoFar = new Map<string, number>(); // ticks each process has run BEFORE tick t
+  let lastKind: string | null = null;
+
   for (const tick of run.ticks) {
-    if (!tick.running) continue;
+    const bump = tick.running; // applied after quiz candidates are built
     const prev = run.ticks[tick.t - 1];
-    if (prev && prev.running === tick.running) continue; // no dispatch this tick
-    // Candidates: the winner plus the ready-queue snapshot (running excluded).
-    // The winner is pinned into the choice set BEFORE capping at 5, so a
-    // process whose name happens to sort late never gets sliced out — that
-    // silently forfeited the quiz.
-    const others = [...new Set(tick.ready)].filter((n) => n !== tick.running);
-    if (others.length === 0) continue; // only one candidate — nothing to predict
-    const choices = [tick.running, ...others].slice(0, 5).sort();
-    const answer = choices.indexOf(tick.running);
-    out.push({
-      tick: tick.t,
-      quiz: {
-        prompt: `t=${tick.t}: the CPU picks its next process — who runs?`,
-        choices,
-        answer,
-        explain: tick.events.find((e) => e.includes("gets the CPU") || e.includes("preempts"))
-          ?? `${tick.running} is dispatched at t=${tick.t}.`,
-      },
-    });
+    const isDispatch = tick.running !== null && !(prev && prev.running === tick.running);
+
+    if (isDispatch && tick.running) {
+      const candidates: Quiz[] = [];
+      const spec = specByName.get(tick.running)!;
+      const explain = tick.events.find((e) => e.includes("gets the CPU") || e.includes("preempts"))
+        ?? `${tick.running} is dispatched at t=${tick.t}.`;
+
+      // "who runs?" — winner pinned into the set, distractors drawn at random,
+      // capped at 5, THEN shuffled: a process whose name sorts late is never
+      // sliced out, and the answer position is different every run.
+      const others = [...new Set(tick.ready)].filter((n) => n !== tick.running);
+      if (others.length > 0) {
+        const choices = rng.shuffle([tick.running, ...rng.shuffle(others).slice(0, 4)]);
+        candidates.push({
+          kind: "dispatch",
+          prompt: `t=${tick.t}: the CPU picks its next process — who runs?`,
+          choices,
+          answer: choices.indexOf(tick.running),
+          explain,
+        });
+      }
+
+      // "how much has it waited?" — time since arrival minus time already run.
+      const waited = tick.t - spec.arrival - (ranSoFar.get(tick.running) ?? 0);
+      const waitedQ = numericChoices(waited, rng);
+      if (others.length > 0 && waitedQ && waited > 0) {
+        candidates.push({
+          kind: "wait-so-far",
+          prompt: `t=${tick.t}: ${tick.running} gets the CPU — how long has it waited so far?`,
+          ...waitedQ,
+          explain: `${tick.running} arrived at t=${spec.arrival} and has run ${ranSoFar.get(tick.running) ?? 0} tick(s), so it waited ${tick.t} − ${spec.arrival} − ${ranSoFar.get(tick.running) ?? 0} = ${waited}.`,
+        });
+      }
+
+      // "how much work is left?" — remaining burst as this slice starts.
+      const remaining = spec.burst - (ranSoFar.get(tick.running) ?? 0);
+      const remQ = numericChoices(remaining, rng);
+      if (others.length > 0 && remQ && (ranSoFar.get(tick.running) ?? 0) > 0) {
+        candidates.push({
+          kind: "remaining",
+          prompt: `t=${tick.t}: ${tick.running} is back on the CPU — how many burst units does it have left?`,
+          ...remQ,
+          explain: `${tick.running} needs ${spec.burst} total and has already run ${ranSoFar.get(tick.running)}, so ${spec.burst} − ${ranSoFar.get(tick.running)} = ${remaining} remain.`,
+        });
+      }
+
+      if (candidates.length > 0) {
+        const quiz: Quiz = pickVaried(candidates as (Quiz & { kind: string })[], lastKind, rng);
+        lastKind = quiz.kind ?? null;
+        out.push({ tick: tick.t, quiz });
+      }
+    }
+
+    if (bump) ranSoFar.set(bump, (ranSoFar.get(bump) ?? 0) + 1);
   }
   return out;
 }

@@ -54,6 +54,9 @@ export interface Quiz {
   /** index into choices */
   answer: number;
   explain: string;
+  /** question type tag ("dispatch", "evict", …) — drives variety picking and
+      lets the fuzz suite assert per-kind ground truths */
+  kind?: string;
 }
 
 export interface Frame {
