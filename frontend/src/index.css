@@ -560,10 +560,16 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 
 /* ---------- topic grid home (VisuAlgo-style cards) ---------- */
 
+/* The dot board belongs to the lab canvases; home gets a wider blueprint
+   grid — hairlines with hard stops, no color fades — so the two surfaces
+   read as different rooms of the same building. */
 .ds-home {
   flex: 1; overflow-y: auto; min-height: 0;
-  background-image: radial-gradient(var(--dot) 1.5px, transparent 1.5px);
-  background-size: 26px 26px;
+  background-image:
+    linear-gradient(var(--dot) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dot) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: -1px -1px;
 }
 .ds-home-inner { max-width: 68rem; margin: 0 auto; padding: 1.8rem 1.4rem 2.4rem; }
 .ds-home-head h2 {
