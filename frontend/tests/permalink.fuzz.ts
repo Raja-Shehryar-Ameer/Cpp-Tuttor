@@ -19,7 +19,7 @@ const rand = (n: number): number => Math.floor(Math.random() * n);
 const pick = <T,>(xs: readonly T[]): T => xs[rand(xs.length)];
 
 function randomLink(): LabLink {
-  switch (rand(4)) {
+  switch (rand(5)) {
     case 0: {
       const n = 1 + rand(6);
       return {
@@ -67,6 +67,21 @@ function randomLink(): LabLink {
         ...(Math.random() < 0.7 ? { algo: pick(WGRAPH_ALGOS).key, from: 1, to: nv } : {}),
       };
     }
+    case 3: {
+      const n = 1 + rand(7);
+      const m = 1 + rand(5);
+      const alloc = Array.from({ length: n }, () => Array.from({ length: m }, () => rand(6)));
+      const banker = Math.random() < 0.5;
+      return {
+        lab: "deadlock",
+        mode: banker ? "banker" : "detect",
+        avail: Array.from({ length: m }, () => rand(6)),
+        alloc,
+        ...(banker
+          ? { max: alloc.map((row) => row.map((a) => a + rand(6))) }
+          : { req: Array.from({ length: n }, () => Array.from({ length: m }, () => rand(6))) }),
+      };
+    }
     default:
       return {
         lab: "sortrace",
@@ -105,6 +120,16 @@ const garbage: string[] = [
   btoa(JSON.stringify({ lab: "sortrace", a: "bogo", b: "merge", values: [1, 2] })),
   btoa(JSON.stringify({ lab: "sortrace", a: "bubble", b: "merge", values: [1] })),
   btoa(JSON.stringify({ lab: "sortrace", a: "bubble", b: "merge", values: [1, 1e300] })),
+  // deadlock: bad mode, missing/mismatched matrices, max below alloc, oversize
+  btoa(JSON.stringify({ lab: "deadlock", mode: "nope", avail: [1], alloc: [[1]] })),
+  btoa(JSON.stringify({ lab: "deadlock", mode: "banker", avail: [1], alloc: [[1]] })),
+  btoa(JSON.stringify({ lab: "deadlock", mode: "banker", avail: [1], alloc: [[2]], max: [[1]] })),
+  btoa(JSON.stringify({ lab: "deadlock", mode: "banker", avail: [1, 1], alloc: [[1]], max: [[1]] })),
+  btoa(JSON.stringify({ lab: "deadlock", mode: "banker", avail: [1], alloc: [[1]], max: [[1], [1]] })),
+  btoa(JSON.stringify({ lab: "deadlock", mode: "detect", avail: [1], alloc: [[1]] })),
+  btoa(JSON.stringify({ lab: "deadlock", mode: "detect", avail: [1], alloc: [[1]], req: [[99]] })),
+  btoa(JSON.stringify({ lab: "deadlock", mode: "detect", avail: Array(9).fill(1), alloc: [Array(9).fill(1)], req: [Array(9).fill(1)] })),
+  btoa(JSON.stringify({ lab: "deadlock", mode: "banker", avail: [1], alloc: Array(20).fill([1]), max: Array(20).fill([1]) })),
 ];
 for (let t = 0; t < 2000; t += 1) {
   garbage.push(Array.from({ length: rand(60) }, () => String.fromCharCode(32 + rand(90))).join(""));

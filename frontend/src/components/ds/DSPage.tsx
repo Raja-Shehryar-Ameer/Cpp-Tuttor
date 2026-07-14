@@ -16,6 +16,7 @@ import {
   Link2,
   ListOrdered,
   ListTree,
+  Lock,
   MemoryStick,
   Network,
   Rows3,
@@ -123,6 +124,7 @@ import {
 import { readLabParam, writeLabParam } from "../../ds/permalink";
 import { exportSvgsPng } from "../../utils/exportPng";
 import { notify } from "../../store/toastStore";
+import { DeadlockLab } from "./DeadlockLab";
 import { DSView } from "./DSView";
 import { PagingLab } from "./PagingLab";
 import { PredictChips, QuizPanel, usePredictScore } from "./predict";
@@ -148,11 +150,11 @@ type Structure =
 
 /** Everything selectable on the topic grid: data structures plus the labs
     that own their whole toolbar/stage/caption (OS labs + the sorting race). */
-type LabTopic = "sched" | "threads" | "paging" | "sortrace";
+type LabTopic = "sched" | "threads" | "paging" | "deadlock" | "sortrace";
 type Topic = Structure | LabTopic;
 
 const isLabTopic = (t: Topic): t is LabTopic =>
-  t === "sched" || t === "threads" || t === "paging" || t === "sortrace";
+  t === "sched" || t === "threads" || t === "paging" || t === "deadlock" || t === "sortrace";
 
 type Category = "Data structures" | "Algorithms" | "Operating systems";
 
@@ -163,6 +165,7 @@ const CATEGORY: Record<Topic, Category> = {
   graph: "Data structures",
   array: "Algorithms", search: "Algorithms", wgraph: "Algorithms", sortrace: "Algorithms",
   sched: "Operating systems", threads: "Operating systems", paging: "Operating systems",
+  deadlock: "Operating systems",
 };
 
 const MAX_BATCH = 24; // more values than this per op makes the lesson unwatchable
@@ -293,6 +296,11 @@ const OS_TOPICS: LabTopicMeta[] = [
     key: "paging", label: "Page Replacement", icon: MemoryStick,
     intro: "FIFO, LRU, Optimal, Clock, and LFU fighting over a handful of frames — the textbook grid, hit/fault ratios, and the preset where MORE memory means MORE faults.",
     complexity: ["5 algorithms", "hit / fault ratio", "Belady's anomaly"],
+  },
+  {
+    key: "deadlock", label: "Deadlock & Banker's", icon: Lock,
+    intro: "Banker's algorithm and deadlock detection over multi-instance resources — watch Work grow, the safe sequence build, and the resource-allocation graph light up its cycle when the answer is 'deadlocked'.",
+    complexity: ["Banker's safety check", "detection mode", "RAG cycle highlight"],
   },
 ];
 
@@ -951,6 +959,8 @@ export function DSPage() {
           <ThreadsLab />
         ) : topic === "paging" ? (
           <PagingLab initial={initialLink?.lab === "paging" ? initialLink : undefined} />
+        ) : topic === "deadlock" ? (
+          <DeadlockLab initial={initialLink?.lab === "deadlock" ? initialLink : undefined} />
         ) : (
           <SortRace initial={initialLink?.lab === "sortrace" ? initialLink : undefined} />
         )}

@@ -7,6 +7,10 @@
 import { MAX_ARRIVAL, MAX_BURST, MAX_PROCS, SCHED_ALGOS, type ProcSpec, type SchedAlgo } from "./sched.ts";
 import { MAX_FRAMES, MAX_PAGE, MAX_REFS, PAGE_ALGOS, type PageAlgo } from "./paging.ts";
 import { MAX_WG_EDGES, MAX_WG_VERTICES, WEIGHT_MAX, WEIGHT_MIN, WGRAPH_ALGOS, type WAlgo } from "./wgraph.ts";
+import { MAX_DL_PROCS, MAX_RES, MAX_UNITS, type DLMode } from "./deadlock.ts";
+
+// Note: a link reproduces the RUN byte for byte (inputs travel by value), but
+// predict-mode questions are freshly randomized each session on purpose.
 
 export const SORT_KEYS = ["bubble", "insertion", "selection", "merge", "quick", "heap"] as const;
 export type SortKey = (typeof SORT_KEYS)[number];
@@ -15,7 +19,8 @@ export type LabLink =
   | { lab: "sched"; algo: SchedAlgo; q: number; procs: ProcSpec[]; race?: SchedAlgo }
   | { lab: "paging"; algo: PageAlgo; frames: number; refs: number[]; race?: PageAlgo }
   | { lab: "wgraph"; directed: boolean; verts: number[]; edges: [number, number, number][]; algo?: WAlgo; from?: number; to?: number }
-  | { lab: "sortrace"; a: SortKey; b: SortKey; values: number[] };
+  | { lab: "sortrace"; a: SortKey; b: SortKey; values: number[] }
+  | { lab: "deadlock"; mode: DLMode; avail: number[]; alloc: number[][]; max?: number[][]; req?: number[][] };
 
 const V_MIN = -999;
 const V_MAX = 9999;
@@ -101,6 +106,27 @@ export function decodeLab(raw: string): LabLink | null {
       if (!Array.isArray(x.values) || x.values.length < 2 || x.values.length > 16) return null;
       if (!x.values.every((v) => intIn(v, V_MIN, V_MAX))) return null;
       return { lab: "sortrace", a: x.a, b: x.b, values: x.values as number[] };
+    }
+
+    if (x.lab === "deadlock") {
+      if (x.mode !== "banker" && x.mode !== "detect") return null;
+      if (!Array.isArray(x.avail) || x.avail.length < 1 || x.avail.length > MAX_RES) return null;
+      if (!x.avail.every((v) => intIn(v, 0, MAX_UNITS))) return null;
+      const m = x.avail.length;
+      const matOk = (mat: unknown): mat is number[][] =>
+        Array.isArray(mat) && mat.length >= 1 && mat.length <= MAX_DL_PROCS &&
+        mat.every((row) => Array.isArray(row) && row.length === m && row.every((v) => intIn(v, 0, MAX_UNITS)));
+      if (!matOk(x.alloc)) return null;
+      const n = x.alloc.length;
+      if (x.mode === "banker") {
+        // Max must exist, match Alloc's shape, and dominate it cellwise —
+        // a process can't already hold more than its declared maximum.
+        if (!matOk(x.max) || x.max.length !== n) return null;
+        if (!x.alloc.every((row, i) => row.every((a, j) => (x.max as number[][])[i][j] >= a))) return null;
+        return { lab: "deadlock", mode: "banker", avail: x.avail as number[], alloc: x.alloc, max: x.max };
+      }
+      if (!matOk(x.req) || x.req.length !== n) return null;
+      return { lab: "deadlock", mode: "detect", avail: x.avail as number[], alloc: x.alloc, req: x.req };
     }
 
     return null;

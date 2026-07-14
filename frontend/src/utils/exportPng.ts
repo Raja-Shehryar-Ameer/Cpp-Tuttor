@@ -11,6 +11,8 @@
 // read live from the DOM (a hidden chip probe + CSS custom properties) so the
 // stylesheet stays the single source of truth.
 
+import type { DLRun } from "../ds/deadlock";
+import { procName, RES_NAMES } from "../ds/deadlock";
 import type { PageRun } from "../ds/paging";
 import { PAGE_ALGOS } from "../ds/paging";
 import type { ProcSpec, SchedRun } from "../ds/sched";
@@ -225,6 +227,107 @@ export function drawGanttPng(run: SchedRun, procs: ProcSpec[], filename: string)
   for (let t = 0; t <= run.makespan; t += 1) {
     if (unit >= 18 || t % 5 === 0 || t === run.makespan) ctx.fillText(String(t), pad + t * unit, barY + barH + 22);
   }
+  downloadCanvas(canvas, filename);
+}
+
+export function drawBankerPng(run: DLRun, filename: string): void {
+  const { bg } = chipColors();
+  const ink = cssVar("--ink");
+  const panel = cssVar("--panel");
+  const panel2 = cssVar("--panel-2");
+  const text = cssVar("--text");
+  const muted = cssVar("--muted");
+  const ok = cssVar("--ok");
+  const danger = cssVar("--danger");
+
+  const spec = run.spec;
+  const n = spec.alloc.length;
+  const m = spec.available.length;
+  const banker = spec.mode === "banker";
+  const matrices: { title: string; mat: number[][] }[] = [
+    { title: "Allocation", mat: spec.alloc },
+    banker ? { title: "Max", mat: spec.max! } : { title: "Request", mat: spec.request! },
+    { title: banker ? "Need" : "Request left", mat: run.need },
+  ];
+
+  const cell = 32;
+  const labelW = 46;
+  const gapX = 34;
+  const pad = 22;
+  const headerY = 58;
+  const matW = labelW + m * cell;
+  const scale = 2;
+  const w = pad * 2 + matrices.length * matW + (matrices.length - 1) * gapX;
+  const h = headerY + 24 + (n + 1) * cell + 84;
+  const canvas = document.createElement("canvas");
+  canvas.width = w * scale;
+  canvas.height = h * scale;
+  const ctx = canvas.getContext("2d")!;
+  ctx.scale(scale, scale);
+
+  ctx.fillStyle = panel;
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = text;
+  ctx.font = `bold 15px "Space Grotesk", system-ui, sans-serif`;
+  ctx.textAlign = "left";
+  ctx.fillText(
+    `${banker ? "Banker's algorithm" : "Deadlock detection"} · Available (${spec.available.join(",")}) · ${
+      banker
+        ? run.safe ? `SAFE — ${run.safeSeq.map(procName).join(" → ")}` : `UNSAFE — ${run.stuck.map(procName).join(", ")} stuck`
+        : run.safe ? "no deadlock" : `DEADLOCKED — ${run.stuck.map(procName).join(", ")}`
+    }`,
+    pad,
+    32,
+  );
+
+  matrices.forEach(({ title, mat }, k) => {
+    const x0 = pad + k * (matW + gapX);
+    ctx.fillStyle = text;
+    ctx.font = `bold 12px "Space Grotesk", system-ui, sans-serif`;
+    ctx.textAlign = "left";
+    ctx.fillText(title, x0, headerY);
+    ctx.font = `bold 11px "JetBrains Mono", monospace`;
+    ctx.textAlign = "center";
+    ctx.fillStyle = muted;
+    for (let j = 0; j < m; j += 1) ctx.fillText(RES_NAMES[j], x0 + labelW + j * cell + cell / 2, headerY + 24);
+    for (let i = 0; i < n; i += 1) {
+      const y = headerY + 30 + i * cell;
+      // process chip
+      ctx.fillStyle = bg[i % 8];
+      ctx.fillRect(x0 + 2, y + 4, labelW - 10, cell - 10);
+      ctx.strokeStyle = ink;
+      ctx.lineWidth = 1.6;
+      ctx.strokeRect(x0 + 2, y + 4, labelW - 10, cell - 10);
+      ctx.fillStyle = "#fffcf5";
+      ctx.font = `bold 12px "JetBrains Mono", monospace`;
+      ctx.fillText(procName(i), x0 + 2 + (labelW - 10) / 2, y + cell / 2 + 4);
+      for (let j = 0; j < m; j += 1) {
+        const x = x0 + labelW + j * cell;
+        ctx.strokeStyle = panel2;
+        ctx.lineWidth = 1.4;
+        ctx.strokeRect(x, y, cell, cell);
+        ctx.fillStyle = text;
+        ctx.font = MONO;
+        ctx.fillText(String(mat[i][j]), x + cell / 2, y + cell / 2 + 4);
+      }
+    }
+  });
+
+  // verdict strip
+  const stripY = headerY + 30 + n * cell + 26;
+  ctx.textAlign = "left";
+  ctx.font = `bold 13px "JetBrains Mono", monospace`;
+  ctx.fillStyle = run.safe ? ok : danger;
+  ctx.fillText(
+    banker
+      ? run.safe ? `Safe sequence: ${run.safeSeq.map(procName).join(" → ")}` : `No safe sequence — ${run.stuck.map(procName).join(", ")} can never satisfy Need`
+      : run.safe ? `Completion order: ${run.safeSeq.map(procName).join(" → ") || "(everyone already finished)"}` : `Deadlocked set: ${run.stuck.map(procName).join(", ")}`,
+    pad,
+    stripY,
+  );
+  ctx.fillStyle = muted;
+  ctx.font = `11px "JetBrains Mono", monospace`;
+  ctx.fillText(`final Work (${run.steps[run.steps.length - 1].work.join(",")})`, pad, stripY + 20);
   downloadCanvas(canvas, filename);
 }
 

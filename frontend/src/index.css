@@ -938,6 +938,52 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .pc-6 { background: #b45309; }
 .pc-7 { background: #6e6450; }
 
+/* ---------- Deadlock & Banker's lab ---------- */
+
+.dl-matrices { display: flex; flex-wrap: wrap; gap: 1.4rem; align-items: flex-start; }
+.dl-table th { padding-right: 0.45rem; text-align: center; }
+.dl-table td { padding: 0.22rem 0.3rem 0.22rem 0; border-top: none; text-align: center; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.dl-table .ds-input.cell { width: 3.2rem; text-align: center; }
+.dl-row-active td, .dl-row-active th { background: var(--hl-soft, var(--panel-2)); }
+.dl-row-done { opacity: 0.45; }
+.dl-stepper { display: inline-flex; align-items: center; gap: 0.15rem; }
+.dl-stepper strong { min-width: 1.2rem; text-align: center; font-family: var(--mono); color: var(--text); }
+.dl-live { margin: 0.4rem 0 0.8rem; }
+.dl-work-chip { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.dl-seq { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.dl-seq-item { display: inline-flex; align-items: center; gap: 0.35rem; }
+.dl-seq-arrow { color: var(--muted); font-weight: 700; }
+.dl-verdict {
+  border: 2px solid var(--ink); border-radius: 8px; box-shadow: var(--shadow);
+  padding: 0.55rem 0.9rem; margin-bottom: 1rem;
+  font-family: var(--mono); font-weight: 700; font-size: 0.9rem; letter-spacing: 0.02em;
+  animation: var-in 0.3s var(--ease-out);
+}
+.dl-verdict.dl-safe { background: var(--ok-soft); }
+.dl-verdict.dl-bad { background: var(--danger-soft); }
+
+/* resource-allocation graph */
+.rag-svg { width: 100%; max-width: 40rem; height: auto; display: block; }
+.rag-proc circle { fill: var(--panel); stroke: var(--ink); stroke-width: 2; }
+.rag-proc.rag-active circle { stroke: var(--accent); stroke-width: 3.5; }
+.rag-proc.rag-finished { opacity: 0.4; }
+.rag-proc.rag-finished circle { stroke-dasharray: 4 3; }
+.rag-check { fill: var(--ok); font-size: 0.8rem; font-weight: 700; }
+.rag-res rect { fill: var(--panel-2); stroke: var(--ink); stroke-width: 2; }
+.rag-label { fill: var(--text); font-family: var(--mono); font-size: 0.78rem; font-weight: 700; }
+.rag-dot { fill: none; stroke: var(--muted); stroke-width: 1.4; }
+.rag-dot-used { fill: var(--accent); stroke: var(--ink); }
+.rag-edge line { stroke: var(--muted); stroke-width: 1.8; transition: opacity 0.3s ease; }
+.rag-edge.rag-req line { stroke-dasharray: 5 4; }
+.rag-arrowhead { fill: var(--muted); }
+.rag-edge.rag-done { opacity: 0.15; }
+.rag-mult { fill: var(--muted); font-family: var(--mono); font-size: 0.7rem; font-weight: 700; }
+/* the deadlock knot: bold ink stroke, static — no pulsing */
+.rag-edge.rag-cycle line { stroke: var(--danger); stroke-width: 3.2; }
+.rag-edge.rag-cycle .rag-mult { fill: var(--danger); }
+.rag-proc.rag-cycle-node circle { stroke: var(--danger); stroke-width: 3.5; }
+.rag-res.rag-cycle-node rect { stroke: var(--danger); stroke-width: 3.5; }
+
 /* ---------- page replacement lab ---------- */
 
 .ref-input { width: 100%; max-width: 46rem; font-family: var(--mono); }
