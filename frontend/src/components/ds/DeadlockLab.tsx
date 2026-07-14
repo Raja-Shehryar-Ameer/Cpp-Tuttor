@@ -516,7 +516,8 @@ export function DeadlockLab({ initial }: { initial?: DeadlockInitial }) {
                 </tbody>
               </table>
             </div>
-            {run && matrixTable(needLabel, run.need, null)}
+            {/* detect mode's scan matrix IS the editable Request — only banker derives something new */}
+            {run && mode === "banker" && matrixTable(needLabel, run.need, null)}
           </div>
         </section>
 
