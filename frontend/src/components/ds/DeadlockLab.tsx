@@ -260,7 +260,7 @@ export function DeadlockLab({ initial }: { initial?: DeadlockInitial }) {
       );
     }
     if (errors.length > 0) {
-      notify.error(errors.length === 1 ? errors[0] : `${errors[0]} (and ${errors.length - 1} more issue${errors.length > 2 ? "s" : ""} like it)`);
+      notify.errors(errors);
       return false;
     }
     return true;

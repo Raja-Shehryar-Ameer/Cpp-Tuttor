@@ -119,25 +119,30 @@ export function ForkPage({ theme }: { theme: "light" | "dark" }) {
   const [copied, setCopied] = useState(false);
 
   const run = () => {
+    // One toast per click: errors block, warnings fold into the result line.
     const check = validateForkSource(source);
     if (check.errors.length > 0) {
-      check.errors.forEach((m) => notify.error(m));
+      notify.errors(check.errors);
       return; // keep the previous tree on screen instead of blanking it
     }
-    check.warnings.forEach((m) => notify.warning(m));
 
     const next = simulateFork(source);
     setResult(next);
     if (next.error) {
       notify.error(`Couldn't parse the program — ${next.error}.`);
+      return;
+    }
+    const zombies = next.processes.filter((p) => p.zombie).length;
+    const orphans = next.processes.filter((p) => p.reparented).length;
+    const extras = [zombies > 0 && `${zombies} zombie${zombies > 1 ? "s" : ""}`, orphans > 0 && `${orphans} orphan${orphans > 1 ? "s" : ""}`]
+      .filter(Boolean)
+      .join(", ");
+    const n = next.processes.length;
+    const summary = `${n} process${n === 1 ? "" : "es"}${extras ? ` — ${extras}` : ""}.`;
+    if (check.warnings.length > 0) {
+      notify.warning(`${summary} Heads-up: ${check.warnings[0]}${check.warnings.length > 1 ? ` (+${check.warnings.length - 1} more)` : ""}`);
     } else {
-      const zombies = next.processes.filter((p) => p.zombie).length;
-      const orphans = next.processes.filter((p) => p.reparented).length;
-      const extras = [zombies > 0 && `${zombies} zombie${zombies > 1 ? "s" : ""}`, orphans > 0 && `${orphans} orphan${orphans > 1 ? "s" : ""}`]
-        .filter(Boolean)
-        .join(", ");
-      const n = next.processes.length;
-      notify.success(`${n} process${n === 1 ? "" : "es"}${extras ? ` — ${extras}` : ""}.`);
+      notify.success(summary);
     }
   };
 

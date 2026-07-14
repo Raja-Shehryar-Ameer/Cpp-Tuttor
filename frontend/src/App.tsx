@@ -95,10 +95,10 @@ export default function App() {
     // compile-in-Docker round-trip that ends the same way.
     const check = validateTracerSource(code);
     if (check.errors.length > 0) {
-      check.errors.forEach((m) => notify.error(m));
+      notify.errors(check.errors);
       return;
     }
-    check.warnings.forEach((m) => notify.warning(m));
+    notify.warnings(check.warnings);
 
     setLoading(true);
     setRequestError(null);

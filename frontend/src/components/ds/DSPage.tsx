@@ -548,6 +548,12 @@ export function DSPage() {
       say(needB ? "Fill both vertex boxes — A and B — with numbers first." : "Fill the A box with a vertex number first.");
       return;
     }
+    // Same clamp every other input path enforces — huge labels break the SVG.
+    const oob = [a, ...(needB ? [b] : [])].filter((v) => v < V_MIN || v > V_MAX);
+    if (oob.length > 0) {
+      say(`Keep vertex values between ${V_MIN} and ${V_MAX} so they fit their circles — ${oob.join(", ")} ${oob.length === 1 ? "is" : "are"} out of range.`);
+      return;
+    }
     run((d) => op(d, a, b));
   };
 
