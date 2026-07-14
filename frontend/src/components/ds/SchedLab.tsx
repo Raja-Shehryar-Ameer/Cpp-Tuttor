@@ -2,7 +2,6 @@ import {
   ChevronFirst,
   Cpu,
   Download,
-  Gauge,
   Link2,
   Pause,
   Play,
@@ -33,6 +32,7 @@ import { writeLabParam } from "../../ds/permalink";
 import { drawGanttPng } from "../../utils/exportPng";
 import { notify } from "../../store/toastStore";
 import { PredictChips, QuizPanel, usePredictScore } from "./predict";
+import { LAB_SPEEDS, SpeedSelect } from "./SpeedSelect";
 
 // Process colors: warm, high-contrast, no blue/purple. Index-stable so P1 is
 // always the same color across Gantt, queue chips, and the metrics table.
@@ -41,11 +41,6 @@ const PROC_COLORS = 8; // .pc-0 … .pc-7 in CSS, cycled
 const colorOf = (procs: ProcSpec[], name: string | null): string =>
   name === null ? "gantt-idle" : `pc-${procs.findIndex((p) => p.name === name) % PROC_COLORS}`;
 
-const SPEEDS = [
-  { label: "0.5×", ms: 1600 },
-  { label: "1×", ms: 800 },
-  { label: "2×", ms: 400 },
-];
 
 const DEFAULT_PROCS: ProcSpec[] = SCHED_PRESETS[1].procs;
 
@@ -211,7 +206,7 @@ export function SchedLab({ initial }: { initial?: SchedInitial }) {
         return;
       }
       setTick(next);
-    }, SPEEDS[speed].ms);
+    }, LAB_SPEEDS[speed].ms);
     return () => window.clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playing, run, runB, speed, predictOn]);
@@ -580,9 +575,7 @@ export function SchedLab({ initial }: { initial?: SchedInitial }) {
               title="scrub through time"
               onChange={(e) => { setPlaying(false); dismissQuiz(); setTick(Number(e.target.value)); }}
             />
-            <button className="speed-btn" onClick={() => setSpeed((s) => (s + 1) % SPEEDS.length)} title="playback speed">
-              <Gauge size={13} /> {SPEEDS[speed].label}
-            </button>
+            <SpeedSelect speed={speed} onChange={setSpeed} />
             <span className="step-counter">t = {now} / {span}</span>
           </div>
         )}

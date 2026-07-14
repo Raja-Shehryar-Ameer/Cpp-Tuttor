@@ -1,7 +1,6 @@
 import {
   ChevronFirst,
   Download,
-  Gauge,
   Link2,
   MemoryStick,
   Pause,
@@ -30,16 +29,11 @@ import { writeLabParam } from "../../ds/permalink";
 import { drawPageGridPng } from "../../utils/exportPng";
 import { notify } from "../../store/toastStore";
 import { PredictChips, QuizPanel, usePredictScore } from "./predict";
+import { LAB_SPEEDS, SpeedSelect } from "./SpeedSelect";
 
 // Page chips reuse the scheduler's warm process palette (.pc-0 … .pc-7),
 // keyed by page number so page 7 is the same color everywhere it appears.
 const chipOf = (page: number): string => `pc-${((page % 8) + 8) % 8}`;
-
-const SPEEDS = [
-  { label: "0.5×", ms: 1600 },
-  { label: "1×", ms: 800 },
-  { label: "2×", ms: 400 },
-];
 
 const DEFAULT_REFS = PAGE_PRESETS[0].refs.join(" ");
 
@@ -209,7 +203,7 @@ export function PagingLab({ initial }: { initial?: PagingInitial }) {
         return;
       }
       setTick(next);
-    }, SPEEDS[speed].ms);
+    }, LAB_SPEEDS[speed].ms);
     return () => window.clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playing, run, speed, predictOn]);
@@ -579,9 +573,7 @@ export function PagingLab({ initial }: { initial?: PagingInitial }) {
               title="scrub through the reference string"
               onChange={(e) => { setPlaying(false); dismissQuiz(); setTick(Number(e.target.value)); }}
             />
-            <button className="speed-btn" onClick={() => setSpeed((s) => (s + 1) % SPEEDS.length)} title="playback speed">
-              <Gauge size={13} /> {SPEEDS[speed].label}
-            </button>
+            <SpeedSelect speed={speed} onChange={setSpeed} />
             <span className="step-counter">ref {now} / {shown.steps.length}</span>
           </div>
         )}

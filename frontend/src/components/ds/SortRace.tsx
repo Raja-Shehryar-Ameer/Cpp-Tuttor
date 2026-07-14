@@ -6,7 +6,6 @@ import {
   ChevronFirst,
   Download,
   Flag,
-  Gauge,
   Link2,
   Pause,
   Play,
@@ -32,6 +31,7 @@ import { writeLabParam } from "../../ds/permalink";
 import { exportSvgsPng } from "../../utils/exportPng";
 import { notify } from "../../store/toastStore";
 import { DSView } from "./DSView";
+import { LAB_SPEEDS, SpeedSelect } from "./SpeedSelect";
 
 export type SortKey = "bubble" | "insertion" | "selection" | "merge" | "quick" | "heap";
 
@@ -45,12 +45,6 @@ export const RACE_SORTS: { key: SortKey; label: string; big: string; fn: (d: { i
 ];
 
 export const MAX_RACE_VALUES = 16;
-
-const SPEEDS = [
-  { label: "0.5×", ms: 1600 },
-  { label: "1×", ms: 800 },
-  { label: "2×", ms: 400 },
-];
 
 const DEFAULT_VALUES = "29, 5, 17, 3, 42, 11, 8, 36";
 
@@ -93,7 +87,7 @@ export function SortRace({ initial }: { initial?: { a: SortKey; b: SortKey; valu
         return;
       }
       setIdx(next);
-    }, SPEEDS[speed].ms);
+    }, LAB_SPEEDS[speed].ms);
     return () => window.clearInterval(t);
   }, [playing, lanes, total, speed]);
 
@@ -299,9 +293,7 @@ export function SortRace({ initial }: { initial?: { a: SortKey; b: SortKey; valu
               title="scrub both panes"
               onChange={(e) => { setPlaying(false); setIdx(Number(e.target.value)); }}
             />
-            <button className="speed-btn" onClick={() => setSpeed((s) => (s + 1) % SPEEDS.length)} title="playback speed">
-              <Gauge size={13} /> {SPEEDS[speed].label}
-            </button>
+            <SpeedSelect speed={speed} onChange={setSpeed} />
             <span className="step-counter">{Math.min(idx + 1, total)} / {total}</span>
           </div>
         )}

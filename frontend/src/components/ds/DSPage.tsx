@@ -6,7 +6,6 @@ import {
   Cpu,
   Download,
   Eye,
-  Gauge,
   GitBranch,
   GraduationCap,
   Hash,
@@ -129,6 +128,7 @@ import { PagingLab } from "./PagingLab";
 import { PredictChips, QuizPanel, usePredictScore } from "./predict";
 import { SortRace } from "./SortRace";
 import { SchedLab } from "./SchedLab";
+import { SpeedSelect } from "./SpeedSelect";
 import { ThreadsLab } from "./ThreadsLab";
 
 type Structure =
@@ -1394,13 +1394,7 @@ export function DSPage() {
                 setIdx(Number(e.target.value));
               }}
             />
-            <button
-              className="speed-btn"
-              onClick={() => setSpeed((s) => (s + 1) % SPEEDS.length)}
-              title="playback speed"
-            >
-              <Gauge size={13} /> {SPEEDS[speed].label}
-            </button>
+            <SpeedSelect speed={speed} onChange={setSpeed} speeds={SPEEDS} />
             <span className="step-counter">
               {idx + 1} / {frames.length}
             </span>

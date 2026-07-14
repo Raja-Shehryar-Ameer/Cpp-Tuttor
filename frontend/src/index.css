@@ -789,7 +789,13 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 }
 .ds-transport { flex: none; gap: 0.4rem; }
 .ds-scrub { width: 130px; flex: none; min-width: 90px; }
-.speed-btn { font-variant-numeric: tabular-nums; font-size: 0.78rem; padding: 0.35rem 0.55rem; width: auto; height: auto; border-radius: 6px; }
+.speed-select { display: inline-flex; align-items: center; gap: 0.3rem; color: var(--muted); }
+.speed-select svg { flex: none; }
+.speed-select select {
+  font-variant-numeric: tabular-nums; font-size: 0.78rem;
+  padding: 0.32rem 1.5rem 0.32rem 0.5rem;
+  background-position: right 0.4rem center;
+}
 
 /* ---------- C fork() process tree ---------- */
 
