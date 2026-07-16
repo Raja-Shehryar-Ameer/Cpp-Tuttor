@@ -22,6 +22,7 @@ import { usePlayback } from "./hooks/usePlayback";
 import { DEFAULT_SAMPLE, SAMPLES_BY_LANG } from "./samples";
 import { notify } from "./store/toastStore";
 import { useTraceStore } from "./store/traceStore";
+import type { TraceStatus } from "./types/trace";
 import { validateTracerSource } from "./validation";
 
 // Code-split the heavy corners: CodeMirror only loads for the tracer, the
@@ -39,6 +40,12 @@ function initialTheme(): Theme {
   if (saved === "light" || saved === "dark") return saved;
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
+
+// One actionable next step per failure class, shown under the backend's message.
+const STATUS_HINTS: Partial<Record<TraceStatus, string>> = {
+  timeout: "If the program reads input, fill the stdin box before running; otherwise look for a loop whose exit condition can never become true.",
+  step_limit: "Shrink the input or loop bounds — the visualizer plays the first steps only.",
+};
 
 function updatePermalink(traceId: string | null): void {
   const url = new URL(window.location.href);
@@ -116,7 +123,11 @@ export default function App() {
         notify.success(`Trace ready — ${result.trace.steps.length} step${result.trace.steps.length === 1 ? "" : "s"}.`);
       } else if (result.trace.steps.length > 0) {
         // Partial trace (crash, timeout, step limit): playable, but say why.
-        notify.warning(result.trace.error ?? `Trace ended early (${result.trace.status}).`);
+        notify.warning(
+          [result.trace.error ?? `Trace ended early (${result.trace.status}).`, STATUS_HINTS[result.trace.status]]
+            .filter(Boolean)
+            .join(" "),
+        );
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Request failed.";
@@ -241,7 +252,10 @@ export default function App() {
       {trace && trace.status !== "ok" && trace.steps.length === 0 && (
         <div className="request-error">
           <CircleAlert size={15} aria-hidden="true" />
-          {trace.error}
+          <span>
+            {trace.error}
+            {STATUS_HINTS[trace.status] && <span className="error-hint"> {STATUS_HINTS[trace.status]}</span>}
+          </span>
         </div>
       )}
       <ErrorBoundary>

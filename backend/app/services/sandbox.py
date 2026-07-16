@@ -27,10 +27,16 @@ class SandboxRunner:
             "--network=none",
             "--memory",
             s.docker_memory,
+            # Without this Docker grants an equal swap allowance on top, so
+            # "out of memory" turns into minutes of swap thrash instead.
+            "--memory-swap",
+            s.docker_memory,
             "--pids-limit",
             str(s.docker_pids_limit),
             "--cpus",
             s.docker_cpus,
+            "--ulimit",
+            f"stack={s.docker_stack_bytes}:{s.docker_stack_bytes}",
             "--read-only",
             # exec: the compiled student binary lives (and runs) in this tmpfs.
             "--tmpfs",
@@ -62,6 +68,15 @@ class SandboxRunner:
         try:
             return Trace.model_validate_json(result.stdout)
         except ValueError:
+            # 137 = SIGKILL of the container itself: the cgroup limit was hit
+            # hard enough to take GDB down with the program. (`docker inspect`
+            # would confirm OOMKilled, but --rm makes that racy.)
+            if result.returncode == 137:
+                return self._error_trace(
+                    code,
+                    TraceStatus.RUNTIME_ERROR,
+                    "The program ran out of memory (256 MB limit) and was killed.",
+                )
             return self._error_trace(
                 code, TraceStatus.RUNTIME_ERROR, "The tracer produced no usable output."
             )

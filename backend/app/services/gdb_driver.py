@@ -125,9 +125,17 @@ class GdbSession:
 
     # ---- inspection ------------------------------------------------------
 
-    def get_stack(self) -> list[dict]:
-        payload = self._cmd("-stack-list-frames")
+    def get_stack(self, max_frames: int | None = None) -> list[dict]:
+        # A range keeps crash snapshots fast when the stack is hundreds of
+        # frames deep (runaway recursion); plain listing everywhere else.
+        suffix = f" 0 {max_frames - 1}" if max_frames else ""
+        payload = self._cmd(f"-stack-list-frames{suffix}")
         return [f.get("frame", f) for f in _as_list(payload.get("stack", []))]
+
+    def stack_depth(self, cap: int = 512) -> int:
+        """Current frame count, counting no further than `cap`."""
+        payload = self._cmd(f"-stack-info-depth {cap}")
+        return int(payload.get("depth", 0))
 
     def select_frame(self, level: int) -> None:
         self._cmd(f"-stack-select-frame {level}")
@@ -254,7 +262,12 @@ def _parse_stop(payload: dict) -> StopInfo:
         file=frame.get("fullname") or frame.get("file"),
         return_value=payload.get("return-value"),
     )
-    if reason.startswith("exited"):
+    if reason == "exited-signalled":
+        # The inferior is already gone (e.g. SIGKILL from the OOM killer) —
+        # report it as a crash, not a normal exit.
+        info.reason = "signal"
+        info.signal_name = payload.get("signal-name")
+    elif reason.startswith("exited"):
         info.reason = "exited"
         # MI reports the inferior's exit code in octal.
         info.exit_code = int(payload.get("exit-code", "0"), 8)

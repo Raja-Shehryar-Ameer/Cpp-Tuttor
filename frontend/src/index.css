@@ -504,6 +504,7 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
   animation: slide-down-in 0.2s var(--ease-out);
 }
 .request-error svg, .program-error svg { color: var(--danger); flex: none; }
+.error-hint { font-weight: 400; color: var(--muted); }
 .program-error { margin: 0.5rem 0 0; }
 
 .crash-card {

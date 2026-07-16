@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     docker_memory: str = "256m"
     docker_pids_limit: int = 64
     docker_cpus: str = "1.0"
+    # Docker's default stack rlimit is unlimited, under which runaway
+    # recursion never overflows — it just eats RAM. Pin the Linux default.
+    docker_stack_bytes: int = 8 * 1024 * 1024
 
     rate_limit: str = "10/minute"
     trace_store_dir: Path = Path("trace_store")

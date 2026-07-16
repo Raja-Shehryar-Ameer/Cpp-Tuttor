@@ -18,8 +18,23 @@ _SIGNAL_MESSAGES = {
     "SIGFPE": "arithmetic error (for example division by zero)",
     "SIGABRT": "the program aborted",
     "SIGBUS": "invalid memory access (bus error)",
+    "SIGKILL": "the program was killed — almost certainly it ran out of memory (256 MB limit)",
+    "SIGILL": "illegal instruction — execution jumped into data or corrupted code",
+    "SIGTRAP": "hit a debug trap",
+    "SIGSYS": "made a system call the sandbox does not allow",
 }
 _MAX_BAILOUTS = 200
+# SIGSEGV classification: this deep almost certainly means runaway recursion…
+_STACK_OVERFLOW_DEPTH = 300
+# …and a fault this close to $sp means the stack guard page, however shallow
+# the stack is (one huge local array can overflow from main directly).
+_STACK_GUARD_BYTES = 1 << 20
+# Snapshotting hundreds of frames is slow and tells the student nothing new.
+_CRASH_SNAPSHOT_FRAMES = 20
+
+
+class WallClockTimeout(GdbTimeout):
+    """Our own wall-clock budget ran out (vs. one MI operation getting stuck)."""
 
 
 class TraceBuilder:
@@ -85,11 +100,18 @@ class TraceService:
         session = self._gdb_factory(str(binary), self._settings.wall_timeout_s)
         try:
             self._run_loop(session, builder, source_path, work_dir)
+        except WallClockTimeout:
+            builder.fail(
+                TraceStatus.TIMEOUT,
+                f"The program ran longer than {self._settings.wall_timeout_s} s — it is "
+                "probably looping forever. The steps captured before the cutoff are playable.",
+            )
         except GdbTimeout:
             builder.fail(
                 TraceStatus.TIMEOUT,
-                f"Program took longer than {self._settings.wall_timeout_s}s "
-                "(is it waiting for input or looping forever?).",
+                "The program stopped making progress — most likely a loop stuck on one "
+                "line, or a read waiting for input that never arrives. Check the loop's "
+                "exit condition, or fill the stdin box and run again.",
             )
         except GdbSessionError as exc:
             builder.fail(TraceStatus.RUNTIME_ERROR, f"The debugger failed: {exc}")
@@ -116,7 +138,7 @@ class TraceService:
         bailouts = 0
         while True:
             if time.monotonic() > deadline:
-                raise GdbTimeout("wall-clock limit reached")
+                raise WallClockTimeout("wall-clock limit reached")
             stop = heap.resolve(session, stop)
 
             if stop.reason == "exited":
@@ -253,8 +275,20 @@ class TraceService:
         source_path: Path,
         stdout_path: Path,
     ) -> None:
+        # Classify before snapshotting: _snapshot_stack selects outer frames,
+        # and $sp follows the selected frame — reading it afterwards would
+        # compare the fault address against main's sp instead of the crash's.
+        overflow = False
+        depth = 0
         try:
-            stack = self._snapshot_stack(session, session.get_stack(), source_path)
+            depth = session.stack_depth()
+            overflow = stop.signal_name == "SIGSEGV" and self._looks_like_stack_overflow(
+                session, depth
+            )
+            frames = session.get_stack(
+                max_frames=_CRASH_SNAPSHOT_FRAMES if depth > _CRASH_SNAPSHOT_FRAMES else None
+            )
+            stack = self._snapshot_stack(session, frames, source_path)
             heap_objects = heap.snapshot(session, stack)
         except GdbSessionError:
             stack, heap_objects = [], []
@@ -269,4 +303,24 @@ class TraceService:
             )
         )
         detail = _SIGNAL_MESSAGES.get(stop.signal_name or "", stop.signal_name or "a fatal signal")
+        if overflow:
+            detail = (
+                "stack overflow — the call stack ran out of space (look for runaway "
+                "recursion with a missing base case, or a huge local array)"
+            )
         builder.fail(TraceStatus.RUNTIME_ERROR, f"Program crashed: {detail}.")
+
+    @staticmethod
+    def _looks_like_stack_overflow(session: GdbSession, depth: int) -> bool:
+        if depth >= _STACK_OVERFLOW_DEPTH:
+            return True
+        # Shallow-stack overflows (one giant local array) fault on the guard
+        # page, so the faulting address sits just past the stack pointer.
+        try:
+            fault = int(
+                session.evaluate("(unsigned long long)$_siginfo._sifields._sigfault.si_addr"), 0
+            )
+            sp = int(session.evaluate("(unsigned long long)$sp"), 0)
+        except (GdbSessionError, TypeError, ValueError):
+            return False
+        return fault != 0 and abs(fault - sp) < _STACK_GUARD_BYTES
