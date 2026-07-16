@@ -10,6 +10,12 @@ import cRecursion from "../../samples/c/recursion.c?raw";
 import cStructList from "../../samples/c/struct_list.c?raw";
 import heapBug from "../../samples/heap_bug.cpp?raw";
 import pointers from "../../samples/pointers.cpp?raw";
+import pyAliasing from "../../samples/py/aliasing.py?raw";
+import pyBasics from "../../samples/py/basics.py?raw";
+import pyDict from "../../samples/py/dict.py?raw";
+import pyException from "../../samples/py/exception.py?raw";
+import pyObjects from "../../samples/py/objects.py?raw";
+import pyRecursion from "../../samples/py/recursion.py?raw";
 import recursion from "../../samples/recursion.cpp?raw";
 import structList from "../../samples/struct_list.cpp?raw";
 import vectorString from "../../samples/vector_string.cpp?raw";
@@ -33,9 +39,18 @@ export const SAMPLES_BY_LANG: Record<TracerLanguage, Record<string, string>> = {
     "linked list — malloc'd nodes on the heap": cStructList,
     "use-after-free — a heap bug, visualized": cHeapBug,
   },
+  python: {
+    "basics — variables & arithmetic": pyBasics,
+    "aliasing — two names, one list": pyAliasing,
+    "dict — a struct that grows": pyDict,
+    "recursion — factorial": pyRecursion,
+    "objects — a linked list of Nodes": pyObjects,
+    "exception — where it blew up": pyException,
+  },
 };
 
 export const DEFAULT_SAMPLE: Record<TracerLanguage, string> = {
   cpp: "pointers — swap via pointers",
   c: "pointers — swap via pointers",
+  python: "aliasing — two names, one list",
 };

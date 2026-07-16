@@ -1,4 +1,5 @@
 import { cpp } from "@codemirror/lang-cpp";
+import { python } from "@codemirror/lang-python";
 import { StateEffect, StateField } from "@codemirror/state";
 import { Decoration, EditorView, type DecorationSet } from "@codemirror/view";
 import CodeMirror, { type ReactCodeMirrorRef } from "@uiw/react-codemirror";
@@ -28,16 +29,23 @@ const highlightField = StateField.define<DecorationSet>({
   provide: (field) => EditorView.decorations.from(field),
 });
 
-const extensions = [cpp(), highlightField, warmSyntax];
+// The C grammar covers C++ too; Python gets its own.
+const EXTENSIONS = {
+  cpp: [cpp(), highlightField, warmSyntax],
+  c: [cpp(), highlightField, warmSyntax],
+  python: [python(), highlightField, warmSyntax],
+};
 
 export function EditorPane({
   code,
   onChange,
   theme,
+  language = "cpp",
 }: {
   code: string;
   onChange: (code: string) => void;
   theme: "light" | "dark";
+  language?: keyof typeof EXTENSIONS;
 }) {
   const editorRef = useRef<ReactCodeMirrorRef>(null);
   const trace = useTraceStore((s) => s.trace);
@@ -57,7 +65,7 @@ export function EditorPane({
       value={playbackActive ? trace.sourceCode : code}
       onChange={onChange}
       readOnly={playbackActive}
-      extensions={extensions}
+      extensions={EXTENSIONS[language]}
       basicSetup={{ foldGutter: false, autocompletion: false }}
       theme={theme === "dark" ? darkChrome : lightChrome}
     />

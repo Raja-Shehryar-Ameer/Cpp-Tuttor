@@ -53,6 +53,10 @@ class SandboxRunner:
                 input=payload,
                 capture_output=True,
                 text=True,
+                # The tracer speaks UTF-8 on both pipes; without this Windows
+                # hosts encode with cp1252 and non-ASCII source breaks JSON.
+                encoding="utf-8",
+                errors="replace",
                 timeout=s.wall_timeout_s * 2 + 15,
             )
         except subprocess.TimeoutExpired:

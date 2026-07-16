@@ -1,0 +1,3071 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 0,
+   "event": "call",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "call",
+   "functionName": "Node",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "Node",
+     "locals": []
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "step",
+   "functionName": "Node",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "Node",
+     "locals": []
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "step",
+   "functionName": "Node",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "Node",
+     "locals": []
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "return",
+   "functionName": "Node",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "Node",
+     "locals": []
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "call",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": []
+    }
+   ]
+  },
+  {
+   "line": 4,
+   "event": "step",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": []
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "event": "return",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 9,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 3,
+   "event": "call",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": []
+    },
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 4,
+   "event": "step",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": []
+    },
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "event": "return",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 10,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 3,
+   "event": "call",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": []
+    },
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 4,
+   "event": "step",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": []
+    },
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "event": "return",
+   "functionName": "__init__",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "__init__",
+     "locals": [
+      {
+       "name": "self",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      },
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 12,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 13,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 14,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 15,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 16,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 14,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 15,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 16,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 14,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 15,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 16,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 14,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 17,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 17,
+   "event": "return",
+   "functionName": "<module>",
+   "stdout": "nodes: 3\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "Node",
+       "type": "type",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "head",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "count",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "walk",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 17,
+   "event": "exit",
+   "functionName": "<module>",
+   "stdout": "nodes: 3\n",
+   "stack": [],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "Node",
+       "kind": "pointer",
+       "address": null,
+       "target": "A2",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A2",
+     "label": "Node",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "value",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "next",
+       "type": "NoneType",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

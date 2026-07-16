@@ -34,7 +34,7 @@ app.add_middleware(
 class TraceRequest(BaseModel):
     code: str
     stdin: str = ""
-    language: Literal["cpp", "c"] = "cpp"
+    language: Literal["cpp", "c", "python"] = "cpp"
 
 
 def get_runner() -> SandboxRunner:

@@ -1,0 +1,228 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 0,
+   "event": "call",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 4,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 6,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "message",
+       "type": "str",
+       "kind": "string",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 6,
+   "event": "return",
+   "functionName": "<module>",
+   "stdout": "total is 14\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "x",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "y",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "message",
+       "type": "str",
+       "kind": "string",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 6,
+   "event": "exit",
+   "functionName": "<module>",
+   "stdout": "total is 14\n",
+   "stack": [],
+   "heap": []
+  }
+ ]
+}

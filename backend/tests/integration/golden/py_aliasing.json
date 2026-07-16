@@ -1,0 +1,674 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 0,
+   "event": "call",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "a",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 4,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "a",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "a",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "c",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 6,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "a",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "c",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "list[4]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[3]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "a = [1, 2, 3, 4]\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "a",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "c",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "list[4]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[3]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 7,
+   "event": "return",
+   "functionName": "<module>",
+   "stdout": "a = [1, 2, 3, 4]\nc = [1, 2, 3]\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "a",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "c",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "list[4]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[3]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 7,
+   "event": "exit",
+   "functionName": "<module>",
+   "stdout": "a = [1, 2, 3, 4]\nc = [1, 2, 3]\n",
+   "stack": [],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "list[4]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[3]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "address": "A1",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

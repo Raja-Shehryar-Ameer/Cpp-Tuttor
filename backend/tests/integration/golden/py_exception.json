@@ -1,0 +1,492 @@
+{
+ "status": "runtime_error",
+ "steps": [
+  {
+   "line": 0,
+   "event": "call",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 6,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "average",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "call",
+   "functionName": "average",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "average",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "average",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 3,
+   "event": "step",
+   "functionName": "average",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "average",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "average",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 3,
+   "event": "return",
+   "functionName": "average",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "average",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "average",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "list[3]",
+     "kind": "array",
+     "freed": false,
+     "elements": [
+      {
+       "name": "[0]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[1]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "[2]",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "6.0\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "average",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "call",
+   "functionName": "average",
+   "stdout": "6.0\n",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "average",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "average",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A1",
+     "label": "list[0]",
+     "kind": "array",
+     "freed": false,
+     "elements": []
+    }
+   ]
+  },
+  {
+   "line": 3,
+   "event": "step",
+   "functionName": "average",
+   "stdout": "6.0\n",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "average",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "average",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A1",
+     "label": "list[0]",
+     "kind": "array",
+     "freed": false,
+     "elements": []
+    }
+   ]
+  },
+  {
+   "line": 3,
+   "event": "return",
+   "functionName": "average",
+   "stdout": "6.0\n",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "average",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "average",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A1",
+     "label": "list[0]",
+     "kind": "array",
+     "freed": false,
+     "elements": []
+    }
+   ]
+  },
+  {
+   "line": 7,
+   "event": "return",
+   "functionName": "<module>",
+   "stdout": "6.0\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "average",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "exception",
+   "functionName": "average",
+   "stdout": "6.0\n",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "average",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "list",
+       "kind": "pointer",
+       "address": null,
+       "target": "A1",
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "average",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A1",
+     "label": "list[0]",
+     "kind": "array",
+     "freed": false,
+     "elements": []
+    }
+   ]
+  }
+ ]
+}

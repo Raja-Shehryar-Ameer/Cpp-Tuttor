@@ -3,7 +3,7 @@ import type { Trace } from "../types/trace";
 const BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 const TRACE_TIMEOUT_MS = 90_000; // compile + GDB drive can legitimately take a while
 
-export type TracerLanguage = "cpp" | "c";
+export type TracerLanguage = "cpp" | "c" | "python";
 
 export interface TraceResult {
   trace: Trace;

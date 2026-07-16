@@ -1,0 +1,1015 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 0,
+   "event": "call",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "call",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "call",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "call",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "call",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f4",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f4",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 4,
+   "event": "step",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f4",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 4,
+   "event": "return",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f4",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 5,
+   "event": "return",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f3",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 5,
+   "event": "return",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f2",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 5,
+   "event": "return",
+   "functionName": "factorial",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f1",
+     "functionName": "factorial",
+     "locals": [
+      {
+       "name": "n",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    },
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "return",
+   "functionName": "<module>",
+   "stdout": "4! = 24\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "factorial",
+       "type": "function",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "exit",
+   "functionName": "<module>",
+   "stdout": "4! = 24\n",
+   "stack": [],
+   "heap": []
+  }
+ ]
+}

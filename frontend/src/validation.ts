@@ -55,22 +55,36 @@ function structural(src: string): string[] {
   return errors;
 }
 
+const LANGUAGE_LABEL: Record<TracerLanguage, string> = { cpp: "C++", c: "C", python: "Python" };
+
 export function validateTracerSource(code: string, language: TracerLanguage = "cpp"): Validation {
   const errors: string[] = [];
   const warnings: string[] = [];
   const trimmed = code.trim();
 
   if (trimmed.length === 0) {
-    errors.push(`The editor is empty — write (or pick) a ${language === "c" ? "C" : "C++"} program first.`);
+    errors.push(`The editor is empty — write (or pick) a ${LANGUAGE_LABEL[language]} program first.`);
     return { errors, warnings };
   }
   if (new Blob([code]).size > MAX_TRACER_BYTES) {
     errors.push("This program is over 64 KB — the tracer is built for exam-sized programs, not projects.");
     return { errors, warnings };
   }
+  if (language === "python") {
+    // Braces and main() are C-shaped checks — Python only gets sanity screens.
+    if (/(#include\s*<|\bint\s+main\s*\(|\bstd::|;\s*}\s*$)/m.test(code))
+      errors.push("This looks like C or C++ — switch the language, or write Python.");
+    if (/^\s*while\s+True\s*:/m.test(code) && !/\bbreak\b/.test(code))
+      warnings.push("while True with no break — the tracer will stop at its step limit.");
+    if (/\binput\s*\(/.test(code))
+      warnings.push("input() reads from the stdin box — fill it before running or the read fails.");
+    return { errors, warnings };
+  }
   errors.push(...structural(code));
   if (language === "c" && /(#include\s*<iostream>|\bstd::|\bcout\b|\bcin\b|\bclass\s+\w|\bnew\s+\w|\bdelete\s)/.test(code))
     errors.push("This looks like C++ — switch the language to C++, or use printf/scanf and malloc/free.");
+  if (/^\s*(def|elif)\s|^\s*import\s+\w+\s*$/m.test(code))
+    errors.push("This looks like Python — switch the language to Python.");
 
   if (/\bfork\s*\(/.test(code))
     warnings.push("fork() spotted — the C fork() tab draws the process tree; the tracer follows only one process.");

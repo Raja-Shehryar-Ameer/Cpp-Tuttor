@@ -1,0 +1,306 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 0,
+   "event": "call",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 2,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 3,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "ages",
+       "type": "dict",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "dict[2]",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "'ada'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "'alan'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 4,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "ages",
+       "type": "dict",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "dict[3]",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "'ada'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "'alan'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "'grace'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "<module>",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "ages",
+       "type": "dict",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "oldest",
+       "type": "str",
+       "kind": "string",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "dict[3]",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "'ada'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "'alan'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "'grace'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "event": "return",
+   "functionName": "<module>",
+   "stdout": "grace is the oldest at 45\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "<module>",
+     "locals": [
+      {
+       "name": "ages",
+       "type": "dict",
+       "kind": "pointer",
+       "address": null,
+       "target": "A0",
+       "elements": null
+      },
+      {
+       "name": "oldest",
+       "type": "str",
+       "kind": "string",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "dict[3]",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "'ada'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "'alan'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "'grace'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "line": 5,
+   "event": "exit",
+   "functionName": "<module>",
+   "stdout": "grace is the oldest at 45\n",
+   "stack": [],
+   "heap": [
+    {
+     "address": "A0",
+     "label": "dict[3]",
+     "kind": "struct",
+     "freed": false,
+     "elements": [
+      {
+       "name": "'ada'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "'alan'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "'grace'",
+       "type": "int",
+       "kind": "primitive",
+       "address": null,
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

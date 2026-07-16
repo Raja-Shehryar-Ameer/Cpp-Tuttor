@@ -15,7 +15,7 @@ pytestmark = pytest.mark.integration
 
 def run_sample(name: str, stdin: str = ""):
     code = (SAMPLES / name).read_text()
-    language = "c" if name.endswith(".c") else "cpp"
+    language = "c" if name.endswith(".c") else "python" if name.endswith(".py") else "cpp"
     return SandboxRunner(Settings()).run(code, stdin, language)
 
 

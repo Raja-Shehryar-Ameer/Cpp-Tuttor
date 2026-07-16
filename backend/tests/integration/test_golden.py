@@ -28,6 +28,12 @@ ALL_SAMPLES = [
     "c/recursion.c",
     "c/struct_list.c",
     "c/heap_bug.c",
+    "py/basics.py",
+    "py/aliasing.py",
+    "py/dict.py",
+    "py/recursion.py",
+    "py/objects.py",
+    "py/exception.py",
 ]
 
 pytestmark = pytest.mark.integration
@@ -36,7 +42,7 @@ pytestmark = pytest.mark.integration
 @pytest.mark.parametrize("sample", ALL_SAMPLES)
 def test_sample_matches_golden(sample: str):
     actual = normalize(run_sample(sample))
-    stem = sample.replace("/", "_").removesuffix(".cpp").removesuffix(".c")
+    stem = sample.replace("/", "_").removesuffix(".cpp").removesuffix(".c").removesuffix(".py")
     golden_path = GOLDEN_DIR / f"{stem}.json"
     if os.environ.get("REGEN_GOLDEN"):
         GOLDEN_DIR.mkdir(exist_ok=True)

@@ -172,7 +172,7 @@ export default function App() {
               </g>
             </svg>
           </span>
-          Shinso <span className="tagline">step-by-step C/C++ visualizer</span>
+          Shinso <span className="tagline">step-by-step C/C++/Python visualizer</span>
         </h1>
         <nav className="main-nav" aria-label="mode">
           <button className={mode === "code" ? "active" : ""} onClick={() => setMode("code")}>
@@ -207,6 +207,12 @@ export default function App() {
                   onClick={() => switchLanguage("c")}
                 >
                   C
+                </button>
+                <button
+                  className={language === "python" ? "active" : ""}
+                  onClick={() => switchLanguage("python")}
+                >
+                  Py
                 </button>
               </div>
               <select
@@ -269,7 +275,7 @@ export default function App() {
               <main>
                 <section className="editor-pane">
                   <Suspense fallback={<div className="pane-loading">loading editor…</div>}>
-                    <EditorPane code={code} onChange={setCode} theme={theme} />
+                    <EditorPane code={code} onChange={setCode} theme={theme} language={language} />
                   </Suspense>
                   {trace === null && (
                     <textarea

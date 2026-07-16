@@ -23,22 +23,29 @@ def main() -> int:
     stdin_text: str = payload.get("stdin", "")
     language: str = payload.get("language", "cpp")
 
-    # The extension drives both the gcc frontend and GDB's DWARF language.
-    source_name = "main.c" if language == "c" else "main.cpp"
-    work_dir = Path(os.environ.get("CPPTUTOR_WORK_DIR", "/work"))
-    (work_dir / source_name).write_text(code)
-    (work_dir / "stdin.txt").write_text(stdin_text)
-
     settings = Settings()
-    service = TraceService(CompileService(), GdbSession, settings)
     try:
-        trace = service.trace(work_dir, source_name)
+        if language == "python":
+            # No compiler, no GDB — sys.settrace in this same process; the
+            # container provides exactly the isolation it gives C programs.
+            from app.services.py_tracer import trace_python
+
+            trace = trace_python(code, stdin_text, settings)
+        else:
+            # The extension drives both the gcc frontend and GDB's DWARF language.
+            source_name = "main.c" if language == "c" else "main.cpp"
+            work_dir = Path(os.environ.get("CPPTUTOR_WORK_DIR", "/work"))
+            (work_dir / source_name).write_text(code)
+            (work_dir / "stdin.txt").write_text(stdin_text)
+            service = TraceService(CompileService(), GdbSession, settings)
+            trace = service.trace(work_dir, source_name)
     except Exception:
         # Never leak a stack trace to the student.
+        lang_label = "Python" if language == "python" else "C/C++"
         trace = Trace(
             status=TraceStatus.RUNTIME_ERROR,
             error="The tracer could not handle this program. "
-            "It may use a C/C++ feature that is not supported yet.",
+            f"It may use a {lang_label} feature that is not supported yet.",
             sourceCode=code,
         )
     print(trace.model_dump_json())
