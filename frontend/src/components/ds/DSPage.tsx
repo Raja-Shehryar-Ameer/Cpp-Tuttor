@@ -8,6 +8,7 @@ import {
   Eye,
   GitBranch,
   GraduationCap,
+  HardDrive,
   Hash,
   Info,
   LayoutGrid,
@@ -125,6 +126,7 @@ import { readLabParam, writeLabParam } from "../../ds/permalink";
 import { exportSvgsPng } from "../../utils/exportPng";
 import { notify } from "../../store/toastStore";
 import { DeadlockLab } from "./DeadlockLab";
+import { DiskLab } from "./DiskLab";
 import { DSView } from "./DSView";
 import { PagingLab } from "./PagingLab";
 import { PredictChips, QuizPanel, usePredictScore } from "./predict";
@@ -150,11 +152,11 @@ type Structure =
 
 /** Everything selectable on the topic grid: data structures plus the labs
     that own their whole toolbar/stage/caption (OS labs + the sorting race). */
-type LabTopic = "sched" | "threads" | "paging" | "deadlock" | "sortrace";
+type LabTopic = "sched" | "threads" | "paging" | "deadlock" | "disk" | "sortrace";
 type Topic = Structure | LabTopic;
 
 const isLabTopic = (t: Topic): t is LabTopic =>
-  t === "sched" || t === "threads" || t === "paging" || t === "deadlock" || t === "sortrace";
+  t === "sched" || t === "threads" || t === "paging" || t === "deadlock" || t === "disk" || t === "sortrace";
 
 type Category = "Data structures" | "Algorithms" | "Operating systems";
 
@@ -165,7 +167,7 @@ const CATEGORY: Record<Topic, Category> = {
   graph: "Data structures",
   array: "Algorithms", search: "Algorithms", wgraph: "Algorithms", sortrace: "Algorithms",
   sched: "Operating systems", threads: "Operating systems", paging: "Operating systems",
-  deadlock: "Operating systems",
+  deadlock: "Operating systems", disk: "Operating systems",
 };
 
 const MAX_BATCH = 24; // more values than this per op makes the lesson unwatchable
@@ -301,6 +303,11 @@ const OS_TOPICS: LabTopicMeta[] = [
     key: "deadlock", label: "Deadlock & Banker's", icon: Lock,
     intro: "Banker's algorithm and deadlock detection over multi-instance resources — watch Work grow, the safe sequence build, and the resource-allocation graph light up its cycle when the answer is 'deadlocked'.",
     complexity: ["Banker's safety check", "detection mode", "RAG cycle highlight"],
+  },
+  {
+    key: "disk", label: "Disk Scheduling", icon: HardDrive,
+    intro: "FCFS, SSTF, SCAN, C-SCAN, LOOK, and C-LOOK racing over the same request queue — the head-movement zigzag every OS exam draws, with total and average seek.",
+    complexity: ["6 algorithms", "total / avg seek", "direction & wraparound"],
   },
 ];
 
@@ -967,6 +974,8 @@ export function DSPage() {
           <PagingLab initial={initialLink?.lab === "paging" ? initialLink : undefined} />
         ) : topic === "deadlock" ? (
           <DeadlockLab initial={initialLink?.lab === "deadlock" ? initialLink : undefined} />
+        ) : topic === "disk" ? (
+          <DiskLab initial={initialLink?.lab === "disk" ? initialLink : undefined} />
         ) : (
           <SortRace initial={initialLink?.lab === "sortrace" ? initialLink : undefined} />
         )}
@@ -1368,7 +1377,7 @@ export function DSPage() {
         <span className="ds-teacher">
           <GraduationCap size={16} aria-hidden="true" />
         </span>
-        <p key={`${idx}-${frame.note}`} className="ds-note">
+        <p key={frame.note} className="ds-note">
           {frame.note}
         </p>
         {frames.length > 1 && (

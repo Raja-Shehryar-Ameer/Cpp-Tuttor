@@ -13,6 +13,8 @@
 
 import type { DLRun } from "../ds/deadlock";
 import { procName, RES_NAMES } from "../ds/deadlock";
+import type { DiskRun } from "../ds/disk";
+import { DISK_ALGOS } from "../ds/disk";
 import type { PageRun } from "../ds/paging";
 import { PAGE_ALGOS } from "../ds/paging";
 import type { ProcSpec, SchedRun } from "../ds/sched";
@@ -227,6 +229,111 @@ export function drawGanttPng(run: SchedRun, procs: ProcSpec[], filename: string)
   for (let t = 0; t <= run.makespan; t += 1) {
     if (unit >= 18 || t % 5 === 0 || t === run.makespan) ctx.fillText(String(t), pad + t * unit, barY + barH + 22);
   }
+  downloadCanvas(canvas, filename);
+}
+
+export function drawDiskChartPng(run: DiskRun, filename: string): void {
+  const meta = DISK_ALGOS.find((a) => a.key === run.algo)!;
+  const ink = cssVar("--ink");
+  const panel = cssVar("--panel");
+  const text = cssVar("--text");
+  const muted = cssVar("--muted");
+  const danger = cssVar("--danger");
+  const hl = cssVar("--hl");
+  const accent = cssVar("--accent");
+
+  const { cylinders, head: start } = run.spec;
+  const rim = cylinders - 1;
+  const pad = 26;
+  const chartW = 640;
+  const L = pad + 16;
+  const R = pad + 16;
+  const axisY = 78;
+  const y0 = 108;
+  const rowH = 30;
+  const scale = 2;
+  const w = chartW;
+  const h = y0 + (run.steps.length - 1) * rowH + 40;
+  const x = (c: number): number => L + (c / rim) * (w - L - R);
+  const rowY = (i: number): number => y0 + i * rowH;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w * scale;
+  canvas.height = h * scale;
+  const ctx = canvas.getContext("2d")!;
+  ctx.scale(scale, scale);
+
+  ctx.fillStyle = panel;
+  ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = text;
+  ctx.font = `bold 15px "Space Grotesk", system-ui, sans-serif`;
+  ctx.textAlign = "left";
+  ctx.fillText(
+    `Disk scheduling — ${meta.short} · head ${start} · total seek ${run.totalSeek} · avg ${run.avgSeek.toFixed(2)}`,
+    pad,
+    32,
+  );
+
+  // cylinder axis + request queue
+  ctx.strokeStyle = muted;
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  ctx.moveTo(L, axisY);
+  ctx.lineTo(w - R, axisY);
+  ctx.stroke();
+  ctx.fillStyle = muted;
+  ctx.font = `11px "JetBrains Mono", monospace`;
+  ctx.textAlign = "center";
+  ctx.fillText("0", x(0), axisY - 12);
+  ctx.fillText(String(rim), x(rim), axisY - 12);
+  ctx.fillStyle = text;
+  ctx.font = `bold 11px "JetBrains Mono", monospace`;
+  ctx.fillText(String(start), x(start), axisY - 12);
+  for (const r of run.spec.requests) {
+    ctx.beginPath();
+    ctx.arc(x(r), axisY, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = accent;
+    ctx.fill();
+    ctx.strokeStyle = ink;
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+  }
+
+  // the zigzag
+  run.moves.forEach((mv, i) => {
+    ctx.beginPath();
+    ctx.moveTo(x(mv.from), rowY(i));
+    ctx.lineTo(x(mv.to), rowY(i + 1));
+    ctx.strokeStyle = mv.jump ? danger : mv.sweep ? muted : text;
+    ctx.lineWidth = 2.4;
+    ctx.lineCap = "round";
+    if (mv.jump) ctx.setLineDash([6, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    if (mv.serviced !== null) {
+      const px = x(mv.to);
+      const py = rowY(i + 1);
+      ctx.beginPath();
+      ctx.arc(px, py, 3.4, 0, Math.PI * 2);
+      ctx.fillStyle = text;
+      ctx.fill();
+      const left = mv.to > rim * 0.82;
+      ctx.fillStyle = muted;
+      ctx.font = `11px "JetBrains Mono", monospace`;
+      ctx.textAlign = left ? "right" : "left";
+      ctx.fillText(String(mv.to), px + (left ? -9 : 9), py + 4);
+    }
+  });
+
+  // start marker
+  ctx.beginPath();
+  ctx.arc(x(start), rowY(0), 6, 0, Math.PI * 2);
+  ctx.fillStyle = hl;
+  ctx.fill();
+  ctx.strokeStyle = ink;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
   downloadCanvas(canvas, filename);
 }
 

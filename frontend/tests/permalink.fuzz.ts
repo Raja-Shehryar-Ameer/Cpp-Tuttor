@@ -9,6 +9,7 @@ import { decodeLab, encodeLab, SORT_KEYS, type LabLink } from "../src/ds/permali
 import { SCHED_ALGOS } from "../src/ds/sched.ts";
 import { PAGE_ALGOS } from "../src/ds/paging.ts";
 import { WGRAPH_ALGOS } from "../src/ds/wgraph.ts";
+import { DISK_ALGOS, MAX_DISK_REQUESTS, MIN_CYL } from "../src/ds/disk.ts";
 
 let fails = 0;
 const fail = (label: string, ...ctx: unknown[]) => {
@@ -19,7 +20,7 @@ const rand = (n: number): number => Math.floor(Math.random() * n);
 const pick = <T,>(xs: readonly T[]): T => xs[rand(xs.length)];
 
 function randomLink(): LabLink {
-  switch (rand(5)) {
+  switch (rand(6)) {
     case 0: {
       const n = 1 + rand(6);
       return {
@@ -82,6 +83,26 @@ function randomLink(): LabLink {
           : { req: Array.from({ length: n }, () => Array.from({ length: m }, () => rand(6))) }),
       };
     }
+    case 4: {
+      // key order must match decodeLab's rebuild for the stringify comparison
+      const cyl = MIN_CYL + rand(1981);
+      const n = 1 + rand(MAX_DISK_REQUESTS);
+      const reqs: number[] = [];
+      const used = new Set<number>();
+      while (reqs.length < n) {
+        const r = rand(cyl);
+        if (!used.has(r)) { used.add(r); reqs.push(r); }
+      }
+      return {
+        lab: "disk",
+        algo: pick(DISK_ALGOS).key,
+        head: rand(cyl),
+        cyl,
+        reqs,
+        ...(Math.random() < 0.5 ? { dir: pick(["up", "down"] as const) } : {}),
+        ...(Math.random() < 0.4 ? { race: pick(DISK_ALGOS).key } : {}),
+      };
+    }
     default:
       return {
         lab: "sortrace",
@@ -130,6 +151,19 @@ const garbage: string[] = [
   btoa(JSON.stringify({ lab: "deadlock", mode: "detect", avail: [1], alloc: [[1]], req: [[99]] })),
   btoa(JSON.stringify({ lab: "deadlock", mode: "detect", avail: Array(9).fill(1), alloc: [Array(9).fill(1)], req: [Array(9).fill(1)] })),
   btoa(JSON.stringify({ lab: "deadlock", mode: "banker", avail: [1], alloc: Array(20).fill([1]), max: Array(20).fill([1]) })),
+  // disk: bad algo/dir, off-platter head/request, platter size out of range,
+  // empty/oversized queue, duplicate cylinders (impossible through the UI)
+  btoa(JSON.stringify({ lab: "disk", algo: "elevator", head: 53, cyl: 200, reqs: [98] })),
+  btoa(JSON.stringify({ lab: "disk", algo: "scan", head: 200, cyl: 200, reqs: [98] })),
+  btoa(JSON.stringify({ lab: "disk", algo: "scan", head: 53, cyl: 200, reqs: [200] })),
+  btoa(JSON.stringify({ lab: "disk", algo: "scan", head: 5, cyl: 19, reqs: [1] })),
+  btoa(JSON.stringify({ lab: "disk", algo: "scan", head: 5, cyl: 2001, reqs: [1] })),
+  btoa(JSON.stringify({ lab: "disk", algo: "scan", head: 53, cyl: 200, reqs: [] })),
+  btoa(JSON.stringify({ lab: "disk", algo: "scan", head: 53, cyl: 200, reqs: Array.from({ length: 13 }, (_, i) => i) })),
+  btoa(JSON.stringify({ lab: "disk", algo: "scan", head: 53, cyl: 200, reqs: [98, 98] })),
+  btoa(JSON.stringify({ lab: "disk", algo: "scan", head: 53, cyl: 200, reqs: [98], dir: "left" })),
+  btoa(JSON.stringify({ lab: "disk", algo: "scan", head: 53, cyl: 200, reqs: [98], race: "elevator" })),
+  btoa(JSON.stringify({ lab: "disk", algo: "scan", head: 53.5, cyl: 200, reqs: [98] })),
 ];
 for (let t = 0; t < 2000; t += 1) {
   garbage.push(Array.from({ length: rand(60) }, () => String.fromCharCode(32 + rand(90))).join(""));
