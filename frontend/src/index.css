@@ -163,6 +163,17 @@ header h1 {
 .header-actions { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
 .theme-toggle { border-radius: 6px; }
 
+/* Tracer language switch: one bordered pill, active segment inked in accent. */
+.lang-seg { display: inline-flex; border: 2px solid var(--ink); border-radius: 6px; overflow: hidden; }
+.lang-seg button {
+  border: none; border-radius: 0; box-shadow: none; padding: 0.42rem 0.7rem;
+  font-size: 0.78rem; font-weight: 700; background: var(--panel); color: var(--muted);
+}
+.lang-seg button + button { border-left: 2px solid var(--ink); }
+.lang-seg button:hover:not(:disabled) { transform: none; box-shadow: none; background: var(--panel-2); color: var(--text); }
+.lang-seg button:active:not(:disabled) { transform: none; }
+.lang-seg button.active { background: var(--accent); color: var(--on-accent); }
+
 /* ---------- buttons & inputs ---------- */
 
 button {
@@ -788,10 +799,12 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   background: var(--accent); color: var(--on-accent); border: 2px solid var(--ink);
 }
 /* The note reads in the teacher's voice: set slightly larger and medium-weight
-   so it carries the caption bar. */
+   so it carries the caption bar. Crossfade only — a translate here would make
+   the caption row twitch on every playback tick. */
+@keyframes note-in { from { opacity: 0.35; } }
 .ds-note {
   margin: 0; font-size: 0.92rem; flex: 1; min-width: 12rem; font-weight: 500;
-  animation: var-in 0.3s var(--ease-out);
+  animation: note-in 0.22s ease-out;
 }
 .ds-transport { flex: none; gap: 0.4rem; }
 .ds-scrub { width: 130px; flex: none; min-width: 90px; }
@@ -887,6 +900,10 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .icon-btn.ghost:hover:not(:disabled) { background: var(--panel-2); color: var(--danger); transform: none; box-shadow: none; }
 .best-row td { background: var(--ok-soft); font-weight: 700; }
 .pending-row { color: var(--muted); opacity: 0.7; }
+.sched-table tr { transition: opacity 0.3s ease, color 0.3s ease; }
+.metric-val { display: inline-block; animation: note-in 0.25s ease-out; }
+@keyframes chip-in { from { opacity: 0; transform: scale(0.92); } }
+.sched-live .proc-chip, .sched-live .page-slot { animation: chip-in 0.25s var(--ease-out); }
 .avg-row td { font-weight: 700; border-top: 2px solid var(--ink); font-family: var(--mono); }
 .sched-stats { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.9rem; }
 .sched-live { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin: 1rem 0; }
@@ -910,10 +927,13 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   display: flex; align-items: center; justify-content: center;
   border: 2px solid var(--ink); border-radius: 4px;
   color: #fffcf5; font-weight: 700; font-size: 0.76rem; font-family: var(--mono);
-  transition: opacity 0.2s ease;
+  /* Future slices stay invisible (no spoiler preview); the active slice is
+     revealed by a moving clip edge that fills in behind the gliding cursor.
+     Negative insets keep border+shadow visible on the three settled edges. */
+  transition: clip-path 0.3s var(--ease-out), opacity 0.25s ease;
+  clip-path: inset(-4px calc(100% - var(--fill, 100%)) -4px -4px);
 }
-.gantt-slice.future { opacity: 0.25; }
-.gantt-slice.partial { opacity: 0.7; }
+.gantt-slice.future { --fill: 0%; opacity: 0; }
 .gantt-slice.gantt-idle { background: transparent; color: var(--muted); border-style: dashed; }
 .gantt-cursor {
   position: absolute; top: -4px; height: 52px; width: 3px;
@@ -950,6 +970,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .dl-table th { padding-right: 0.45rem; text-align: center; }
 .dl-table td { padding: 0.22rem 0.3rem 0.22rem 0; border-top: none; text-align: center; font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .dl-table .ds-input.cell { width: 3.2rem; text-align: center; }
+.dl-table td, .dl-table th, .dl-table tr { transition: background-color 0.3s ease, opacity 0.3s ease; }
 .dl-row-active td, .dl-row-active th { background: var(--hl-soft, var(--panel-2)); }
 .dl-row-done { opacity: 0.45; }
 .dl-stepper { display: inline-flex; align-items: center; gap: 0.15rem; }
@@ -999,6 +1020,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   border: 1.5px solid var(--panel-2); min-width: 2.1rem; height: 2rem;
   padding: 0.12rem 0.3rem; text-align: center;
   font-variant-numeric: tabular-nums; font-weight: 500;
+  transition: opacity 0.3s var(--ease-out), background-color 0.3s ease, box-shadow 0.25s ease;
 }
 .page-grid .pg-label {
   border-color: transparent; text-align: right; padding-right: 0.55rem;
@@ -1006,7 +1028,8 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   letter-spacing: 0.06em; text-transform: uppercase;
 }
 .page-grid thead th { border-color: transparent; padding-bottom: 0.35rem; }
-.page-grid .future { opacity: 0.22; }
+/* Hidden, not dimmed: the grid draws itself column-by-column as playback lands. */
+.page-grid .future { opacity: 0; }
 .page-grid .current-col { background: var(--hl-soft); }
 .page-grid td.load-cell { box-shadow: inset 0 0 0 2px var(--danger); font-weight: 700; }
 .page-grid td.hit-cell { box-shadow: inset 0 0 0 2px var(--ok); font-weight: 700; }
@@ -1016,6 +1039,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   display: inline-flex; align-items: center; gap: 0.35rem;
   border: 1.5px solid var(--panel-2); border-radius: 8px; padding: 0.22rem 0.5rem;
   background: var(--panel);
+  transition: border-color 0.25s ease;
 }
 .page-slot.hand { border: 2px solid var(--ink); }
 .page-slot.just-hit { border-color: var(--ok); }
@@ -1028,7 +1052,35 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .page-slot .pg-hand { color: var(--text); font-weight: 700; }
 .pg-victim { color: var(--danger); border-color: var(--danger); }
 .warn-row td { background: var(--danger-soft); font-weight: 700; }
+.best-row td, .warn-row td { transition: background-color 0.3s ease; }
 .sweep-head { margin-top: 1.1rem; }
+
+/* ---------- disk scheduling lab ---------- */
+
+/* Zigzag chart: x = cylinder, one row per head move going down. Future
+   segments are invisible (no spoiler preview); the newest one draws itself
+   toward the new head position via the pathLength/dash trick. */
+.disk-svg { display: block; }
+.disk-axis { stroke: var(--muted); stroke-width: 1.6; }
+.disk-tick { fill: var(--muted); font-family: var(--mono); font-size: 0.68rem; font-variant-numeric: tabular-nums; }
+.disk-tick.disk-start { fill: var(--text); font-weight: 700; }
+.disk-req { fill: var(--panel); stroke: var(--ink); stroke-width: 1.8; transition: fill 0.25s ease, stroke 0.25s ease; }
+.disk-req.served { fill: var(--accent); }
+.disk-req.now { stroke: var(--hl); stroke-width: 3; }
+.disk-seg { stroke: var(--text); stroke-width: 2.4; stroke-linecap: round; transition: opacity 0.3s ease; }
+@keyframes seg-draw { from { stroke-dashoffset: 1; } }
+@keyframes seg-fade { from { opacity: 0; } }
+.disk-seg.seg-new:not(.seg-jump) { stroke-dasharray: 1; animation: seg-draw 0.35s var(--ease-out); }
+.disk-seg.seg-future { opacity: 0; }
+.seg-sweep { stroke: var(--muted); }
+.seg-jump { stroke: var(--danger); stroke-dasharray: 6 5; }
+.disk-seg.seg-jump.seg-new { animation: seg-fade 0.3s ease-out; }
+.disk-vertex { animation: seg-fade 0.25s ease-out; }
+.disk-vertex circle { fill: var(--text); }
+.disk-vertex text { fill: var(--muted); font-family: var(--mono); font-size: 0.66rem; font-variant-numeric: tabular-nums; }
+.disk-headmark { transition: transform 0.3s var(--ease-out); }
+.disk-headmark circle { fill: var(--hl); stroke: var(--ink); stroke-width: 2; }
+.disk-order { font-size: 0.72rem; }
 
 /* ---------- races ---------- */
 

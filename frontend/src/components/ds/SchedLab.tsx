@@ -15,7 +15,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   MAX_ARRIVAL,
   MAX_BURST,
@@ -60,16 +60,24 @@ function SchedResult({ run, procs, now }: { run: SchedRun; procs: ProcSpec[]; no
       </div>
       <div className="gantt-wrap">
         <div className="gantt" style={{ width: run.makespan * unit + 2 }}>
-          {run.slices.map((s, i) => (
-            <div
-              key={i}
-              className={`gantt-slice ${colorOf(procs, s.name)}${s.end <= clamped ? "" : s.start < clamped ? " partial" : " future"}`}
-              style={{ left: s.start * unit, width: (s.end - s.start) * unit }}
-              title={`${s.name ?? "idle"}: ${s.start} → ${s.end}`}
-            >
-              {(s.end - s.start) * unit >= 26 && <span>{s.name ?? "—"}</span>}
-            </div>
-          ))}
+          {run.slices.map((s, i) => {
+            const span = s.end - s.start;
+            const state = s.end <= clamped ? "" : s.start < clamped ? " partial" : " future";
+            // The clip edge tracks the cursor, so the active slice fills in
+            // behind the playhead instead of being previewed up front.
+            const style: CSSProperties = { left: s.start * unit, width: span * unit };
+            if (state === " partial") style["--fill" as never] = `${((clamped - s.start) / span) * 100}%` as never;
+            return (
+              <div
+                key={i}
+                className={`gantt-slice ${colorOf(procs, s.name)}${state}`}
+                style={style}
+                title={`${s.name ?? "idle"}: ${s.start} → ${s.end}`}
+              >
+                {span * unit >= 26 && <span>{s.name ?? "—"}</span>}
+              </div>
+            );
+          })}
           <div className="gantt-cursor" style={{ left: clamped * unit }} />
           <div className="gantt-ticks">
             {Array.from({ length: run.makespan + 1 }, (_, t) =>
@@ -115,10 +123,10 @@ function SchedResult({ run, procs, now }: { run: SchedRun; procs: ProcSpec[]; no
                   <td>{m.arrival}</td>
                   <td>{m.burst}</td>
                   {meta.usesPriority && <td>{m.priority}</td>}
-                  <td>{done ? m.completion : "…"}</td>
-                  <td>{done ? m.turnaround : "…"}</td>
-                  <td>{done ? m.waiting : "…"}</td>
-                  <td>{done ? m.response : "…"}</td>
+                  <td><span key={done ? "v" : "p"} className="metric-val">{done ? m.completion : "…"}</span></td>
+                  <td><span key={done ? "v" : "p"} className="metric-val">{done ? m.turnaround : "…"}</span></td>
+                  <td><span key={done ? "v" : "p"} className="metric-val">{done ? m.waiting : "…"}</span></td>
+                  <td><span key={done ? "v" : "p"} className="metric-val">{done ? m.response : "…"}</span></td>
                 </tr>
               );
             })}
