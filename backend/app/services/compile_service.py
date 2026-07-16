@@ -7,7 +7,12 @@ from pathlib import Path
 
 # zero-init makes not-yet-assigned locals render as 0 instead of random garbage,
 # which also keeps traces deterministic for golden tests.
-GXX_FLAGS = ["-g", "-O0", "-fno-omit-frame-pointer", "-std=c++17", "-ftrivial-auto-var-init=zero"]
+_COMMON_FLAGS = ["-g", "-O0", "-fno-omit-frame-pointer", "-ftrivial-auto-var-init=zero"]
+# Keyed by source suffix so compile() needs no extra language parameter.
+_TOOLCHAIN = {
+    ".c": ["gcc", "-std=c17", *_COMMON_FLAGS],
+    ".cpp": ["g++", "-std=c++17", *_COMMON_FLAGS],
+}
 
 
 class CompileError(Exception):
@@ -19,12 +24,16 @@ class CompileError(Exception):
 class CompileService:
     def compile(self, source: Path, out_dir: Path) -> Path:
         binary = out_dir / "prog"
-        result = subprocess.run(
-            ["g++", *GXX_FLAGS, "-o", str(binary), str(source)],
-            capture_output=True,
-            text=True,
-            timeout=30,
-        )
+        toolchain = _TOOLCHAIN.get(source.suffix, _TOOLCHAIN[".cpp"])
+        try:
+            result = subprocess.run(
+                [*toolchain, "-o", str(binary), str(source)],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+        except subprocess.TimeoutExpired:
+            raise CompileError("compilation took longer than 30 s — simplify the program") from None
         if result.returncode != 0:
             # Strip temp-dir paths so students see 'main.cpp:3' not '/work/main.cpp:3'.
             raise CompileError(result.stderr.replace(str(source), source.name).strip())

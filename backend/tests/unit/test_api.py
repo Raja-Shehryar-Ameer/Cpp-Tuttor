@@ -9,18 +9,25 @@ from app.services.trace_store import TraceStore
 
 
 class StubRunner:
-    def run(self, code: str, stdin_text: str) -> Trace:
+    def __init__(self):
+        self.language: str | None = None
+
+    def run(self, code: str, stdin_text: str, language: str = "cpp") -> Trace:
+        self.language = language
         return Trace(status=TraceStatus.OK, sourceCode=code, steps=[])
 
 
 @pytest.fixture()
 def client(tmp_path):
-    app.dependency_overrides[get_runner] = lambda: StubRunner()
+    stub = StubRunner()
+    app.dependency_overrides[get_runner] = lambda: stub
     app.dependency_overrides[get_store] = lambda: TraceStore(tmp_path)
     limiter = app.state.limiter
     limiter.reset()
+    test_client = TestClient(app)
+    test_client.stub = stub
     try:
-        yield TestClient(app)
+        yield test_client
     finally:
         app.dependency_overrides.clear()
 
@@ -49,6 +56,22 @@ def test_oversized_source_rejected(client):
 
 def test_missing_code_rejected(client):
     response = client.post("/api/trace", json={"stdin": ""})
+    assert response.status_code == 422
+
+
+def test_language_defaults_to_cpp(client):
+    assert client.post("/api/trace", json={"code": "int main(){}"}).status_code == 200
+    assert client.stub.language == "cpp"
+
+
+def test_c_language_passes_through(client):
+    response = client.post("/api/trace", json={"code": "int main(void){}", "language": "c"})
+    assert response.status_code == 200
+    assert client.stub.language == "c"
+
+
+def test_unknown_language_rejected(client):
+    response = client.post("/api/trace", json={"code": "int main(){}", "language": "rust"})
     assert response.status_code == 422
 
 

@@ -12,14 +12,14 @@ import {
   Sun,
 } from "lucide-react";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { fetchSharedTrace, requestTrace } from "./api/client";
+import { fetchSharedTrace, requestTrace, type TracerLanguage } from "./api/client";
 import { Controls } from "./components/Controls";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { StdoutPane } from "./components/StdoutPane";
 import { ToastHost } from "./components/Toast";
 import { MemoryDiagram } from "./components/diagram/MemoryDiagram";
 import { usePlayback } from "./hooks/usePlayback";
-import { SAMPLES } from "./samples";
+import { DEFAULT_SAMPLE, SAMPLES_BY_LANG } from "./samples";
 import { notify } from "./store/toastStore";
 import { useTraceStore } from "./store/traceStore";
 import { validateTracerSource } from "./validation";
@@ -31,8 +31,6 @@ const EditorPane = lazy(() =>
 );
 const DSPage = lazy(() => import("./components/ds/DSPage").then((m) => ({ default: m.DSPage })));
 const ForkPage = lazy(() => import("./fork/ForkPage").then((m) => ({ default: m.ForkPage })));
-
-const DEFAULT_SAMPLE = "pointers — swap via pointers";
 
 type Theme = "light" | "dark";
 
@@ -56,7 +54,8 @@ export default function App() {
     new URLSearchParams(window.location.search).has("lab") ? "ds" : "code",
   );
   const [theme, setTheme] = useState<Theme>(initialTheme);
-  const [code, setCode] = useState(SAMPLES[DEFAULT_SAMPLE]);
+  const [language, setLanguage] = useState<TracerLanguage>("cpp");
+  const [code, setCode] = useState(SAMPLES_BY_LANG.cpp[DEFAULT_SAMPLE.cpp]);
   const [stdin, setStdin] = useState("");
   const [traceId, setTraceId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -90,10 +89,16 @@ export default function App() {
       });
   }, []);
 
+  const switchLanguage = (lang: TracerLanguage) => {
+    if (lang === language) return;
+    setLanguage(lang);
+    setCode(SAMPLES_BY_LANG[lang][DEFAULT_SAMPLE[lang]]);
+  };
+
   const visualize = async () => {
     // Catch the obvious problems here — instant feedback instead of a
     // compile-in-Docker round-trip that ends the same way.
-    const check = validateTracerSource(code);
+    const check = validateTracerSource(code, language);
     if (check.errors.length > 0) {
       notify.errors(check.errors);
       return;
@@ -103,7 +108,7 @@ export default function App() {
     setLoading(true);
     setRequestError(null);
     try {
-      const result = await requestTrace(code, stdin);
+      const result = await requestTrace(code, stdin, language);
       setTrace(result.trace);
       setTraceId(result.traceId);
       updatePermalink(result.traceId);
@@ -156,7 +161,7 @@ export default function App() {
               </g>
             </svg>
           </span>
-          Shinso <span className="tagline">step-by-step C++ visualizer</span>
+          Shinso <span className="tagline">step-by-step C/C++ visualizer</span>
         </h1>
         <nav className="main-nav" aria-label="mode">
           <button className={mode === "code" ? "active" : ""} onClick={() => setMode("code")}>
@@ -178,15 +183,32 @@ export default function App() {
             {theme === "dark" ? <Sun size={14} aria-hidden="true" /> : <Moon size={14} aria-hidden="true" />}
           </button>
           {mode === "code" && trace === null && (
-            <select
-              defaultValue={DEFAULT_SAMPLE}
-              onChange={(e) => setCode(SAMPLES[e.target.value])}
-              title="example gallery"
-            >
-              {Object.keys(SAMPLES).map((name) => (
-                <option key={name}>{name}</option>
-              ))}
-            </select>
+            <>
+              <div className="lang-seg" role="group" aria-label="language">
+                <button
+                  className={language === "cpp" ? "active" : ""}
+                  onClick={() => switchLanguage("cpp")}
+                >
+                  C++
+                </button>
+                <button
+                  className={language === "c" ? "active" : ""}
+                  onClick={() => switchLanguage("c")}
+                >
+                  C
+                </button>
+              </div>
+              <select
+                key={language}
+                defaultValue={DEFAULT_SAMPLE[language]}
+                onChange={(e) => setCode(SAMPLES_BY_LANG[language][e.target.value])}
+                title="example gallery"
+              >
+                {Object.keys(SAMPLES_BY_LANG[language]).map((name) => (
+                  <option key={name}>{name}</option>
+                ))}
+              </select>
+            </>
           )}
           {mode === "code" &&
             (trace === null ? (

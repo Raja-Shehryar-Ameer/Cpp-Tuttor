@@ -14,7 +14,7 @@ class SandboxRunner:
     def __init__(self, settings: Settings):
         self._settings = settings
 
-    def run(self, code: str, stdin_text: str) -> Trace:
+    def run(self, code: str, stdin_text: str, language: str = "cpp") -> Trace:
         s = self._settings
         name = f"cpptutor-{uuid.uuid4().hex[:12]}"
         cmd = [
@@ -39,7 +39,7 @@ class SandboxRunner:
             "/tmp:rw,size=16m",
             s.docker_image,
         ]
-        payload = json.dumps({"code": code, "stdin": stdin_text})
+        payload = json.dumps({"code": code, "stdin": stdin_text, "language": language})
         try:
             # Grace period on top of the tracer's own wall clock, then hard kill.
             result = subprocess.run(

@@ -3,6 +3,8 @@ import type { Trace } from "../types/trace";
 const BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000";
 const TRACE_TIMEOUT_MS = 90_000; // compile + GDB drive can legitimately take a while
 
+export type TracerLanguage = "cpp" | "c";
+
 export interface TraceResult {
   trace: Trace;
   traceId: string | null;
@@ -23,13 +25,17 @@ function friendly(error: unknown): Error {
   return error instanceof Error ? error : new Error("Request failed.");
 }
 
-export async function requestTrace(code: string, stdin: string): Promise<TraceResult> {
+export async function requestTrace(
+  code: string,
+  stdin: string,
+  language: TracerLanguage = "cpp",
+): Promise<TraceResult> {
   let response: Response;
   try {
     response = await fetch(`${BASE}/api/trace`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, stdin }),
+      body: JSON.stringify({ code, stdin, language }),
       signal: AbortSignal.timeout(TRACE_TIMEOUT_MS),
     });
   } catch (error) {

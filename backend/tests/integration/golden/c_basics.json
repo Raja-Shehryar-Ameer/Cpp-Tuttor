@@ -1,0 +1,442 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 4,
+   "event": "call",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 5,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 6,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "product",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 9,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "product",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 10,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "sum = 10\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "product",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 11,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "sum = 10\nproduct = 21\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "product",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 12,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "sum = 10\nproduct = 21\nratio = 2.33\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "product",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 13,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "sum = 10\nproduct = 21\nratio = 2.33\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "a",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A0",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "b",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A1",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "sum",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A2",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "product",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A3",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "ratio",
+       "type": "double",
+       "kind": "primitive",
+       "address": "A4",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 13,
+   "event": "exit",
+   "functionName": "main",
+   "stdout": "sum = 10\nproduct = 21\nratio = 2.33\n",
+   "stack": [],
+   "heap": []
+  }
+ ]
+}

@@ -15,7 +15,8 @@ pytestmark = pytest.mark.integration
 
 def run_sample(name: str, stdin: str = ""):
     code = (SAMPLES / name).read_text()
-    return SandboxRunner(Settings()).run(code, stdin)
+    language = "c" if name.endswith(".c") else "cpp"
+    return SandboxRunner(Settings()).run(code, stdin, language)
 
 
 def test_basics_traces_primitives():

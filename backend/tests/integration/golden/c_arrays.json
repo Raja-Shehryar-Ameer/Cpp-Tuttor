@@ -1,0 +1,2329 @@
+{
+ "status": "ok",
+ "steps": [
+  {
+   "line": 5,
+   "event": "call",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": []
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 6,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 8,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 7,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "i",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A5",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 10,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 11,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "name",
+       "type": "char [16]",
+       "kind": "array",
+       "address": "A7",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A8",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A9",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A10",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A11",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[5]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A12",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[6]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A13",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[7]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A14",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[8]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A15",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[9]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A16",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[10]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A17",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[11]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A18",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[12]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A19",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[13]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A20",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[14]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A21",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[15]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A22",
+         "target": null,
+         "elements": null
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 12,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "name",
+       "type": "char [16]",
+       "kind": "array",
+       "address": "A7",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A8",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A9",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A10",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A11",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[5]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A12",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[6]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A13",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[7]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A14",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[8]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A15",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[9]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A16",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[10]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A17",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[11]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A18",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[12]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A19",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[13]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A20",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[14]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A21",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[15]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A22",
+         "target": null,
+         "elements": null
+        }
+       ]
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 13,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "name",
+       "type": "char [16]",
+       "kind": "array",
+       "address": "A7",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A8",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A9",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A10",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A11",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[5]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A12",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[6]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A13",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[7]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A14",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[8]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A15",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[9]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A16",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[10]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A17",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[11]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A18",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[12]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A19",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[13]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A20",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[14]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A21",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[15]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A22",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "len",
+       "type": "size_t",
+       "kind": "primitive",
+       "address": "A23",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 14,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "total = 66\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "name",
+       "type": "char [16]",
+       "kind": "array",
+       "address": "A7",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A8",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A9",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A10",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A11",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[5]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A12",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[6]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A13",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[7]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A14",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[8]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A15",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[9]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A16",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[10]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A17",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[11]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A18",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[12]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A19",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[13]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A20",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[14]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A21",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[15]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A22",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "len",
+       "type": "size_t",
+       "kind": "primitive",
+       "address": "A23",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 15,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "total = 66\nshinso has 6 letters\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "name",
+       "type": "char [16]",
+       "kind": "array",
+       "address": "A7",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A8",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A9",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A10",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A11",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[5]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A12",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[6]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A13",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[7]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A14",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[8]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A15",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[9]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A16",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[10]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A17",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[11]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A18",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[12]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A19",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[13]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A20",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[14]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A21",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[15]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A22",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "len",
+       "type": "size_t",
+       "kind": "primitive",
+       "address": "A23",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 16,
+   "event": "step",
+   "functionName": "main",
+   "stdout": "total = 66\nshinso has 6 letters\n",
+   "stack": [
+    {
+     "frameId": "f0",
+     "functionName": "main",
+     "locals": [
+      {
+       "name": "nums",
+       "type": "int [5]",
+       "kind": "array",
+       "address": "A0",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A0",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A1",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A2",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A3",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "int",
+         "kind": "primitive",
+         "address": "A4",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "total",
+       "type": "int",
+       "kind": "primitive",
+       "address": "A6",
+       "target": null,
+       "elements": null
+      },
+      {
+       "name": "name",
+       "type": "char [16]",
+       "kind": "array",
+       "address": "A7",
+       "target": null,
+       "elements": [
+        {
+         "name": "[0]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A7",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[1]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A8",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[2]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A9",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[3]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A10",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[4]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A11",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[5]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A12",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[6]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A13",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[7]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A14",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[8]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A15",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[9]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A16",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[10]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A17",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[11]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A18",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[12]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A19",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[13]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A20",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[14]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A21",
+         "target": null,
+         "elements": null
+        },
+        {
+         "name": "[15]",
+         "type": "char",
+         "kind": "primitive",
+         "address": "A22",
+         "target": null,
+         "elements": null
+        }
+       ]
+      },
+      {
+       "name": "len",
+       "type": "size_t",
+       "kind": "primitive",
+       "address": "A23",
+       "target": null,
+       "elements": null
+      }
+     ]
+    }
+   ],
+   "heap": []
+  },
+  {
+   "line": 16,
+   "event": "exit",
+   "functionName": "main",
+   "stdout": "total = 66\nshinso has 6 letters\n",
+   "stack": [],
+   "heap": []
+  }
+ ]
+}

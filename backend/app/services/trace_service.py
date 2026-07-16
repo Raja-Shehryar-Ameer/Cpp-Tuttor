@@ -70,8 +70,8 @@ class TraceService:
         self._gdb_factory = gdb_factory
         self._settings = settings
 
-    def trace(self, work_dir: Path) -> Trace:
-        source_path = work_dir / "main.cpp"
+    def trace(self, work_dir: Path, source_name: str = "main.cpp") -> Trace:
+        source_path = work_dir / source_name
         # Per-trace state for declaration-gated variable visibility.
         self._decl_cache: dict[str, dict[str, int]] = {}
         self._progress: list[list] = []  # bottom-up [functionName, max executed line]

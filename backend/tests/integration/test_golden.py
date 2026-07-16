@@ -22,6 +22,12 @@ ALL_SAMPLES = [
     "struct_list.cpp",
     "heap_bug.cpp",
     "vector_string.cpp",
+    "c/basics.c",
+    "c/pointers.c",
+    "c/arrays.c",
+    "c/recursion.c",
+    "c/struct_list.c",
+    "c/heap_bug.c",
 ]
 
 pytestmark = pytest.mark.integration
@@ -30,7 +36,8 @@ pytestmark = pytest.mark.integration
 @pytest.mark.parametrize("sample", ALL_SAMPLES)
 def test_sample_matches_golden(sample: str):
     actual = normalize(run_sample(sample))
-    golden_path = GOLDEN_DIR / f"{sample.removesuffix('.cpp')}.json"
+    stem = sample.replace("/", "_").removesuffix(".cpp").removesuffix(".c")
+    golden_path = GOLDEN_DIR / f"{stem}.json"
     if os.environ.get("REGEN_GOLDEN"):
         GOLDEN_DIR.mkdir(exist_ok=True)
         golden_path.write_text(json.dumps(actual, indent=1))

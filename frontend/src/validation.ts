@@ -2,6 +2,8 @@
 // say so in plain words, instead of burning a Docker round-trip (tracer) or a
 // cryptic parse error (fork simulator) to find out.
 
+import type { TracerLanguage } from "./api/client";
+
 export interface Validation {
   /** blocking problems — don't run */
   errors: string[];
@@ -53,13 +55,13 @@ function structural(src: string): string[] {
   return errors;
 }
 
-export function validateTracerSource(code: string): Validation {
+export function validateTracerSource(code: string, language: TracerLanguage = "cpp"): Validation {
   const errors: string[] = [];
   const warnings: string[] = [];
   const trimmed = code.trim();
 
   if (trimmed.length === 0) {
-    errors.push("The editor is empty — write (or pick) a C++ program first.");
+    errors.push(`The editor is empty — write (or pick) a ${language === "c" ? "C" : "C++"} program first.`);
     return { errors, warnings };
   }
   if (new Blob([code]).size > MAX_TRACER_BYTES) {
@@ -67,6 +69,8 @@ export function validateTracerSource(code: string): Validation {
     return { errors, warnings };
   }
   errors.push(...structural(code));
+  if (language === "c" && /(#include\s*<iostream>|\bstd::|\bcout\b|\bcin\b|\bclass\s+\w|\bnew\s+\w|\bdelete\s)/.test(code))
+    errors.push("This looks like C++ — switch the language to C++, or use printf/scanf and malloc/free.");
 
   if (/\bfork\s*\(/.test(code))
     warnings.push("fork() spotted — the C fork() tab draws the process tree; the tracer follows only one process.");

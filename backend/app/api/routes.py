@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,6 +34,7 @@ app.add_middleware(
 class TraceRequest(BaseModel):
     code: str
     stdin: str = ""
+    language: Literal["cpp", "c"] = "cpp"
 
 
 def get_runner() -> SandboxRunner:
@@ -58,7 +59,7 @@ def create_trace(
             status_code=413,
             detail=f"Source exceeds {settings.max_source_bytes // 1024} KB limit.",
         )
-    trace = runner.run(body.code, body.stdin)
+    trace = runner.run(body.code, body.stdin, body.language)
     response.headers["X-Trace-Id"] = store.save(body.code, body.stdin, trace)
     return trace
 

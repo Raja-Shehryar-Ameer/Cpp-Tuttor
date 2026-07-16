@@ -21,21 +21,24 @@ def main() -> int:
     payload = json.load(sys.stdin)
     code: str = payload["code"]
     stdin_text: str = payload.get("stdin", "")
+    language: str = payload.get("language", "cpp")
 
+    # The extension drives both the gcc frontend and GDB's DWARF language.
+    source_name = "main.c" if language == "c" else "main.cpp"
     work_dir = Path(os.environ.get("CPPTUTOR_WORK_DIR", "/work"))
-    (work_dir / "main.cpp").write_text(code)
+    (work_dir / source_name).write_text(code)
     (work_dir / "stdin.txt").write_text(stdin_text)
 
     settings = Settings()
     service = TraceService(CompileService(), GdbSession, settings)
     try:
-        trace = service.trace(work_dir)
+        trace = service.trace(work_dir, source_name)
     except Exception:
         # Never leak a stack trace to the student.
         trace = Trace(
             status=TraceStatus.RUNTIME_ERROR,
             error="The tracer could not handle this program. "
-            "It may use a C++ feature that is not supported yet.",
+            "It may use a C/C++ feature that is not supported yet.",
             sourceCode=code,
         )
     print(trace.model_dump_json())
