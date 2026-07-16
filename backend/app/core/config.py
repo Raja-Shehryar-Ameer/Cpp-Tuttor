@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     wall_timeout_s: int = 25
     output_limit_bytes: int = 64 * 1024
     max_source_bytes: int = 20 * 1024
+    max_stdin_bytes: int = 64 * 1024
 
     docker_image: str = "cpptutor-tracer"
     docker_memory: str = "256m"

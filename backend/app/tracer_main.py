@@ -23,6 +23,11 @@ def main() -> int:
     stdin_text: str = payload.get("stdin", "")
     language: str = payload.get("language", "cpp")
 
+    # Program input arrives from browsers and pasted text with any line-ending
+    # convention; a stray '\r' silently breaks string comparisons and parsing
+    # in every language, so normalize once at the boundary.
+    stdin_text = stdin_text.replace("\r\n", "\n").replace("\r", "\n")
+
     settings = Settings()
     try:
         if language == "python":

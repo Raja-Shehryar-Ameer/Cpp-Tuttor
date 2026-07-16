@@ -35,7 +35,8 @@ export async function requestTrace(
     response = await fetch(`${BASE}/api/trace`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, stdin, language }),
+      // Pasted text can carry \r\n; a stray \r breaks parsing in every language.
+      body: JSON.stringify({ code, stdin: stdin.replace(/\r\n?/g, "\n"), language }),
       signal: AbortSignal.timeout(TRACE_TIMEOUT_MS),
     });
   } catch (error) {

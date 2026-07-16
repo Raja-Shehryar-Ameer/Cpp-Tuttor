@@ -110,6 +110,10 @@ export default function App() {
       notify.errors(check.errors);
       return;
     }
+    if (new Blob([stdin]).size > 64 * 1024) {
+      notify.errors(["The stdin box holds over 64 KB — trim the input to exam size."]);
+      return;
+    }
     notify.warnings(check.warnings);
 
     setLoading(true);

@@ -59,6 +59,11 @@ def create_trace(
             status_code=413,
             detail=f"Source exceeds {settings.max_source_bytes // 1024} KB limit.",
         )
+    if len(body.stdin.encode()) > settings.max_stdin_bytes:
+        raise HTTPException(
+            status_code=413,
+            detail=f"stdin exceeds {settings.max_stdin_bytes // 1024} KB limit.",
+        )
     trace = runner.run(body.code, body.stdin, body.language)
     response.headers["X-Trace-Id"] = store.save(body.code, body.stdin, trace)
     return trace

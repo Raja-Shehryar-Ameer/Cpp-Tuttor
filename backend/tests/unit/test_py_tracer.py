@@ -228,10 +228,45 @@ def test_input_reads_from_the_provided_stdin():
     assert "hi ada" in trace.steps[-1].stdout
 
 
-def test_input_past_eof_is_a_clean_runtime_error():
+def test_input_past_eof_names_the_stdin_box():
     trace = run("first = input()\nsecond = input()\n", stdin="only-one\n")
     assert trace.status == TraceStatus.RUNTIME_ERROR
     assert "EOFError" in trace.error
+    assert "stdin box" in trace.error
+
+
+def test_stdin_buffer_reads_real_bytes():
+    trace = run(
+        """
+        import sys
+        raw = sys.stdin.buffer.read()
+        print(len(raw), type(raw).__name__)
+        """,
+        stdin="abcd\n",
+    )
+    assert trace.status == TraceStatus.OK
+    assert "5 bytes" in trace.steps[-1].stdout
+
+
+def test_crlf_stdin_reads_clean_lines():
+    trace = run(
+        'name = input()\nprint("match" if name == "ada" else repr(name))\n',
+        stdin="ada\r\n",
+    )
+    assert trace.status == TraceStatus.OK
+    assert "match" in trace.steps[-1].stdout
+
+
+def test_input_prompt_lands_in_stdout():
+    trace = run('name = input("name? ")\nprint("hi", name)\n', stdin="ada\n")
+    assert trace.status == TraceStatus.OK
+    assert "name? hi ada" in trace.steps[-1].stdout
+
+
+def test_unicode_stdin_round_trips():
+    trace = run('w = input()\nprint("word:", w, len(w))\n', stdin="héllo\n")
+    assert trace.status == TraceStatus.OK
+    assert "word: héllo 5" in trace.steps[-1].stdout
 
 
 def test_output_flood_is_truncated():

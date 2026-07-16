@@ -76,7 +76,11 @@ class _PyTracer:
         old_stdout, old_stdin = sys.stdout, sys.stdin
         old_limit = sys.getrecursionlimit()
         sys.stdout = self._stdout
-        sys.stdin = io.StringIO(self._stdin_text)
+        # A real byte-backed wrapper, not StringIO: programs that reach for
+        # sys.stdin.buffer (or mix input() with .read()) must work too.
+        sys.stdin = io.TextIOWrapper(
+            io.BytesIO(self._stdin_text.encode("utf-8")), encoding="utf-8"
+        )
         alarm_set = self._arm_alarm()
         try:
             sys.setrecursionlimit(_RECURSION_LIMIT + len(_inspect_stack_depth()))
@@ -203,7 +207,13 @@ class _PyTracer:
                 heap=heap,
             )
         )
-        message = str(exc) or "(no message)"
+        if isinstance(exc, EOFError):
+            message = (
+                "the program asked for more input than the stdin box provides — "
+                "add the missing line(s) and run again"
+            )
+        else:
+            message = str(exc) or "(no message)"
         self._builder.fail(
             TraceStatus.RUNTIME_ERROR, f"Program crashed: {type(exc).__name__}: {message}."
         )
