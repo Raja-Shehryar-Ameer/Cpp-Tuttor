@@ -1,6 +1,7 @@
 import { Ban, Droplet } from "lucide-react";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { collectPointers, registerBox } from "../../store/boxRegistry";
+import { useHeapIds } from "../../store/traceStore";
 import type { HeapObject, Step, Value } from "../../types/trace";
 import { ValueBox } from "./ValueBox";
 
@@ -25,6 +26,7 @@ function HeapBox({
     },
     [object.address],
   );
+  const heapId = useHeapIds().get(object.address);
   return (
     <div
       ref={ref}
@@ -33,6 +35,11 @@ function HeapBox({
       style={{ transform: `translate(${x}px, ${y}px)`, opacity: ready ? undefined : 0 }}
     >
       <div className="heap-label">
+        {heapId && (
+          <span className="heap-id" title="reference id — pointers to this object read →">
+            {heapId}
+          </span>
+        )}
         <span className="heap-label-text">{object.label}</span>
         {object.freed && (
           <span className="freed-tag">

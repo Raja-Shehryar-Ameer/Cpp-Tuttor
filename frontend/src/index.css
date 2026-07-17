@@ -366,6 +366,10 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
   display: flex; align-items: center; gap: 0.4rem;
   font-weight: 600; margin-bottom: 0.45rem; font-size: 0.85rem; font-family: var(--mono);
 }
+.heap-id {
+  font-family: var(--mono); font-size: 0.68rem; font-weight: 700;
+  border: var(--edge-thin); border-radius: var(--r-sm); padding: 0 0.3rem;
+}
 .freed-tag {
   display: inline-flex; align-items: center; gap: 0.25rem;
   color: var(--danger); font-size: 0.68rem; font-family: inherit; font-weight: 700;
@@ -399,6 +403,8 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 }
 .value-cell.string { color: var(--ok); }
 .value-cell.pointer { color: var(--text); }
+.value-cell.pointer .heap-ref { font-family: var(--mono); font-weight: 700; letter-spacing: 0.02em; }
+.value-cell.pointer .heap-ref.danger { color: var(--danger); }
 .value-cell.null-pointer { color: var(--muted); border-style: dashed; }
 .value-cell.uninit { color: var(--faint); }
 

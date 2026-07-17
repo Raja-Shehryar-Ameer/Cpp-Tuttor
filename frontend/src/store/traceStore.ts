@@ -1,9 +1,12 @@
 import { create } from "zustand";
 import type { Step, Trace } from "../types/trace";
+import { computeHeapIds } from "../utils/heapIds";
 
 interface TraceState {
   trace: Trace | null;
   currentStep: number;
+  /** per-step heap address → "Hn" display id, computed once per trace */
+  heapIds: ReadonlyMap<string, string>[];
   playing: boolean;
   speedMs: number;
   loading: boolean;
@@ -23,11 +26,19 @@ const clamp = (value: number, max: number) => Math.max(0, Math.min(value, max));
 export const useTraceStore = create<TraceState>((set) => ({
   trace: null,
   currentStep: 0,
+  heapIds: [],
   playing: false,
   speedMs: 800,
   loading: false,
   requestError: null,
-  setTrace: (trace) => set({ trace, currentStep: 0, playing: false, requestError: null }),
+  setTrace: (trace) =>
+    set({
+      trace,
+      heapIds: trace ? computeHeapIds(trace.steps) : [],
+      currentStep: 0,
+      playing: false,
+      requestError: null,
+    }),
   setStep: (step) =>
     set((s) => ({ currentStep: clamp(step, (s.trace?.steps.length ?? 1) - 1) })),
   stepForward: () =>
@@ -45,4 +56,11 @@ export const useTraceStore = create<TraceState>((set) => ({
 
 export function useCurrentStep(): Step | null {
   return useTraceStore((s) => s.trace?.steps[s.currentStep] ?? null);
+}
+
+const EMPTY_IDS: ReadonlyMap<string, string> = new Map();
+
+/** The current step's heap address → "Hn" map (stable empty map out of range). */
+export function useHeapIds(): ReadonlyMap<string, string> {
+  return useTraceStore((s) => s.heapIds[s.currentStep] ?? EMPTY_IDS);
 }

@@ -1,6 +1,7 @@
 import { Circle } from "lucide-react";
 import { useCallback } from "react";
 import { registerBox } from "../../store/boxRegistry";
+import { useHeapIds, useTraceStore } from "../../store/traceStore";
 import type { Value, ValueKind } from "../../types/trace";
 
 // ONE recursive component renders every Value kind; dispatch is kind-driven.
@@ -42,14 +43,29 @@ function Scalar({ value, className }: { value: Value; className: string }) {
 function PointerCell({ value }: { value: Value }) {
   const ref = useRegister(value.address);
   const isNull = value.target === null;
+  // Heap targets are named by their stable Hn id so the reader can match a
+  // pointer to its object without following the arrow. Stack targets (e.g.
+  // swap via pointers) have no Hn — those keep the plain dot.
+  const heapId = useHeapIds().get(value.target ?? "");
+  const targetFreed = useTraceStore((s) =>
+    value.target !== null &&
+    (s.trace?.steps[s.currentStep]?.heap.some((o) => o.address === value.target && o.freed) ??
+      false),
+  );
   return (
     <span
       ref={ref}
       className={`value-cell pointer${isNull ? " null-pointer" : ""}`}
-      title={`${describe(value)} → ${value.value ?? "?"}`}
+      title={`${describe(value)} → ${heapId ?? value.value ?? "?"}`}
     >
-      <span key={value.target ?? "null"} className="flash">
-        {isNull ? "null" : <Circle size={8} strokeWidth={0} fill="currentColor" aria-label="pointer" />}
+      <span key={heapId ?? value.target ?? "null"} className="flash">
+        {isNull ? (
+          "null"
+        ) : heapId ? (
+          <span className={`heap-ref${targetFreed ? " danger" : ""}`}>→{heapId}</span>
+        ) : (
+          <Circle size={8} strokeWidth={0} fill="currentColor" aria-label="pointer" />
+        )}
       </span>
     </span>
   );
