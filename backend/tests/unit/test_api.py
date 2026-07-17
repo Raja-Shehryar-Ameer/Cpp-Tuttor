@@ -54,6 +54,13 @@ def test_oversized_source_rejected(client):
     assert "KB limit" in response.json()["detail"]
 
 
+def test_oversized_stdin_rejected(client):
+    big = "x" * (settings.max_stdin_bytes + 1)
+    response = client.post("/api/trace", json={"code": "int main(){}", "stdin": big})
+    assert response.status_code == 413
+    assert "stdin" in response.json()["detail"]
+
+
 def test_missing_code_rejected(client):
     response = client.post("/api/trace", json={"stdin": ""})
     assert response.status_code == 422
@@ -75,6 +82,25 @@ def test_unknown_language_rejected(client):
     assert response.status_code == 422
 
 
+def test_language_echoed_in_trace_payload(client):
+    response = client.post("/api/trace", json={"code": "x = 1", "language": "python"})
+    assert response.status_code == 200
+    assert response.json()["language"] == "python"
+    default = client.post("/api/trace", json={"code": "int main(){}"})
+    assert default.json()["language"] == "cpp"
+
+
+def test_stored_trace_without_language_loads_as_null(client, tmp_path):
+    # A trace saved before the language field existed must still load (as null).
+    legacy_id = "deadbeef01234567"
+    (tmp_path / f"{legacy_id}.json").write_text(
+        '{"version": 1, "status": "ok", "error": null, "sourceCode": "int main(){}", "steps": []}'
+    )
+    response = client.get(f"/api/trace/{legacy_id}")
+    assert response.status_code == 200
+    assert response.json()["language"] is None
+
+
 def test_permalink_roundtrip(client):
     created = client.post("/api/trace", json={"code": "int main(){}"})
     trace_id = created.headers["X-Trace-Id"]
@@ -82,6 +108,8 @@ def test_permalink_roundtrip(client):
     fetched = client.get(f"/api/trace/{trace_id}")
     assert fetched.status_code == 200
     assert fetched.json()["sourceCode"] == "int main(){}"
+    # Language is stamped before the trace is stored, so permalinks carry it.
+    assert fetched.json()["language"] == "cpp"
 
 
 def test_unknown_permalink_404(client):

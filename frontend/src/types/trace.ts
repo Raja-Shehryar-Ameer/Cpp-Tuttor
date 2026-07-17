@@ -43,6 +43,8 @@ export interface Step {
 
 export interface Trace {
   version: 1;
+  /** null only on traces stored before the field existed — treat as C-like */
+  language: "cpp" | "c" | "python" | null;
   status: TraceStatus;
   error: string | null;
   sourceCode: string;

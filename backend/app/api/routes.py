@@ -65,6 +65,9 @@ def create_trace(
             detail=f"stdin exceeds {settings.max_stdin_bytes // 1024} KB limit.",
         )
     trace = runner.run(body.code, body.stdin, body.language)
+    # Stamped here, not in the container, so every path (including sandbox
+    # error traces) carries it and the tracer image needs no rebuild.
+    trace.language = body.language
     response.headers["X-Trace-Id"] = store.save(body.code, body.stdin, trace)
     return trace
 

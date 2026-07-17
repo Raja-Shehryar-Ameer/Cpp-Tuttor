@@ -70,6 +70,8 @@ class Step(BaseModel):
 
 class Trace(BaseModel):
     version: Literal[1] = 1
+    # None only on traces stored before the field existed; set at the API boundary.
+    language: Literal["cpp", "c", "python"] | None = None
     status: TraceStatus
     error: str | None = None
     sourceCode: str

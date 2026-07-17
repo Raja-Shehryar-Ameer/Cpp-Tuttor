@@ -9,6 +9,7 @@ Any change lands here first, then in both mirrors, in the same commit.
 | Field | Type | Notes |
 |---|---|---|
 | `version` | `1` | Schema version literal |
+| `language` | `"cpp" \| "c" \| "python" \| null` | Set by the API from the request; `null` on traces stored before this field existed (UI treats `null` as C-like) |
 | `status` | `"ok" \| "compile_error" \| "runtime_error" \| "timeout" \| "step_limit"` | |
 | `error` | `string \| null` | Human-readable message when `status != "ok"` |
 | `sourceCode` | `string` | Echoed back for the player |
