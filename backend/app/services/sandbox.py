@@ -81,6 +81,15 @@ class SandboxRunner:
                     TraceStatus.RUNTIME_ERROR,
                     "The program ran out of memory (256 MB limit) and was killed.",
                 )
+            # `docker run` with an absent image fails before any tracing starts;
+            # without this branch it reads as a tracer bug instead of a setup one.
+            image_missing = ("Unable to find image", "pull access denied", "No such image")
+            if any(marker in result.stderr for marker in image_missing):
+                return self._error_trace(
+                    code,
+                    TraceStatus.RUNTIME_ERROR,
+                    "Execution backend is unavailable — the tracer image is not built.",
+                )
             return self._error_trace(
                 code, TraceStatus.RUNTIME_ERROR, "The tracer produced no usable output."
             )

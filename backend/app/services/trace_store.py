@@ -27,4 +27,9 @@ class TraceStore:
         path = self._root / f"{trace_id}.json"
         if not path.exists():
             return None
-        return Trace.model_validate_json(path.read_text(encoding="utf-8"))
+        try:
+            return Trace.model_validate_json(path.read_text(encoding="utf-8"))
+        except ValueError:
+            # Corrupt or schema-incompatible stored file: a dead link (404),
+            # not a server error.
+            return None

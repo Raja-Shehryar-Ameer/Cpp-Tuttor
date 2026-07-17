@@ -117,6 +117,12 @@ def test_unknown_permalink_404(client):
     assert client.get("/api/trace/not-a-valid-id").status_code == 404
 
 
+def test_corrupt_stored_trace_is_404(client, tmp_path):
+    corrupt_id = "cafebabe89abcdef"
+    (tmp_path / f"{corrupt_id}.json").write_text("{ this is not json")
+    assert client.get(f"/api/trace/{corrupt_id}").status_code == 404
+
+
 def test_rate_limit_kicks_in(client):
     limit = int(settings.rate_limit.split("/")[0])
     for _ in range(limit):

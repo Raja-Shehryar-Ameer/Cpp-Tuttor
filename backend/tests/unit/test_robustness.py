@@ -121,9 +121,9 @@ def test_stuck_op_timeout_mentions_input_and_loop_exit(tmp_path, monkeypatch):
 # ---- sandbox OOM heuristic ------------------------------------------------
 
 
-def _run_with_result(monkeypatch, returncode: int, stdout: str = "not json"):
+def _run_with_result(monkeypatch, returncode: int, stdout: str = "not json", stderr: str = ""):
     def fake_run(*args, **kwargs):
-        return subprocess.CompletedProcess(args=[], returncode=returncode, stdout=stdout, stderr="")
+        return subprocess.CompletedProcess(args=[], returncode=returncode, stdout=stdout, stderr=stderr)
 
     monkeypatch.setattr(subprocess, "run", fake_run)
     return SandboxRunner(Settings()).run("int main() {}", "")
@@ -139,3 +139,26 @@ def test_other_garbage_output_keeps_generic_message(monkeypatch):
     trace = _run_with_result(monkeypatch, 1)
     assert trace.status == TraceStatus.RUNTIME_ERROR
     assert "no usable output" in trace.error
+
+
+def test_missing_tracer_image_reports_backend_unavailable(monkeypatch):
+    trace = _run_with_result(
+        monkeypatch,
+        125,
+        stdout="",
+        stderr="Unable to find image 'cpptutor-tracer:latest' locally",
+    )
+    assert trace.status == TraceStatus.RUNTIME_ERROR
+    assert "unavailable" in trace.error
+    assert "image" in trace.error
+
+
+def test_pull_denied_reports_backend_unavailable(monkeypatch):
+    trace = _run_with_result(
+        monkeypatch,
+        125,
+        stdout="",
+        stderr="docker: Error response from daemon: pull access denied for cpptutor-tracer",
+    )
+    assert trace.status == TraceStatus.RUNTIME_ERROR
+    assert "unavailable" in trace.error
