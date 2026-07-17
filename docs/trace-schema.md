@@ -30,7 +30,7 @@ Any change lands here first, then in both mirrors, in the same commit.
 
 | Field | Type |
 |---|---|
-| `frameId` | `string` (`"f0"` = innermost) |
+| `frameId` | `string` (numbered from the bottom: `"f0"` = outermost, i.e. `main` / `<module>`) |
 | `functionName` | `string` |
 | `line` | `number` |
 | `locals` | `Value[]` |
@@ -63,3 +63,5 @@ Any change lands here first, then in both mirrors, in the same commit.
 - Addresses are opaque strings used only as arrow endpoints and heap keys.
 - `stdout` is cumulative per step so the player can jump anywhere without replay.
 - Every `Value` uses the same recursive shape; one renderer handles everything.
+- Python traces: `freed` is never true and `Value.address` is always null —
+  memory is managed automatically; the UI shows reference badges, not addresses.

@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from textwrap import dedent
 
+import pytest
+
 from app.core.config import Settings
 from app.models.trace import StepEvent, TraceStatus, ValueKind
 from app.services.py_tracer import trace_python
+from tests.unit.trace_invariants import assert_trace_invariants
 
 
 def run(code: str, stdin: str = "", **overrides):
@@ -286,3 +289,48 @@ def test_exit_call_is_a_normal_exit():
     assert trace.status == TraceStatus.OK
     assert trace.steps[-1].event == StepEvent.EXIT
     assert "bye" in trace.steps[-1].stdout
+
+
+# ---- structural invariants -----------------------------------------------------
+
+INVARIANT_PROGRAMS = {
+    "basics": "x = 3\ny = x + 4\nprint(y)\n",
+    "aliasing": "a = [1, 2, 3]\nb = a\nb.append(4)\n",
+    "nested": "matrix = [[1], [2, 3]]\nflat = matrix[0] + matrix[1]\n",
+    "cycle": "a = [1]\na.append(a)\n",
+    "objects": """
+        class Node:
+            def __init__(self, v):
+                self.v = v
+                self.next = None
+
+        head = Node(1)
+        head.next = Node(2)
+        """,
+    "recursion": """
+        def fact(n):
+            return 1 if n <= 1 else n * fact(n - 1)
+
+        print(fact(6))
+        """,
+    "exception": "nums = [1, 2]\nprint(nums[5])\n",
+    "del_and_reassign": """
+        a = [1, 2]
+        del a
+        b = [3, 4]
+        b = [5, 6]
+        """,
+}
+
+
+@pytest.mark.parametrize("name", INVARIANT_PROGRAMS)
+def test_trace_invariants_hold(name):
+    assert_trace_invariants(run(INVARIANT_PROGRAMS[name]), python=True)
+
+
+def test_python_never_frees():
+    # del and rebinding drop objects from the heap view; nothing is ever
+    # marked freed — memory management is Python's job, not the student's.
+    trace = run(INVARIANT_PROGRAMS["del_and_reassign"])
+    assert trace.status == TraceStatus.OK
+    assert all(not h.freed for s in trace.steps for h in s.heap)
