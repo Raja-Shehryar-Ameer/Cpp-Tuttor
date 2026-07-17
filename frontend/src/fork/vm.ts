@@ -3,7 +3,7 @@
 // honest: a child is just a clone of the parent's (instruction pointer, stack,
 // variables), so a fork inside a loop duplicates the loop counter correctly.
 
-import { lex, Parser, type Expr, type Stmt } from "./simulate";
+import { lex, Parser, type Expr, type Stmt } from "./simulate.ts";
 
 type Op =
   | "CONST" | "LOAD" | "STORE" | "POP" | "DUP"
@@ -355,7 +355,8 @@ export function simulateFork(source: string): SimResult {
 
   const terminate = (p: Proc, status: number) => {
     p.alive = false;
-    p.exitStatus = status;
+    // Real wait() exposes only the low 8 bits — exit(256) reads back as 0.
+    p.exitStatus = status & 0xff;
     p.ip = code.length;
     // Orphan any children still running — the kernel reparents them to
     // systemd/init (PID 1). We keep the fork-time parent in the tree and just
