@@ -7,12 +7,14 @@ import { ValueBox } from "./ValueBox";
 function HeapBox({
   object,
   leaked,
+  python,
   x,
   y,
   ready,
 }: {
   object: HeapObject;
   leaked: boolean;
+  python: boolean;
   x: number;
   y: number;
   ready: boolean;
@@ -46,9 +48,12 @@ function HeapBox({
       {object.elements.map((value, i) => (
         <ValueBox key={`${value.name}-${i}`} value={value} />
       ))}
-      <div className="heap-addr" title="actual address of this allocation">
-        {object.address}
-      </div>
+      {/* Python addresses are synthetic id()s, not allocations — never shown. */}
+      {!python && (
+        <div className="heap-addr" title="actual address of this allocation">
+          {object.address}
+        </div>
+      )}
     </div>
   );
 }
@@ -160,10 +165,11 @@ function sameLayout(a: HeapLayout, b: HeapLayout): boolean {
   return true;
 }
 
-// On the exit step, anything never freed is flagged as a leak.
-export function HeapRegion({ step }: { step: Step | null }) {
+// On the exit step, anything never freed is flagged as a leak — a C/C++
+// concept only: Python frees everything itself, so nothing there can leak.
+export function HeapRegion({ step, python }: { step: Step | null; python: boolean }) {
   const objects = step ? chainOrder(step) : [];
-  const exited = step?.event === "exit";
+  const exited = step?.event === "exit" && !python;
   const regionRef = useRef<HTMLDivElement>(null);
   const [layout, setLayout] = useState<HeapLayout>({ pos: new Map(), height: 0 });
 
@@ -200,13 +206,16 @@ export function HeapRegion({ step }: { step: Step | null }) {
             key={object.address}
             object={object}
             leaked={exited && !object.freed}
+            python={python}
             x={p?.x ?? 0}
             y={p?.y ?? 0}
             ready={p !== undefined}
           />
         );
       })}
-      {objects.length === 0 && <div className="empty-note">nothing on the heap</div>}
+      {objects.length === 0 && (
+        <div className="empty-note">{python ? "no objects yet" : "nothing on the heap"}</div>
+      )}
     </div>
   );
 }

@@ -89,6 +89,8 @@ export default function App() {
         useTraceStore.getState().setTrace(sharedTrace);
         setTraceId(shared);
         setCode(sharedTrace.sourceCode);
+        // Traces stored before the language field default to the cpp editor.
+        if (sharedTrace.language) setLanguage(sharedTrace.language);
       })
       .catch((error: Error) => {
         useTraceStore.getState().setRequestError(error.message);

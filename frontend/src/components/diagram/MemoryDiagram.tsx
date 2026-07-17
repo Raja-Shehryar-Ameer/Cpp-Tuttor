@@ -20,6 +20,9 @@ export function MemoryDiagram() {
   // On a return step, the value the collapsed frame handed back to the frame
   // now on top — shown as a bubble so recursion unwinding is legible.
   const returnInfo = computeReturnInfo(trace, currentStep);
+  // Python manages memory automatically — no addresses, no free, no leaks —
+  // so the right column presents objects, not a heap the user must manage.
+  const python = trace?.language === "python";
   return (
     <div className="memory-diagram" ref={containerRef}>
       <div className="memory-region stack-region">
@@ -43,12 +46,12 @@ export function MemoryDiagram() {
       <div className="memory-region heap-region-wrap">
         <div className="region-header">
           <MemoryStick size={13} aria-hidden="true" />
-          <span>Heap</span>
+          <span>{python ? "Objects" : "Heap"}</span>
           <span className="grow-hint">
             chains read <ArrowRight size={11} aria-label="forward" />
           </span>
         </div>
-        <HeapRegion step={step} />
+        <HeapRegion step={step} python={python} />
       </div>
       <ArrowLayer containerRef={containerRef} step={step} />
     </div>
