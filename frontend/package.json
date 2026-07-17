@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --experimental-strip-types tests/fork.test.ts && node --experimental-strip-types tests/heapIds.test.ts && node --experimental-strip-types tests/traceStore.test.ts && node --experimental-strip-types tests/validation.test.ts"
   },
   "dependencies": {
     "@codemirror/lang-cpp": "^6.0.3",

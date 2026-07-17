@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Step, Trace } from "../types/trace";
-import { computeHeapIds } from "../utils/heapIds";
+// Explicit .ts extension so the plain-node test suites can import this module.
+import { computeHeapIds } from "../utils/heapIds.ts";
 
 interface TraceState {
   trace: Trace | null;
