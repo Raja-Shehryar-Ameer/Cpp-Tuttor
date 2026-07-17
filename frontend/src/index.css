@@ -243,7 +243,9 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
   border-top: var(--edge); padding: 0.65rem 0.85rem; height: 4.5rem; resize: none;
   font-size: 0.85rem;
 }
-.stdin-box:focus { outline: none; background: var(--panel-2); }
+/* Edge-to-edge textarea: an outer ring would clip against the pane, so the
+   focus affordance is an inset ring instead. */
+.stdin-box:focus { outline: none; background: var(--panel-2); box-shadow: inset 0 0 0 2.5px var(--accent); }
 
 .diagram-pane {
   overflow: auto; min-width: 0; display: flex; flex-direction: column;
@@ -451,6 +453,9 @@ footer { border-top: var(--edge); background: var(--panel); transition: backgrou
   height: 10px; border-radius: var(--r-sm); background: var(--panel-2);
   border: var(--edge-thin); outline: none;
 }
+/* The rule above kills the browser outline at all times, so keyboard focus
+   needs its own ring — same shadow ring the text inputs use. */
+.controls input[type="range"]:focus-visible, .ds-scrub:focus-visible { box-shadow: var(--ring); }
 .controls input[type="range"]::-webkit-slider-thumb, .ds-scrub::-webkit-slider-thumb {
   -webkit-appearance: none; width: 17px; height: 17px; border-radius: var(--r-sm);
   background: var(--accent); border: var(--edge);
