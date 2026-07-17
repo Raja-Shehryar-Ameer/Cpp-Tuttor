@@ -277,6 +277,10 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
   position: relative; display: grid;
   grid-template-columns: minmax(230px, 36%) 1fr; gap: 1.3rem;
   align-items: stretch; min-height: 100%; padding: 1.1rem 88px 1.5rem 1.1rem;
+  /* The pane is a column flexbox: without this, a tall trace shrinks the
+     diagram box to the pane height and the content overflows past the
+     bottom padding, gluing the stack/heap to the pane edge. */
+  flex-shrink: 0;
 }
 .memory-region {
   border: var(--edge); border-radius: var(--r-xl);
