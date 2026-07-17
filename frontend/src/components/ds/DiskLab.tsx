@@ -5,13 +5,13 @@ import {
   Link2,
   Pause,
   Play,
+  RotateCcw,
   Scale,
   Shuffle,
   StepBack,
   StepForward,
   Swords,
   Target,
-  X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -440,7 +440,7 @@ export function DiskLab({ initial }: { initial?: DiskInitial }) {
           </>
         )}
         <button onClick={() => { setReqText(DEFAULT_PRESET.requests.join(" ")); setCylinders(DEFAULT_PRESET.cylinders); setHead(DEFAULT_PRESET.head); setDir("up"); invalidate(); setCompare(false); writeLabParam(null); }}>
-          <X size={13} /> Reset
+          <RotateCcw size={13} aria-hidden="true" /> Reset
         </button>
       </div>
 
@@ -455,6 +455,7 @@ export function DiskLab({ initial }: { initial?: DiskInitial }) {
           <input
             className="ds-input ref-input"
             value={reqText}
+            aria-label="request queue"
             placeholder="e.g. 98 183 37 122 14 124 65 67"
             onChange={(e) => { setReqText(e.target.value); invalidate(); }}
             onKeyDown={(e) => { if (e.key === "Enter") runNow(); }}
@@ -548,14 +549,14 @@ export function DiskLab({ initial }: { initial?: DiskInitial }) {
         <p key={note} className="ds-note">{note}</p>
         {shown && (
           <div className="transport ds-transport">
-            <button onClick={() => { dismissQuiz(); setTick(0); }} disabled={now === 0} title="restart">
-              <ChevronFirst size={15} />
+            <button onClick={() => { dismissQuiz(); setTick(0); }} disabled={now === 0} title="restart" aria-label="Restart">
+              <ChevronFirst size={16} aria-hidden="true" />
             </button>
-            <button onClick={() => { dismissQuiz(); setTick((i) => Math.max(0, i - 1)); }} disabled={now === 0} title="previous move">
-              <StepBack size={15} />
+            <button onClick={() => { dismissQuiz(); setTick((i) => Math.max(0, i - 1)); }} disabled={now === 0} title="previous move" aria-label="Previous move">
+              <StepBack size={16} aria-hidden="true" />
             </button>
-            <button className="play-btn" onClick={() => { if (now >= span) setTick(0); setPlaying(!playing); }} title="play / pause">
-              {playing ? <Pause size={15} /> : <Play size={15} />}
+            <button className="play-btn" onClick={() => { if (now >= span) setTick(0); setPlaying(!playing); }} title="play / pause" aria-label={playing ? "Pause" : "Play"}>
+              {playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
             </button>
             <button
               onClick={() => {
@@ -569,8 +570,9 @@ export function DiskLab({ initial }: { initial?: DiskInitial }) {
               }}
               disabled={now >= span}
               title="next move"
+              aria-label="Next move"
             >
-              <StepForward size={15} />
+              <StepForward size={16} aria-hidden="true" />
             </button>
             <input
               className="ds-scrub"
@@ -579,6 +581,7 @@ export function DiskLab({ initial }: { initial?: DiskInitial }) {
               max={span}
               value={now}
               title="scrub through the moves"
+              aria-label="scrub through the moves"
               onChange={(e) => { setPlaying(false); dismissQuiz(); setTick(Number(e.target.value)); }}
             />
             <SpeedSelect speed={speed} onChange={setSpeed} />

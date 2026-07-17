@@ -42,7 +42,7 @@ export function StdoutPane() {
       <pre>{output}</pre>
       {trace?.error && atLastStep && (
         <div className="program-error">
-          <CircleAlert size={15} aria-hidden="true" />
+          <CircleAlert size={14} aria-hidden="true" />
           {trace.error}
         </div>
       )}

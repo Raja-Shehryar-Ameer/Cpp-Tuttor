@@ -13,11 +13,11 @@ import {
   Pause,
   Play,
   Plus,
+  RotateCcw,
   Shuffle,
   StepBack,
   StepForward,
   Target,
-  X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -421,17 +421,17 @@ export function DeadlockLab({ initial }: { initial?: DeadlockInitial }) {
         <label className="ds-mode">
           procs:
           <span className="dl-stepper">
-            <button className="icon-btn ghost" onClick={() => resize(-1, 0)} title="remove a process"><Minus size={13} /></button>
+            <button className="icon-btn ghost" onClick={() => resize(-1, 0)} title="remove a process" aria-label="remove a process"><Minus size={13} aria-hidden="true" /></button>
             <strong>{n}</strong>
-            <button className="icon-btn ghost" onClick={() => resize(1, 0)} title="add a process"><Plus size={13} /></button>
+            <button className="icon-btn ghost" onClick={() => resize(1, 0)} title="add a process" aria-label="add a process"><Plus size={13} aria-hidden="true" /></button>
           </span>
         </label>
         <label className="ds-mode">
           resources:
           <span className="dl-stepper">
-            <button className="icon-btn ghost" onClick={() => resize(0, -1)} title="remove a resource type"><Minus size={13} /></button>
+            <button className="icon-btn ghost" onClick={() => resize(0, -1)} title="remove a resource type" aria-label="remove a resource type"><Minus size={13} aria-hidden="true" /></button>
             <strong>{m}</strong>
-            <button className="icon-btn ghost" onClick={() => resize(0, 1)} title="add a resource type"><Plus size={13} /></button>
+            <button className="icon-btn ghost" onClick={() => resize(0, 1)} title="add a resource type" aria-label="add a resource type"><Plus size={13} aria-hidden="true" /></button>
           </span>
         </label>
         <button className="primary" onClick={runNow}>
@@ -478,7 +478,7 @@ export function DeadlockLab({ initial }: { initial?: DeadlockInitial }) {
           setRequest(alloc0Request(DEFAULT.alloc.length, DEFAULT.available.length));
           writeLabParam(null);
         }}>
-          <X size={13} /> Reset
+          <RotateCcw size={13} aria-hidden="true" /> Reset
         </button>
       </div>
 
@@ -590,14 +590,14 @@ export function DeadlockLab({ initial }: { initial?: DeadlockInitial }) {
         <p key={note} className="ds-note">{note}</p>
         {run && (
           <div className="transport ds-transport">
-            <button onClick={() => { dismissQuiz(); setStep(0); }} disabled={step === 0} title="restart">
-              <ChevronFirst size={15} />
+            <button onClick={() => { dismissQuiz(); setStep(0); }} disabled={step === 0} title="restart" aria-label="Restart">
+              <ChevronFirst size={16} aria-hidden="true" />
             </button>
-            <button onClick={() => { dismissQuiz(); setStep((i) => Math.max(0, i - 1)); }} disabled={step === 0} title="previous step">
-              <StepBack size={15} />
+            <button onClick={() => { dismissQuiz(); setStep((i) => Math.max(0, i - 1)); }} disabled={step === 0} title="previous step" aria-label="Previous step">
+              <StepBack size={16} aria-hidden="true" />
             </button>
-            <button className="play-btn" onClick={() => { if (step >= lastStep) setStep(0); setPlaying(!playing); }} title="play / pause">
-              {playing ? <Pause size={15} /> : <Play size={15} />}
+            <button className="play-btn" onClick={() => { if (step >= lastStep) setStep(0); setPlaying(!playing); }} title="play / pause" aria-label={playing ? "Pause" : "Play"}>
+              {playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
             </button>
             <button
               onClick={() => {
@@ -611,8 +611,9 @@ export function DeadlockLab({ initial }: { initial?: DeadlockInitial }) {
               }}
               disabled={step >= lastStep}
               title="next step"
+              aria-label="Next step"
             >
-              <StepForward size={15} />
+              <StepForward size={16} aria-hidden="true" />
             </button>
             <input
               className="ds-scrub"
@@ -621,6 +622,7 @@ export function DeadlockLab({ initial }: { initial?: DeadlockInitial }) {
               max={lastStep}
               value={Math.min(step, lastStep)}
               title="scrub through the scan"
+              aria-label="scrub through the scan"
               onChange={(e) => { setPlaying(false); dismissQuiz(); setStep(Number(e.target.value)); }}
             />
             <SpeedSelect speed={speed} onChange={setSpeed} />

@@ -56,28 +56,35 @@ export function Controls() {
   return (
     <div className="controls">
       <div className="transport">
-        <button onClick={() => setStep(0)} disabled={atStart} title="First step (Home)">
-          <ChevronFirst size={16} />
+        <button
+          onClick={() => setStep(0)}
+          disabled={atStart}
+          title="First step (Home)"
+          aria-label="First step"
+        >
+          <ChevronFirst size={16} aria-hidden="true" />
         </button>
-        <button onClick={stepBack} disabled={atStart} title="Previous step (←)">
-          <StepBack size={16} />
+        <button onClick={stepBack} disabled={atStart} title="Previous step (←)" aria-label="Previous step">
+          <StepBack size={16} aria-hidden="true" />
         </button>
         <button
           className="play-btn"
           onClick={() => setPlaying(!playing)}
           title="Play / pause (space)"
+          aria-label={playing ? "Pause" : "Play"}
         >
-          {playing ? <Pause size={16} /> : <Play size={16} />}
+          {playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
         </button>
-        <button onClick={stepForward} disabled={atEnd} title="Next step (→)">
-          <StepForward size={16} />
+        <button onClick={stepForward} disabled={atEnd} title="Next step (→)" aria-label="Next step">
+          <StepForward size={16} aria-hidden="true" />
         </button>
         <button
           onClick={() => setStep(Number.MAX_SAFE_INTEGER)}
           disabled={atEnd}
           title="Last step (End)"
+          aria-label="Last step"
         >
-          <ChevronLast size={16} />
+          <ChevronLast size={16} aria-hidden="true" />
         </button>
       </div>
       <input
@@ -108,6 +115,7 @@ export function Controls() {
         value={speedMs}
         onChange={(e) => setSpeedMs(Number(e.target.value))}
         title="playback speed"
+        aria-label="playback speed"
       >
         {SPEEDS.map(([label, ms]) => (
           <option key={ms} value={ms}>

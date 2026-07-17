@@ -194,6 +194,7 @@ export default function App() {
             className="icon-btn theme-toggle"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             title={theme === "dark" ? "switch to light theme" : "switch to dark theme"}
+            aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
           >
             {theme === "dark" ? <Sun size={14} aria-hidden="true" /> : <Moon size={14} aria-hidden="true" />}
           </button>
@@ -255,13 +256,13 @@ export default function App() {
       </header>
       {requestError && (
         <div className="request-error">
-          <CircleAlert size={15} aria-hidden="true" />
+          <CircleAlert size={14} aria-hidden="true" />
           {requestError}
         </div>
       )}
       {trace && trace.status !== "ok" && trace.steps.length === 0 && (
         <div className="request-error">
-          <CircleAlert size={15} aria-hidden="true" />
+          <CircleAlert size={14} aria-hidden="true" />
           <span>
             {trace.error}
             {STATUS_HINTS[trace.status] && <span className="error-hint"> {STATUS_HINTS[trace.status]}</span>}

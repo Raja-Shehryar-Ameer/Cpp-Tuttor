@@ -6,6 +6,7 @@ import {
   Pause,
   Play,
   Plus,
+  RotateCcw,
   Scale,
   Shuffle,
   StepBack,
@@ -13,7 +14,6 @@ import {
   Swords,
   Target,
   Trash2,
-  X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
@@ -450,7 +450,7 @@ export function SchedLab({ initial }: { initial?: SchedInitial }) {
           </>
         )}
         <button onClick={() => { setProcs(DEFAULT_PROCS.map((p) => ({ ...p }))); setRun(null); setRunB(null); setCompare(false); writeLabParam(null); }}>
-          <X size={13} /> Reset
+          <RotateCcw size={13} aria-hidden="true" /> Reset
         </button>
       </div>
 
@@ -474,8 +474,8 @@ export function SchedLab({ initial }: { initial?: SchedInitial }) {
                   <td><input className="ds-input cell" type="number" min={1} max={MAX_BURST} value={p.burst} onChange={(e) => editProc(i, "burst", e.target.value)} /></td>
                   <td><input className="ds-input cell" type="number" min={1} max={99} value={p.priority} onChange={(e) => editProc(i, "priority", e.target.value)} disabled={!meta.usesPriority && !compare} /></td>
                   <td>
-                    <button className="icon-btn ghost" onClick={() => removeProc(i)} title={`remove ${p.name}`}>
-                      <Trash2 size={13} />
+                    <button className="icon-btn ghost" onClick={() => removeProc(i)} title={`remove ${p.name}`} aria-label={`remove ${p.name}`}>
+                      <Trash2 size={13} aria-hidden="true" />
                     </button>
                   </td>
                 </tr>
@@ -550,14 +550,14 @@ export function SchedLab({ initial }: { initial?: SchedInitial }) {
         <p key={note} className="ds-note">{note}</p>
         {shown && (
           <div className="transport ds-transport">
-            <button onClick={() => { dismissQuiz(); setTick(0); }} disabled={now === 0} title="restart">
-              <ChevronFirst size={15} />
+            <button onClick={() => { dismissQuiz(); setTick(0); }} disabled={now === 0} title="restart" aria-label="Restart">
+              <ChevronFirst size={16} aria-hidden="true" />
             </button>
-            <button onClick={() => { dismissQuiz(); setTick((i) => Math.max(0, i - 1)); }} disabled={now === 0} title="previous tick">
-              <StepBack size={15} />
+            <button onClick={() => { dismissQuiz(); setTick((i) => Math.max(0, i - 1)); }} disabled={now === 0} title="previous tick" aria-label="Previous tick">
+              <StepBack size={16} aria-hidden="true" />
             </button>
-            <button className="play-btn" onClick={() => { if (now >= span) setTick(0); setPlaying(!playing); }} title="play / pause">
-              {playing ? <Pause size={15} /> : <Play size={15} />}
+            <button className="play-btn" onClick={() => { if (now >= span) setTick(0); setPlaying(!playing); }} title="play / pause" aria-label={playing ? "Pause" : "Play"}>
+              {playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
             </button>
             <button
               onClick={() => {
@@ -571,8 +571,9 @@ export function SchedLab({ initial }: { initial?: SchedInitial }) {
               }}
               disabled={now >= span}
               title="next tick"
+              aria-label="Next tick"
             >
-              <StepForward size={15} />
+              <StepForward size={16} aria-hidden="true" />
             </button>
             <input
               className="ds-scrub"
@@ -581,6 +582,7 @@ export function SchedLab({ initial }: { initial?: SchedInitial }) {
               max={span}
               value={now}
               title="scrub through time"
+              aria-label="scrub through time"
               onChange={(e) => { setPlaying(false); dismissQuiz(); setTick(Number(e.target.value)); }}
             />
             <SpeedSelect speed={speed} onChange={setSpeed} />

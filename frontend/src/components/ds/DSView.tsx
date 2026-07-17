@@ -174,19 +174,21 @@ function Boxes({
   w,
   h,
   extras,
+  label,
 }: {
   frame: Frame;
   placed: Placed[];
   w: number;
   h: number;
   extras?: ReactNode;
+  label?: string;
 }) {
   const lifts = useLifts(
     placed.map((p) => ({ key: p.id, cx: p.x + 31, cy: p.y + 19, w: 62, h: 38 })),
     BOX_LIFT,
   );
   return (
-    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="img" aria-label={label ?? "diagram"}>
       <defs>
         <marker id="ds-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto">
           <path d="M0,0 L8,4 L0,8 z" className="ds-arrow-head" />
@@ -214,6 +216,7 @@ function ListScene({ frame, nodes }: { frame: Frame; nodes: { id: number; value:
       placed={placed}
       w={w}
       h={96}
+      label="linked list diagram"
       extras={
         <>
           <text className="ds-tag" x={12} y={50}>
@@ -247,6 +250,7 @@ function StackScene({ frame, items }: { frame: Frame; items: { id: number; value
       placed={placed}
       w={330}
       h={h}
+      label="stack diagram"
       extras={
         <>
           <line className="ds-floor" x1={70} y1={floorY} x2={172} y2={floorY} />
@@ -275,6 +279,7 @@ function QueueScene({ frame, items }: { frame: Frame; items: { id: number; value
       placed={placed}
       w={w}
       h={110}
+      label="queue diagram"
       extras={
         <>
           {items.length > 0 && (
@@ -326,7 +331,7 @@ function TreeScene({ frame, root }: { frame: Frame; root: TreeNode | null }) {
     () => 52,
   );
   return (
-    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="img" aria-label="binary tree diagram">
       {edges.map(([a, b]) => (
         <Edge key={`e${b.id}`} className="ds-edge" x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
       ))}
@@ -384,7 +389,7 @@ function GraphScene({
   return (
     // When the ring outgrows the pane, the whole scene scales down to fit
     // instead of overflowing into a scrollbar — viewBox keeps it crisp.
-    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ maxWidth: "100%", height: "auto" }}>
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ maxWidth: "100%", height: "auto" }} role="img" aria-label="graph diagram">
       {edges.map(([a, b]) => {
         const pa = at.get(a);
         const pb = at.get(b);
@@ -455,7 +460,7 @@ function BTreeScene({ frame, root, plus }: { frame: Frame; root: BNode | null; p
   );
 
   return (
-    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ maxWidth: "100%", height: "auto" }}>
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ maxWidth: "100%", height: "auto" }} role="img" aria-label="B-tree diagram">
       <defs>
         <marker id={chainId} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
           <path d="M0,0 L8,4 L0,8 z" fill="context-stroke" />
@@ -573,7 +578,7 @@ function WGraphScene({
   });
 
   return (
-    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ maxWidth: "100%", height: "auto" }}>
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ maxWidth: "100%", height: "auto" }} role="img" aria-label="weighted graph diagram">
       <defs>
         <marker id={arrowId} viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
           <path d="M0,0 L8,4 L0,8 z" fill="context-stroke" />
@@ -650,7 +655,7 @@ function HeapScene({ frame, items }: { frame: Frame; items: { id: number; value:
     () => 52,
   );
   return (
-    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="img" aria-label="min-heap diagram">
       {placed.slice(1).map((p) => {
         const parent = placed[(p.i - 1) >> 1];
         return <Edge key={`e${p.id}`} className="ds-edge" x1={parent.x} y1={parent.y} x2={p.x} y2={p.y} />;
@@ -705,7 +710,7 @@ function HashScene({ frame, buckets }: { frame: Frame; buckets: { id: number; va
     BOX_LIFT,
   );
   return (
-    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="img" aria-label="hash table diagram">
       <defs>
         <marker id="ds-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" orient="auto">
           <path d="M0,0 L8,4 L0,8 z" className="ds-arrow-head" />
@@ -757,7 +762,7 @@ function OAHashScene({ frame, slots }: { frame: Frame; slots: (({ id: number; va
     BOX_LIFT,
   );
   return (
-    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="img" aria-label="open-addressing hash table diagram">
       <text className="ds-tag" x={30} y={26}>
         one flat array of {slots.length} slots — colliding keys probe for another slot instead of chaining:
       </text>
@@ -820,7 +825,7 @@ function ArrayScene({ frame, items }: { frame: Frame; items: { id: number; value
     (_mover, other) => other.h + 12,
   );
   return (
-    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`}>
+    <svg className="ds-svg" width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="img" aria-label="array diagram">
       <line className="ds-floor" x1={20} y1={base + 5} x2={w - 20} y2={base + 5} />
       {items.map((node, i) => {
         const barH = barHs.get(node.id)!;

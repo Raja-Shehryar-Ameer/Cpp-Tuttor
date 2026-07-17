@@ -246,7 +246,7 @@ export function SortRace({ initial }: { initial?: { a: SortKey; b: SortKey; valu
       <div className="sched-body">
         {champion && (
           <div className="race-banner">
-            <Flag size={15} aria-hidden="true" />
+            <Flag size={14} aria-hidden="true" />
             {champion} sort finished first on this input — fewer steps, not necessarily fewer of BOTH ops. Check the counters.
           </div>
         )}
@@ -272,17 +272,17 @@ export function SortRace({ initial }: { initial?: { a: SortKey; b: SortKey; valu
         </p>
         {lanes && (
           <div className="transport ds-transport">
-            <button onClick={() => setIdx(0)} disabled={idx === 0} title="restart">
-              <ChevronFirst size={15} />
+            <button onClick={() => setIdx(0)} disabled={idx === 0} title="restart" aria-label="Restart">
+              <ChevronFirst size={16} aria-hidden="true" />
             </button>
-            <button onClick={() => setIdx((i) => Math.max(0, i - 1))} disabled={idx === 0} title="previous step">
-              <StepBack size={15} />
+            <button onClick={() => setIdx((i) => Math.max(0, i - 1))} disabled={idx === 0} title="previous step" aria-label="Previous step">
+              <StepBack size={16} aria-hidden="true" />
             </button>
-            <button className="play-btn" onClick={() => { if (idx >= total - 1) setIdx(0); setPlaying(!playing); }} title="play / pause">
-              {playing ? <Pause size={15} /> : <Play size={15} />}
+            <button className="play-btn" onClick={() => { if (idx >= total - 1) setIdx(0); setPlaying(!playing); }} title="play / pause" aria-label={playing ? "Pause" : "Play"}>
+              {playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
             </button>
-            <button onClick={() => setIdx((i) => Math.min(total - 1, i + 1))} disabled={idx >= total - 1} title="next step">
-              <StepForward size={15} />
+            <button onClick={() => setIdx((i) => Math.min(total - 1, i + 1))} disabled={idx >= total - 1} title="next step" aria-label="Next step">
+              <StepForward size={16} aria-hidden="true" />
             </button>
             <input
               className="ds-scrub"
@@ -291,6 +291,7 @@ export function SortRace({ initial }: { initial?: { a: SortKey; b: SortKey; valu
               max={total - 1}
               value={idx}
               title="scrub both panes"
+              aria-label="scrub both panes"
               onChange={(e) => { setPlaying(false); setIdx(Number(e.target.value)); }}
             />
             <SpeedSelect speed={speed} onChange={setSpeed} />

@@ -25,6 +25,7 @@ import {
   Pencil,
   Play,
   Plus,
+  RotateCcw,
   Route,
   Search,
   SearchCheck,
@@ -35,7 +36,6 @@ import {
   Trash2,
   Triangle,
   Workflow,
-  X,
   Zap,
 } from "lucide-react";
 import { useEffect, useRef, useState, type ComponentType } from "react";
@@ -1256,10 +1256,15 @@ export function DSPage() {
           </button>
         )}
         <button onClick={reset} title="clear this structure">
-          <X size={13} /> Reset
+          <RotateCcw size={13} aria-hidden="true" /> Reset
         </button>
-        <button className="icon-btn" onClick={() => setInfoOpen(true)} title={`about ${meta.label}`}>
-          <Info size={14} />
+        <button
+          className="icon-btn"
+          onClick={() => setInfoOpen(true)}
+          title={`about ${meta.label}`}
+          aria-label={`about ${meta.label}`}
+        >
+          <Info size={14} aria-hidden="true" />
         </button>
       </div>
 
@@ -1382,14 +1387,14 @@ export function DSPage() {
         </p>
         {frames.length > 1 && (
           <div className="transport ds-transport">
-            <button onClick={() => { dismissQuiz(); setIdx(0); }} disabled={idx === 0} title="restart lesson">
-              <ChevronFirst size={15} />
+            <button onClick={() => { dismissQuiz(); setIdx(0); }} disabled={idx === 0} title="restart lesson" aria-label="Restart lesson">
+              <ChevronFirst size={16} aria-hidden="true" />
             </button>
-            <button onClick={() => { dismissQuiz(); setIdx((i) => Math.max(0, i - 1)); }} disabled={idx === 0} title="previous step">
-              <StepBack size={15} />
+            <button onClick={() => { dismissQuiz(); setIdx((i) => Math.max(0, i - 1)); }} disabled={idx === 0} title="previous step" aria-label="Previous step">
+              <StepBack size={16} aria-hidden="true" />
             </button>
-            <button className="play-btn" onClick={() => setPlaying(!playing)} title="play / pause">
-              {playing ? <Pause size={15} /> : <Play size={15} />}
+            <button className="play-btn" onClick={() => setPlaying(!playing)} title="play / pause" aria-label={playing ? "Pause" : "Play"}>
+              {playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
             </button>
             <button
               onClick={() => {
@@ -1403,8 +1408,9 @@ export function DSPage() {
               }}
               disabled={idx >= frames.length - 1}
               title="next step"
+              aria-label="Next step"
             >
-              <StepForward size={15} />
+              <StepForward size={16} aria-hidden="true" />
             </button>
             <input
               className="ds-scrub"
@@ -1413,6 +1419,7 @@ export function DSPage() {
               max={frames.length - 1}
               value={idx}
               title="scrub through the lesson"
+              aria-label="scrub through the lesson"
               onChange={(e) => {
                 setPlaying(false);
                 dismissQuiz();

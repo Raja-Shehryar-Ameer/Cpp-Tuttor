@@ -17,7 +17,7 @@ export function ToastHost() {
         const Icon = ICONS[t.kind];
         return (
           <div key={t.id} className={`toast toast-${t.kind}`}>
-            <Icon size={15} aria-hidden="true" />
+            <Icon size={14} aria-hidden="true" />
             <span className="toast-msg">{t.message}</span>
             <button className="toast-close" onClick={() => dismiss(t.id)} aria-label="dismiss notification">
               <X size={13} aria-hidden="true" />

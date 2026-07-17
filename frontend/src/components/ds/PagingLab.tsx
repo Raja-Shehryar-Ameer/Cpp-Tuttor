@@ -5,13 +5,13 @@ import {
   MemoryStick,
   Pause,
   Play,
+  RotateCcw,
   Scale,
   Shuffle,
   StepBack,
   StepForward,
   Swords,
   Target,
-  X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -423,7 +423,7 @@ export function PagingLab({ initial }: { initial?: PagingInitial }) {
           </>
         )}
         <button onClick={() => { setRefText(DEFAULT_REFS); setFrameCount(3); invalidate(); setCompare(false); writeLabParam(null); }}>
-          <X size={13} /> Reset
+          <RotateCcw size={13} aria-hidden="true" /> Reset
         </button>
       </div>
 
@@ -436,6 +436,7 @@ export function PagingLab({ initial }: { initial?: PagingInitial }) {
           <input
             className="ds-input ref-input"
             value={refText}
+            aria-label="reference string"
             placeholder="e.g. 1 2 3 4 1 2 5 1 2 3 4 5"
             onChange={(e) => { setRefText(e.target.value); invalidate(); }}
             onKeyDown={(e) => { if (e.key === "Enter") runNow(); }}
@@ -536,18 +537,19 @@ export function PagingLab({ initial }: { initial?: PagingInitial }) {
         <p key={note} className="ds-note">{note}</p>
         {shown && (
           <div className="transport ds-transport">
-            <button onClick={() => { dismissQuiz(); setTick(0); }} disabled={now === 0} title="restart">
-              <ChevronFirst size={15} />
+            <button onClick={() => { dismissQuiz(); setTick(0); }} disabled={now === 0} title="restart" aria-label="Restart">
+              <ChevronFirst size={16} aria-hidden="true" />
             </button>
-            <button onClick={() => { dismissQuiz(); setTick((i) => Math.max(0, i - 1)); }} disabled={now === 0} title="previous reference">
-              <StepBack size={15} />
+            <button onClick={() => { dismissQuiz(); setTick((i) => Math.max(0, i - 1)); }} disabled={now === 0} title="previous reference" aria-label="Previous reference">
+              <StepBack size={16} aria-hidden="true" />
             </button>
             <button
               className="play-btn"
               onClick={() => { if (now >= shown.steps.length) setTick(0); setPlaying(!playing); }}
               title="play / pause"
+              aria-label={playing ? "Pause" : "Play"}
             >
-              {playing ? <Pause size={15} /> : <Play size={15} />}
+              {playing ? <Pause size={16} aria-hidden="true" /> : <Play size={16} aria-hidden="true" />}
             </button>
             <button
               onClick={() => {
@@ -561,8 +563,9 @@ export function PagingLab({ initial }: { initial?: PagingInitial }) {
               }}
               disabled={now >= shown.steps.length}
               title="next reference"
+              aria-label="Next reference"
             >
-              <StepForward size={15} />
+              <StepForward size={16} aria-hidden="true" />
             </button>
             <input
               className="ds-scrub"
@@ -571,6 +574,7 @@ export function PagingLab({ initial }: { initial?: PagingInitial }) {
               max={shown.steps.length}
               value={now}
               title="scrub through the reference string"
+              aria-label="scrub through the reference string"
               onChange={(e) => { setPlaying(false); dismissQuiz(); setTick(Number(e.target.value)); }}
             />
             <SpeedSelect speed={speed} onChange={setSpeed} />
