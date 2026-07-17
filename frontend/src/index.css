@@ -54,6 +54,16 @@
   --chevron: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%232a2924' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
   --ease-glide: cubic-bezier(0.25, 0.8, 0.3, 1);
   --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --dur-press: 0.12s;
+  --dur-fast: 0.2s;
+  --dur-med: 0.25s;
+  --dur-slow: 0.3s;
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-lg: 8px;
+  --r-xl: 10px;
+  --edge: 2px solid var(--ink);
+  --edge-thin: 1.5px solid var(--ink);
   --mono: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
   --display: "Archivo Black", "Arial Black", sans-serif;
   font-family: "Space Grotesk", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -116,7 +126,7 @@ body {
   margin: 0; background: var(--bg); color: var(--text); line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: background-color var(--dur-med) var(--ease-out), color var(--dur-med) var(--ease-out);
 }
 
 ::selection { background: var(--accent-soft); }
@@ -140,9 +150,9 @@ body {
 header {
   display: flex; align-items: center; justify-content: space-between;
   gap: 0.6rem; flex-wrap: wrap;
-  padding: 0.7rem 1.4rem; border-bottom: 2px solid var(--ink);
+  padding: 0.7rem 1.4rem; border-bottom: var(--edge);
   background: var(--panel);
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+  transition: background-color var(--dur-med) var(--ease-out), border-color var(--dur-med) var(--ease-out);
 }
 header h1 {
   display: flex; align-items: center; gap: 0.65rem;
@@ -157,19 +167,19 @@ header h1 {
 .tagline {
   color: var(--text); font-size: 0.62rem; font-weight: 600; margin-left: 0.45rem;
   font-family: inherit; text-transform: uppercase; letter-spacing: 0.13em;
-  background: var(--accent-soft); border: 1.5px solid var(--ink);
-  border-radius: 4px; padding: 0.22rem 0.5rem;
+  background: var(--accent-soft); border: var(--edge-thin);
+  border-radius: var(--r-sm); padding: 0.22rem 0.5rem;
 }
 .header-actions { display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; }
-.theme-toggle { border-radius: 6px; }
+.theme-toggle { border-radius: var(--r-md); }
 
 /* Tracer language switch: one bordered pill, active segment inked in accent. */
-.lang-seg { display: inline-flex; border: 2px solid var(--ink); border-radius: 6px; overflow: hidden; }
+.lang-seg { display: inline-flex; border: var(--edge); border-radius: var(--r-md); overflow: hidden; }
 .lang-seg button {
   border: none; border-radius: 0; box-shadow: none; padding: 0.42rem 0.7rem;
   font-size: 0.78rem; font-weight: 700; background: var(--panel); color: var(--muted);
 }
-.lang-seg button + button { border-left: 2px solid var(--ink); }
+.lang-seg button + button { border-left: var(--edge); }
 .lang-seg button:hover:not(:disabled) { transform: none; box-shadow: none; background: var(--panel-2); color: var(--text); }
 .lang-seg button:active:not(:disabled) { transform: none; }
 .lang-seg button.active { background: var(--accent); color: var(--on-accent); }
@@ -178,12 +188,12 @@ header h1 {
 
 button {
   display: inline-flex; align-items: center; gap: 0.45rem;
-  background: var(--panel); color: var(--text); border: 2px solid var(--ink);
-  border-radius: 6px; padding: 0.45rem 0.9rem; cursor: pointer; font-size: 0.86rem;
+  background: var(--panel); color: var(--text); border: var(--edge);
+  border-radius: var(--r-md); padding: 0.45rem 0.9rem; cursor: pointer; font-size: 0.86rem;
   font-family: inherit; font-weight: 600;
   box-shadow: var(--shadow);
   transition: background 0.15s var(--ease-out), color 0.15s var(--ease-out),
-    box-shadow 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+    box-shadow var(--dur-press) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 button:hover:not(:disabled) {
   transform: translate(-1px, -1px);
@@ -199,13 +209,13 @@ button.icon-btn { padding: 0.45rem; }
 
 select {
   appearance: none; -webkit-appearance: none;
-  background: var(--panel); color: var(--text); border: 2px solid var(--ink);
-  border-radius: 6px; padding: 0.42rem 1.8rem 0.42rem 0.65rem; font-size: 0.85rem;
+  background: var(--panel); color: var(--text); border: var(--edge);
+  border-radius: var(--r-md); padding: 0.42rem 1.8rem 0.42rem 0.65rem; font-size: 0.85rem;
   font-family: inherit; font-weight: 500; cursor: pointer;
   background-image: var(--chevron);
   background-repeat: no-repeat;
   background-position: right 0.6rem center;
-  transition: box-shadow 0.12s var(--ease-out), transform 0.12s var(--ease-out);
+  transition: box-shadow var(--dur-press) var(--ease-out), transform var(--dur-press) var(--ease-out);
 }
 select:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
 
@@ -213,7 +223,7 @@ select:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
 
 main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; min-height: 0; }
 
-.editor-pane { display: flex; flex-direction: column; border-right: 2px solid var(--ink); min-width: 0; min-height: 0; background: var(--panel); }
+.editor-pane { display: flex; flex-direction: column; border-right: var(--edge); min-width: 0; min-height: 0; background: var(--panel); }
 .editor { flex: 1; overflow: auto; font-size: 14px; }
 .editor .cm-editor { height: 100%; font-family: var(--mono); background: var(--panel); }
 .editor .cm-gutters { background: var(--panel-2); color: var(--muted); border-right: none; }
@@ -230,7 +240,7 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 
 .stdin-box {
   background: var(--panel); color: var(--text); border: none; font-family: var(--mono);
-  border-top: 2px solid var(--ink); padding: 0.65rem 0.85rem; height: 4.5rem; resize: none;
+  border-top: var(--edge); padding: 0.65rem 0.85rem; height: 4.5rem; resize: none;
   font-size: 0.85rem;
 }
 .stdin-box:focus { outline: none; background: var(--panel-2); }
@@ -249,9 +259,9 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 }
 .diagram-empty .empty-icon {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 48px; height: 48px; border-radius: 10px;
+  width: 48px; height: 48px; border-radius: var(--r-xl);
   background: var(--accent); color: var(--on-accent);
-  border: 2px solid var(--ink); box-shadow: var(--shadow-lift);
+  border: var(--edge); box-shadow: var(--shadow-lift);
 }
 .diagram-empty h2 {
   margin: 0; font-family: var(--display); font-weight: 400;
@@ -267,10 +277,10 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
   align-items: stretch; min-height: 100%; padding: 1.1rem 88px 1.5rem 1.1rem;
 }
 .memory-region {
-  border: 2px solid var(--ink); border-radius: 10px;
+  border: var(--edge); border-radius: var(--r-xl);
   padding: 0.85rem 1rem 1.1rem; min-width: 0;
   box-shadow: var(--shadow-lift);
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+  transition: background-color var(--dur-med) var(--ease-out), border-color var(--dur-med) var(--ease-out);
 }
 .stack-region { background: var(--stack-bg); }
 .stack-region .region-header { color: var(--stack-ink); }
@@ -284,8 +294,8 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 }
 .grow-hint {
   display: inline-flex; align-items: center; gap: 0.15rem;
-  margin-left: 0.4rem; padding: 0.12rem 0.45rem; border-radius: 4px;
-  background: var(--panel); border: 1.5px solid var(--ink);
+  margin-left: 0.4rem; padding: 0.12rem 0.45rem; border-radius: var(--r-sm);
+  background: var(--panel); border: var(--edge-thin);
   font-size: 0.62rem; letter-spacing: 0.06em; text-transform: none; font-weight: 600;
   color: var(--text);
 }
@@ -295,11 +305,11 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 .stack-region .stack-frame { margin-bottom: 1rem; }
 
 .stack-frame {
-  background: var(--panel); border: 2px solid var(--ink); border-radius: 8px;
+  background: var(--panel); border: var(--edge); border-radius: var(--r-lg);
   padding: 0.65rem 0.85rem; box-shadow: var(--shadow);
   width: fit-content; min-width: 200px; max-width: 100%;
-  animation: slide-down-in 0.22s var(--ease-out);
-  transition: box-shadow 0.2s ease, background-color 0.25s ease;
+  animation: slide-down-in var(--dur-fast) var(--ease-out);
+  transition: box-shadow var(--dur-fast) var(--ease-out), background-color var(--dur-med) var(--ease-out);
 }
 .stack-frame.active {
   box-shadow: var(--ring), var(--shadow);
@@ -316,10 +326,10 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
    unwinding reads as "factorial() returned 6 → rest" rather than a silent pop. */
 .return-bubble {
   display: flex; align-items: center; gap: 0.35rem;
-  margin: 0 0 0.5rem; padding: 0.28rem 0.55rem; border-radius: 6px;
-  background: var(--accent-soft); border: 1.5px solid var(--ink);
+  margin: 0 0 0.5rem; padding: 0.28rem 0.55rem; border-radius: var(--r-md);
+  background: var(--accent-soft); border: var(--edge-thin);
   color: var(--text); font-size: 0.76rem; line-height: 1.3; font-weight: 500;
-  animation: return-pop 0.3s var(--ease-out);
+  animation: return-pop var(--dur-slow) var(--ease-out);
 }
 .return-bubble svg { flex: none; color: var(--accent-ink); }
 .return-bubble code { font-family: var(--mono); font-size: 0.72rem; }
@@ -336,13 +346,13 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 .heap-region .heap-object { position: absolute; top: 0; left: 0; }
 
 .heap-object {
-  background: var(--heap-card); border: 2px solid var(--ink); border-radius: 8px;
+  background: var(--heap-card); border: var(--edge); border-radius: var(--r-lg);
   padding: 0.6rem 0.8rem; box-shadow: var(--shadow);
   width: fit-content; min-width: 90px; max-width: 100%;
-  animation: fade-in 0.3s var(--ease-out);
+  animation: fade-in var(--dur-slow) var(--ease-out);
   transition: transform 0.45s var(--ease-glide),
-    opacity 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease,
-    background-color 0.25s ease;
+    opacity var(--dur-slow) var(--ease-out), border-color var(--dur-slow) var(--ease-out), box-shadow var(--dur-slow) var(--ease-out),
+    background-color var(--dur-med) var(--ease-out);
 }
 .heap-object.freed { opacity: 0.5; border-style: dashed; box-shadow: none; }
 .heap-object.freed .heap-label-text { text-decoration: line-through; }
@@ -354,13 +364,13 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
   display: inline-flex; align-items: center; gap: 0.25rem;
   color: var(--danger); font-size: 0.68rem; font-family: inherit; font-weight: 700;
   background: var(--danger-soft); border: 1.5px solid var(--danger);
-  border-radius: 4px; padding: 0.1rem 0.45rem;
+  border-radius: var(--r-sm); padding: 0.1rem 0.45rem;
 }
 .leak-tag {
   display: inline-flex; align-items: center; gap: 0.25rem;
   color: var(--hl-ink); font-size: 0.68rem; font-family: inherit; font-weight: 700;
-  background: var(--hl-soft); border: 1.5px solid var(--hl); border-radius: 4px; padding: 0.1rem 0.45rem;
-  animation: fade-in 0.25s ease-out;
+  background: var(--hl-soft); border: 1.5px solid var(--hl); border-radius: var(--r-sm); padding: 0.1rem 0.45rem;
+  animation: fade-in var(--dur-med) var(--ease-out);
 }
 .heap-addr {
   color: var(--faint); font-family: var(--mono); font-size: 0.62rem;
@@ -371,24 +381,24 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 
 .value-row {
   display: flex; align-items: baseline; gap: 0.5rem; margin: 0.45rem 0; flex-wrap: wrap;
-  animation: var-in 0.25s var(--ease-out);
+  animation: var-in var(--dur-med) var(--ease-out);
 }
 .var-name { color: var(--muted); font-family: var(--mono); font-size: 0.82rem; min-width: 2ch; }
 .value-cell {
   display: inline-flex; align-items: center;
-  background: var(--panel-2); border: 1.5px solid var(--ink); border-radius: 4px;
+  background: var(--panel-2); border: var(--edge-thin); border-radius: var(--r-sm);
   padding: 0.15rem 0.45rem; font-family: var(--mono); font-size: 0.82rem;
   font-variant-numeric: tabular-nums;
-  transition: background-color 0.25s ease, border-color 0.25s ease;
+  transition: background-color var(--dur-med) var(--ease-out), border-color var(--dur-med) var(--ease-out);
 }
 .value-cell.string { color: var(--ok); }
 .value-cell.pointer { color: var(--text); }
 .value-cell.null-pointer { color: var(--muted); border-style: dashed; }
 .value-cell.uninit { color: var(--faint); }
 
-.flash { animation: value-flash 0.7s ease-out; border-radius: 3px; display: inline-flex; align-items: center; }
+.flash { animation: value-flash 0.7s var(--ease-out); border-radius: 3px; display: inline-flex; align-items: center; }
 
-.aggregate { display: inline-flex; gap: 0; border-radius: 4px; overflow: visible; flex-wrap: wrap; }
+.aggregate { display: inline-flex; gap: 0; border-radius: var(--r-sm); overflow: visible; flex-wrap: wrap; }
 .aggregate-item { display: inline-flex; flex-direction: column; align-items: stretch; }
 .aggregate-item .element-name {
   color: var(--muted); font-size: 0.62rem; text-align: center; font-family: var(--mono);
@@ -398,7 +408,7 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 .array-box > .aggregate-item + .aggregate-item > .value-cell { border-left: none; border-radius: 0; }
 .array-box > .aggregate-item:first-child > .value-cell { border-radius: 4px 0 0 4px; }
 .array-box > .aggregate-item:last-child > .value-cell { border-radius: 0 4px 4px 0; }
-.array-box > .aggregate-item:only-child > .value-cell { border-radius: 4px; }
+.array-box > .aggregate-item:only-child > .value-cell { border-radius: var(--r-sm); }
 .struct-box > .aggregate-item { margin-right: 0.45rem; }
 /* 2D+ array: stack each inner row on its own line so it reads like a matrix. */
 .aggregate.matrix-rows { flex-direction: column; align-items: flex-start; flex-wrap: nowrap; gap: 5px; }
@@ -410,7 +420,7 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
   position: absolute; inset: 0; width: 100%; height: 100%;
   pointer-events: none; overflow: visible;
 }
-.arrow { transition: opacity 0.25s ease; animation: arrow-in 0.25s ease-out; }
+.arrow { transition: opacity var(--dur-med) var(--ease-out); animation: arrow-in var(--dur-med) var(--ease-out); }
 /* No `d` transition: the measurement loop redraws arrows every frame while
    boxes glide, so paths are always exact and markers never flip mid-morph. */
 .arrow path { fill: none; stroke: var(--arrow); stroke-width: 2; }
@@ -422,13 +432,13 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
 
 /* ---------- debug panel ---------- */
 
-footer { border-top: 2px solid var(--ink); background: var(--panel); transition: background-color 0.25s ease, border-color 0.25s ease; }
+footer { border-top: var(--edge); background: var(--panel); transition: background-color var(--dur-med) var(--ease-out), border-color var(--dur-med) var(--ease-out); }
 .controls {
   display: flex; align-items: center; gap: 0.8rem; padding: 0.65rem 1.4rem; flex-wrap: wrap;
 }
 .transport { display: flex; align-items: center; gap: 0.4rem; }
 .transport button {
-  width: 32px; height: 32px; padding: 0; border-radius: 6px;
+  width: 32px; height: 32px; padding: 0; border-radius: var(--r-md);
   justify-content: center;
 }
 .transport button.play-btn {
@@ -438,25 +448,25 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 
 .controls input[type="range"], .ds-scrub {
   flex: 1; min-width: 120px; appearance: none; -webkit-appearance: none;
-  height: 10px; border-radius: 4px; background: var(--panel-2);
-  border: 1.5px solid var(--ink); outline: none;
+  height: 10px; border-radius: var(--r-sm); background: var(--panel-2);
+  border: var(--edge-thin); outline: none;
 }
 .controls input[type="range"]::-webkit-slider-thumb, .ds-scrub::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 17px; height: 17px; border-radius: 4px;
-  background: var(--accent); border: 2px solid var(--ink);
+  -webkit-appearance: none; width: 17px; height: 17px; border-radius: var(--r-sm);
+  background: var(--accent); border: var(--edge);
   cursor: pointer;
 }
 .controls input[type="range"]::-moz-range-thumb, .ds-scrub::-moz-range-thumb {
-  width: 14px; height: 14px; border-radius: 4px;
-  background: var(--accent); border: 2px solid var(--ink);
+  width: 14px; height: 14px; border-radius: var(--r-sm);
+  background: var(--accent); border: var(--edge);
   cursor: pointer;
 }
 .step-counter { color: var(--muted); font-size: 0.8rem; white-space: nowrap; font-weight: 500; font-variant-numeric: tabular-nums; }
 
 .event-badge {
   display: inline-flex; align-items: center; gap: 0.25rem;
-  font-size: 0.66rem; padding: 0.16rem 0.5rem; border-radius: 4px;
-  background: var(--panel-2); border: 1.5px solid var(--ink); color: var(--text);
+  font-size: 0.66rem; padding: 0.16rem 0.5rem; border-radius: var(--r-sm);
+  background: var(--panel-2); border: var(--edge-thin); color: var(--text);
   font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
 }
 .event-badge.event-call { color: var(--ok); background: var(--ok-soft); }
@@ -483,13 +493,13 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 }
 .stdout-copy {
   padding: 0.22rem 0.5rem; font-size: 0.72rem; gap: 0.3rem;
-  border-radius: 4px; border-width: 1.5px; box-shadow: 2px 2px 0 var(--shadow-color);
+  border-radius: var(--r-sm); border-width: 1.5px; box-shadow: 2px 2px 0 var(--shadow-color);
 }
 .stdout-copy:hover:not(:disabled) { box-shadow: 3px 3px 0 var(--shadow-color); }
 /* Fixed height: the output scrolls internally so the footer never grows
    upward into the diagram as stdout accumulates across steps. */
 .stdout-pane pre {
-  background: var(--panel-2); border: 2px solid var(--ink); border-radius: 8px;
+  background: var(--panel-2); border: var(--edge); border-radius: var(--r-lg);
   margin: 0; padding: 0.55rem 0.75rem; height: 6rem; overflow: auto;
   font-family: var(--mono); font-size: 0.83rem; white-space: pre-wrap;
 }
@@ -498,10 +508,10 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 
 .request-error, .program-error {
   display: flex; align-items: center; gap: 0.5rem;
-  background: var(--danger-soft); border: 2px solid var(--ink); color: var(--text);
-  border-radius: 8px; padding: 0.55rem 0.85rem; margin: 0.6rem 1.4rem; font-size: 0.875rem;
+  background: var(--danger-soft); border: var(--edge); color: var(--text);
+  border-radius: var(--r-lg); padding: 0.55rem 0.85rem; margin: 0.6rem 1.4rem; font-size: 0.875rem;
   font-weight: 500; box-shadow: var(--shadow);
-  animation: slide-down-in 0.2s var(--ease-out);
+  animation: slide-down-in var(--dur-fast) var(--ease-out);
 }
 .request-error svg, .program-error svg { color: var(--danger); flex: none; }
 .error-hint { font-weight: 400; color: var(--muted); }
@@ -509,7 +519,7 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 
 .crash-card {
   margin: 3rem auto; max-width: min(30rem, calc(100vw - 2rem)); text-align: center;
-  background: var(--panel); border: 2px solid var(--ink); border-radius: 10px;
+  background: var(--panel); border: var(--edge); border-radius: var(--r-xl);
   padding: 2rem 2.2rem; box-shadow: var(--shadow-lift); color: var(--text);
   display: flex; flex-direction: column; align-items: center; gap: 0.7rem;
 }
@@ -518,7 +528,7 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 .crash-card p { margin: 0; color: var(--muted); font-size: 0.9rem; max-width: 42ch; }
 .crash-card pre {
   max-width: 100%; overflow-x: auto; background: var(--panel-2);
-  border: 2px solid var(--ink); border-radius: 8px; padding: 0.5rem 0.8rem;
+  border: var(--edge); border-radius: var(--r-lg); padding: 0.5rem 0.8rem;
   font-family: var(--mono); font-size: 0.78rem; color: var(--danger);
 }
 
@@ -553,7 +563,7 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
    active one — reads as navigation, not another button cluster. */
 .main-nav { display: flex; align-items: center; gap: 0.15rem; flex-wrap: wrap; }
 .main-nav button {
-  border: none; background: transparent; box-shadow: none; border-radius: 6px;
+  border: none; background: transparent; box-shadow: none; border-radius: var(--r-md);
   color: var(--muted); font-weight: 700; font-size: 0.74rem;
   text-transform: uppercase; letter-spacing: 0.09em; padding: 0.55rem 0.85rem;
   position: relative;
@@ -598,14 +608,14 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 .ds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
 .ds-card {
   display: flex; gap: 0.85rem; align-items: flex-start; text-align: left;
-  background: var(--panel); border: 2px solid var(--ink); border-radius: 10px;
+  background: var(--panel); border: var(--edge); border-radius: var(--r-xl);
   box-shadow: var(--shadow); padding: 0.95rem; font-size: inherit;
 }
 .ds-card:hover:not(:disabled) { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--shadow-color); }
 .ds-card-icon {
   flex: none; display: inline-flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px; border-radius: 8px;
-  background: var(--accent); color: var(--on-accent); border: 2px solid var(--ink);
+  width: 40px; height: 40px; border-radius: var(--r-lg);
+  background: var(--accent); color: var(--on-accent); border: var(--edge);
 }
 .ds-card-body { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
 .ds-card-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.3rem; }
@@ -619,11 +629,11 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 
 .ds-tabs {
   display: flex; gap: 0.45rem; padding: 0.7rem 1.4rem; flex-wrap: wrap;
-  border-bottom: 2px solid var(--ink); background: var(--panel);
+  border-bottom: var(--edge); background: var(--panel);
 }
 .ds-tab {
-  border: 2px solid var(--ink); background: var(--panel);
-  border-radius: 6px; color: var(--muted); padding: 0.4rem 0.8rem;
+  border: var(--edge); background: var(--panel);
+  border-radius: var(--r-md); color: var(--muted); padding: 0.4rem 0.8rem;
   position: relative; gap: 0.35rem; white-space: nowrap; font-weight: 600;
   box-shadow: 2px 2px 0 var(--shadow-color); font-size: 0.83rem;
 }
@@ -634,7 +644,7 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 
 .ds-opbar {
   display: flex; align-items: center; gap: 0.55rem; flex-wrap: wrap;
-  padding: 0.75rem 1.4rem; background: var(--panel); border-bottom: 2px solid var(--ink);
+  padding: 0.75rem 1.4rem; background: var(--panel); border-bottom: var(--edge);
 }
 /* Graph Algorithms: a separate run bar under the build bar, so the
    algorithms never crowd the structure ops. */
@@ -642,8 +652,8 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 .ds-opbar.wg-run .sched-hint { flex: 1; min-width: 220px; }
 .wg-vert { min-width: 4.2rem; }
 .ds-input {
-  background: var(--panel); color: var(--text); border: 2px solid var(--ink);
-  border-radius: 6px; padding: 0.42rem 0.6rem; font-size: 0.875rem; font-family: var(--mono);
+  background: var(--panel); color: var(--text); border: var(--edge);
+  border-radius: var(--r-md); padding: 0.42rem 0.6rem; font-size: 0.875rem; font-family: var(--mono);
   width: 200px; transition: box-shadow 0.15s var(--ease-out);
 }
 .ds-input.small { width: 56px; text-align: center; }
@@ -654,8 +664,8 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
 .ds-bulk {
   display: flex; gap: 0.9rem; align-items: stretch; flex-wrap: wrap;
   padding: 0.75rem 1.4rem; background: var(--panel);
-  border-bottom: 2px solid var(--ink);
-  animation: slide-down-in 0.2s var(--ease-out);
+  border-bottom: var(--edge);
+  animation: slide-down-in var(--dur-fast) var(--ease-out);
 }
 .ds-bulk-text {
   flex: 1; min-width: 220px; max-width: 34rem; resize: vertical;
@@ -664,7 +674,7 @@ footer { border-top: 2px solid var(--ink); background: var(--panel); transition:
   min-height: 5rem; max-height: 15rem; overflow-y: auto;
   background: var(--panel); color: var(--text); font-family: var(--mono);
   font-size: 0.85rem; line-height: 1.5;
-  border: 2px solid var(--ink); border-radius: 6px; padding: 0.5rem 0.65rem;
+  border: var(--edge); border-radius: var(--r-md); padding: 0.5rem 0.65rem;
   transition: box-shadow 0.15s var(--ease-out);
 }
 .ds-bulk-text:focus { outline: none; box-shadow: var(--ring); }
@@ -683,14 +693,14 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   position: absolute; z-index: 5; top: 1.1rem; left: 1.1rem; right: 1.1rem;
   display: flex; gap: 0.9rem; align-items: flex-start;
   max-width: 34rem; margin: 0 auto;
-  background: var(--panel); border: 2px solid var(--ink); border-radius: 10px;
+  background: var(--panel); border: var(--edge); border-radius: var(--r-xl);
   padding: 1rem 1.15rem; box-shadow: var(--shadow-lift);
-  animation: slide-down-in 0.25s var(--ease-out);
+  animation: slide-down-in var(--dur-med) var(--ease-out);
 }
 .ds-info-icon {
   flex: none; display: inline-flex; align-items: center; justify-content: center;
-  width: 38px; height: 38px; border-radius: 8px;
-  background: var(--accent); color: var(--on-accent); border: 2px solid var(--ink);
+  width: 38px; height: 38px; border-radius: var(--r-lg);
+  background: var(--accent); color: var(--on-accent); border: var(--edge);
 }
 .ds-info-body { flex: 1; min-width: 10rem; }
 .ds-info-body h3 {
@@ -701,7 +711,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .ds-complexity { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 .ds-chip {
   font-family: var(--mono); font-size: 0.7rem; color: var(--text);
-  background: var(--panel-2); border: 1.5px solid var(--ink); border-radius: 4px;
+  background: var(--panel-2); border: var(--edge-thin); border-radius: var(--r-sm);
   padding: 0.14rem 0.5rem; white-space: nowrap; font-variant-numeric: tabular-nums;
 }
 .ds-info-card > button { flex: none; align-self: center; }
@@ -721,16 +731,16 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 /* Glides are driven by GlideG's additive FLIP animation (DSView.tsx), not a
    CSS transition. Entering nodes fade in after a beat so a newcomer is never
    visible on top of a neighbor still gliding out of its slot. */
-.ds-node { animation: ds-node-in 0.3s var(--ease-out) 0.22s backwards; }
+.ds-node { animation: ds-node-in var(--dur-slow) var(--ease-out) var(--dur-fast) backwards; }
 @keyframes ds-node-in { from { opacity: 0; } }
 .ds-box, .ds-circle, .ds-bar {
   fill: var(--panel); stroke: var(--ink); stroke-width: 2;
-  transition: fill 0.3s ease, stroke 0.3s ease;
+  transition: fill var(--dur-slow) var(--ease-out), stroke var(--dur-slow) var(--ease-out);
 }
 .ds-slot { fill: transparent; stroke: var(--faint); stroke-width: 1.6; stroke-dasharray: 3 3; }
 .ds-value {
   font-family: var(--mono); font-size: 0.9rem; fill: var(--text); text-anchor: middle;
-  transition: fill 0.3s ease;
+  transition: fill var(--dur-slow) var(--ease-out);
 }
 /* the teacher's highlighter is amber; green = success, red = trouble */
 /* B-tree scene: the node frame is a quiet container; keys are the actors.
@@ -759,17 +769,17 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .ds-link, .ds-edge, .ds-floor { stroke: var(--ink); stroke-width: 2; fill: none; }
 .ds-link { stroke: var(--arrow); }
 .ds-arrow-head { fill: var(--arrow); }
-.ds-link, .ds-edge { transition: d 0.6s var(--ease-glide), stroke 0.3s ease; }
+.ds-link, .ds-edge { transition: d 0.6s var(--ease-glide), stroke var(--dur-slow) var(--ease-out); }
 
 /* Weighted edges (Graph Algorithms lab): highlightable like nodes. */
 .ds-wedge {
   stroke: var(--ink); stroke-width: 2; fill: none;
-  transition: d 0.6s var(--ease-glide), stroke 0.3s ease, stroke-width 0.3s ease;
+  transition: d 0.6s var(--ease-glide), stroke var(--dur-slow) var(--ease-out), stroke-width var(--dur-slow) var(--ease-out);
 }
 .ds-wedge.hl { stroke: var(--hl); stroke-width: 3.5; }
 .ds-wedge.ok { stroke: var(--ok); stroke-width: 3.5; }
 .ds-wedge.bad { stroke: var(--danger); stroke-width: 3.5; stroke-dasharray: 6 4; }
-.ds-wlabel-bg { fill: var(--panel); stroke: var(--faint); stroke-width: 1.2; transition: stroke 0.3s ease; }
+.ds-wlabel-bg { fill: var(--panel); stroke: var(--faint); stroke-width: 1.2; transition: stroke var(--dur-slow) var(--ease-out); }
 .ds-wlabel { font-size: 0.7rem; font-weight: 700; fill: var(--text); font-family: var(--mono); }
 .ds-wlabel-g.hl .ds-wlabel-bg { stroke: var(--hl); stroke-width: 2; fill: var(--hl-soft); }
 .ds-wlabel-g.ok .ds-wlabel-bg { stroke: var(--ok); stroke-width: 2; fill: var(--ok-soft); }
@@ -791,13 +801,13 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 
 .ds-caption {
   display: flex; align-items: center; gap: 0.8rem;
-  border-top: 2px solid var(--ink); background: var(--panel);
+  border-top: var(--edge); background: var(--panel);
   padding: 0.75rem 1.4rem; min-height: 3.5rem; flex-wrap: wrap;
 }
 .ds-teacher {
   flex: none; display: inline-flex; align-items: center; justify-content: center;
-  width: 34px; height: 34px; border-radius: 8px;
-  background: var(--accent); color: var(--on-accent); border: 2px solid var(--ink);
+  width: 34px; height: 34px; border-radius: var(--r-lg);
+  background: var(--accent); color: var(--on-accent); border: var(--edge);
 }
 /* The note reads in the teacher's voice: set slightly larger and medium-weight
    so it carries the caption bar. Crossfade only — a translate here would make
@@ -805,7 +815,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 @keyframes note-in { from { opacity: 0.35; } }
 .ds-note {
   margin: 0; font-size: 0.92rem; flex: 1; min-width: 12rem; font-weight: 500;
-  animation: note-in 0.22s ease-out;
+  animation: note-in var(--dur-fast) var(--ease-out);
 }
 .ds-transport { flex: none; gap: 0.4rem; }
 .ds-scrub { width: 130px; flex: none; min-width: 90px; }
@@ -822,7 +832,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .fork-main { display: grid; grid-template-columns: minmax(320px, 40%) 1fr; flex: 1; min-height: 0; }
 .fork-run-row {
   display: flex; align-items: center; gap: 0.85rem;
-  padding: 0.7rem 1.05rem; border-top: 2px solid var(--ink); background: var(--panel);
+  padding: 0.7rem 1.05rem; border-top: var(--edge); background: var(--panel);
 }
 .fork-count { color: var(--muted); font-size: 0.82rem; font-weight: 500; font-variant-numeric: tabular-nums; }
 
@@ -847,18 +857,18 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .legend-dot.orphan { background: var(--hl-soft); border: 2px solid var(--hl); }
 .legend-dot.zombie { background: var(--danger-soft); border: 2px solid var(--danger); }
 
-.fork-bottom { border-top: 2px solid var(--ink); padding: 0.9rem 1.2rem 1rem; background: var(--panel); }
+.fork-bottom { border-top: var(--edge); padding: 0.9rem 1.2rem 1rem; background: var(--panel); }
 .fork-bottom .stdout-head { margin-bottom: 0.55rem; }
 .fork-output {
-  background: var(--panel-2); border: 2px solid var(--ink); border-radius: 8px;
+  background: var(--panel-2); border: var(--edge); border-radius: var(--r-lg);
   margin: 0; padding: 0.55rem 0.75rem; height: 5rem; overflow: auto;
   font-family: var(--mono); font-size: 0.83rem; white-space: pre-wrap;
 }
 .fork-note { color: var(--muted); font-size: 0.72rem; margin: 0.4rem 0 0; line-height: 1.4; }
 .fork-error {
   display: flex; align-items: center; gap: 0.5rem; margin: 1rem 1.2rem;
-  background: var(--danger-soft); border: 2px solid var(--ink); color: var(--text);
-  border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.85rem; font-weight: 500;
+  background: var(--danger-soft); border: var(--edge); color: var(--text);
+  border-radius: var(--r-lg); padding: 0.6rem 0.85rem; font-size: 0.85rem; font-weight: 500;
   box-shadow: var(--shadow);
 }
 .fork-error svg { color: var(--danger); flex: none; }
@@ -875,7 +885,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   background-size: 26px 26px;
 }
 .sched-procs, .sched-results {
-  background: var(--panel); border: 2px solid var(--ink); border-radius: 10px;
+  background: var(--panel); border: var(--edge); border-radius: var(--r-xl);
   box-shadow: var(--shadow); padding: 0.95rem 1.1rem 1.1rem;
   max-width: 62rem; width: 100%; min-width: 0;
 }
@@ -901,11 +911,11 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .icon-btn.ghost:hover:not(:disabled) { background: var(--panel-2); color: var(--danger); transform: none; box-shadow: none; }
 .best-row td { background: var(--ok-soft); font-weight: 700; }
 .pending-row { color: var(--muted); opacity: 0.7; }
-.sched-table tr { transition: opacity 0.3s ease, color 0.3s ease; }
-.metric-val { display: inline-block; animation: note-in 0.25s ease-out; }
+.sched-table tr { transition: opacity var(--dur-slow) var(--ease-out), color var(--dur-slow) var(--ease-out); }
+.metric-val { display: inline-block; animation: note-in var(--dur-med) var(--ease-out); }
 @keyframes chip-in { from { opacity: 0; transform: scale(0.92); } }
-.sched-live .proc-chip, .sched-live .page-slot { animation: chip-in 0.25s var(--ease-out); }
-.avg-row td { font-weight: 700; border-top: 2px solid var(--ink); font-family: var(--mono); }
+.sched-live .proc-chip, .sched-live .page-slot { animation: chip-in var(--dur-med) var(--ease-out); }
+.avg-row td { font-weight: 700; border-top: var(--edge); font-family: var(--mono); }
 .sched-stats { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.9rem; }
 .sched-live { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin: 1rem 0; }
 .sched-live-label {
@@ -926,12 +936,12 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .gantt-slice {
   position: absolute; top: 2px; height: 40px;
   display: flex; align-items: center; justify-content: center;
-  border: 2px solid var(--ink); border-radius: 4px;
+  border: var(--edge); border-radius: var(--r-sm);
   color: #fffcf5; font-weight: 700; font-size: 0.76rem; font-family: var(--mono);
   /* Future slices stay invisible (no spoiler preview); the active slice is
      revealed by a moving clip edge that fills in behind the gliding cursor.
      Negative insets keep border+shadow visible on the three settled edges. */
-  transition: clip-path 0.3s var(--ease-out), opacity 0.25s ease;
+  transition: clip-path var(--dur-slow) var(--ease-out), opacity var(--dur-med) var(--ease-out);
   clip-path: inset(-4px calc(100% - var(--fill, 100%)) -4px -4px);
 }
 .gantt-slice.future { --fill: 0%; opacity: 0; }
@@ -939,7 +949,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .gantt-cursor {
   position: absolute; top: -4px; height: 52px; width: 3px;
   background: var(--hl); border-radius: 2px; z-index: 2;
-  transition: left 0.25s var(--ease-out);
+  transition: left var(--dur-med) var(--ease-out);
 }
 .gantt-ticks { position: absolute; top: 46px; left: 0; right: 0; height: 16px; }
 .gantt-ticks span {
@@ -952,7 +962,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .proc-chip {
   display: inline-flex; align-items: center; justify-content: center;
   min-width: 2.3rem; padding: 0.12rem 0.5rem;
-  border: 2px solid var(--ink); border-radius: 4px;
+  border: var(--edge); border-radius: var(--r-sm);
   font-family: var(--mono); font-size: 0.74rem; font-weight: 700; color: #fffcf5;
 }
 .proc-chip.gantt-idle { color: var(--muted); border-style: dashed; background: transparent; }
@@ -971,7 +981,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .dl-table th { padding-right: 0.45rem; text-align: center; }
 .dl-table td { padding: 0.22rem 0.3rem 0.22rem 0; border-top: none; text-align: center; font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .dl-table .ds-input.cell { width: 3.2rem; text-align: center; }
-.dl-table td, .dl-table th, .dl-table tr { transition: background-color 0.3s ease, opacity 0.3s ease; }
+.dl-table td, .dl-table th, .dl-table tr { transition: background-color var(--dur-slow) var(--ease-out), opacity var(--dur-slow) var(--ease-out); }
 .dl-row-active td, .dl-row-active th { background: var(--hl-soft, var(--panel-2)); }
 .dl-row-done { opacity: 0.45; }
 .dl-stepper { display: inline-flex; align-items: center; gap: 0.15rem; }
@@ -982,10 +992,10 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .dl-seq-item { display: inline-flex; align-items: center; gap: 0.35rem; }
 .dl-seq-arrow { color: var(--muted); font-weight: 700; }
 .dl-verdict {
-  border: 2px solid var(--ink); border-radius: 8px; box-shadow: var(--shadow);
+  border: var(--edge); border-radius: var(--r-lg); box-shadow: var(--shadow);
   padding: 0.55rem 0.9rem; margin-bottom: 1rem;
   font-family: var(--mono); font-weight: 700; font-size: 0.9rem; letter-spacing: 0.02em;
-  animation: var-in 0.3s var(--ease-out);
+  animation: var-in var(--dur-slow) var(--ease-out);
 }
 .dl-verdict.dl-safe { background: var(--ok-soft); }
 .dl-verdict.dl-bad { background: var(--danger-soft); }
@@ -1001,7 +1011,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .rag-label { fill: var(--text); font-family: var(--mono); font-size: 0.78rem; font-weight: 700; }
 .rag-dot { fill: none; stroke: var(--muted); stroke-width: 1.4; }
 .rag-dot-used { fill: var(--accent); stroke: var(--ink); }
-.rag-edge line { stroke: var(--muted); stroke-width: 1.8; transition: opacity 0.3s ease; }
+.rag-edge line { stroke: var(--muted); stroke-width: 1.8; transition: opacity var(--dur-slow) var(--ease-out); }
 .rag-edge.rag-req line { stroke-dasharray: 5 4; }
 .rag-arrowhead { fill: var(--muted); }
 .rag-edge.rag-done { opacity: 0.15; }
@@ -1021,7 +1031,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   border: 1.5px solid var(--panel-2); min-width: 2.1rem; height: 2rem;
   padding: 0.12rem 0.3rem; text-align: center;
   font-variant-numeric: tabular-nums; font-weight: 500;
-  transition: opacity 0.3s var(--ease-out), background-color 0.3s ease, box-shadow 0.25s ease;
+  transition: opacity var(--dur-slow) var(--ease-out), background-color var(--dur-slow) var(--ease-out), box-shadow var(--dur-med) var(--ease-out);
 }
 .page-grid .pg-label {
   border-color: transparent; text-align: right; padding-right: 0.55rem;
@@ -1038,11 +1048,11 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .page-grid .pg-fault { color: var(--danger); font-weight: 700; border-color: transparent; }
 .page-slot {
   display: inline-flex; align-items: center; gap: 0.35rem;
-  border: 1.5px solid var(--panel-2); border-radius: 8px; padding: 0.22rem 0.5rem;
+  border: 1.5px solid var(--panel-2); border-radius: var(--r-lg); padding: 0.22rem 0.5rem;
   background: var(--panel);
-  transition: border-color 0.25s ease;
+  transition: border-color var(--dur-med) var(--ease-out);
 }
-.page-slot.hand { border: 2px solid var(--ink); }
+.page-slot.hand { border: var(--edge); }
 .page-slot.just-hit { border-color: var(--ok); }
 .page-slot.just-loaded { border-color: var(--danger); }
 .page-slot em, .pg-slot-name {
@@ -1053,7 +1063,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .page-slot .pg-hand { color: var(--text); font-weight: 700; }
 .pg-victim { color: var(--danger); border-color: var(--danger); }
 .warn-row td { background: var(--danger-soft); font-weight: 700; }
-.best-row td, .warn-row td { transition: background-color 0.3s ease; }
+.best-row td, .warn-row td { transition: background-color var(--dur-slow) var(--ease-out); }
 .sweep-head { margin-top: 1.1rem; }
 
 /* ---------- disk scheduling lab ---------- */
@@ -1065,21 +1075,21 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .disk-axis { stroke: var(--muted); stroke-width: 1.6; }
 .disk-tick { fill: var(--muted); font-family: var(--mono); font-size: 0.68rem; font-variant-numeric: tabular-nums; }
 .disk-tick.disk-start { fill: var(--text); font-weight: 700; }
-.disk-req { fill: var(--panel); stroke: var(--ink); stroke-width: 1.8; transition: fill 0.25s ease, stroke 0.25s ease; }
+.disk-req { fill: var(--panel); stroke: var(--ink); stroke-width: 1.8; transition: fill var(--dur-med) var(--ease-out), stroke var(--dur-med) var(--ease-out); }
 .disk-req.served { fill: var(--accent); }
 .disk-req.now { stroke: var(--hl); stroke-width: 3; }
-.disk-seg { stroke: var(--text); stroke-width: 2.4; stroke-linecap: round; transition: opacity 0.3s ease; }
+.disk-seg { stroke: var(--text); stroke-width: 2.4; stroke-linecap: round; transition: opacity var(--dur-slow) var(--ease-out); }
 @keyframes seg-draw { from { stroke-dashoffset: 1; } }
 @keyframes seg-fade { from { opacity: 0; } }
 .disk-seg.seg-new:not(.seg-jump) { stroke-dasharray: 1; animation: seg-draw 0.35s var(--ease-out); }
 .disk-seg.seg-future { opacity: 0; }
 .seg-sweep { stroke: var(--muted); }
 .seg-jump { stroke: var(--danger); stroke-dasharray: 6 5; }
-.disk-seg.seg-jump.seg-new { animation: seg-fade 0.3s ease-out; }
-.disk-vertex { animation: seg-fade 0.25s ease-out; }
+.disk-seg.seg-jump.seg-new { animation: seg-fade var(--dur-slow) var(--ease-out); }
+.disk-vertex { animation: seg-fade var(--dur-med) var(--ease-out); }
 .disk-vertex circle { fill: var(--text); }
 .disk-vertex text { fill: var(--muted); font-family: var(--mono); font-size: 0.66rem; font-variant-numeric: tabular-nums; }
-.disk-headmark { transition: transform 0.3s var(--ease-out); }
+.disk-headmark { transition: transform var(--dur-slow) var(--ease-out); }
 .disk-headmark circle { fill: var(--hl); stroke: var(--ink); stroke-width: 2; }
 .disk-order { font-size: 0.72rem; }
 
@@ -1090,7 +1100,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   align-items: start;
 }
 .race-pane {
-  background: var(--panel); border: 2px solid var(--ink); border-radius: 10px;
+  background: var(--panel); border: var(--edge); border-radius: var(--r-xl);
   box-shadow: var(--shadow); padding: 0.8rem 0.9rem; min-width: 0;
 }
 .race-pane-head { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; margin-bottom: 0.4rem; }
@@ -1105,7 +1115,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .race-banner {
   display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.9rem;
   padding: 0.6rem 0.9rem; font-weight: 700; font-size: 0.9rem;
-  background: var(--ok-soft); border: 2px solid var(--ok); border-radius: 10px;
+  background: var(--ok-soft); border: 2px solid var(--ok); border-radius: var(--r-xl);
 }
 .race-stack { display: flex; flex-direction: column; gap: 1rem; }
 @media (max-width: 980px) {
@@ -1117,12 +1127,12 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .quiz-panel {
   display: flex; gap: 0.7rem; align-items: flex-start;
   margin: 0 1.4rem 0.8rem; padding: 0.85rem 1rem;
-  background: var(--panel); border: 2px solid var(--ink); border-radius: 10px;
+  background: var(--panel); border: var(--edge); border-radius: var(--r-xl);
   box-shadow: var(--shadow);
 }
 .quiz-icon {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; flex: none; border-radius: 8px;
+  width: 28px; height: 28px; flex: none; border-radius: var(--r-lg);
   background: var(--hl-soft); color: var(--hl-ink); border: 2px solid var(--hl);
 }
 .quiz-body { flex: 1; min-width: 0; }
@@ -1140,7 +1150,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 /* ---------- threads lab ---------- */
 
 .threads-stage {
-  background: var(--panel); border: 2px solid var(--ink); border-radius: 10px;
+  background: var(--panel); border: var(--edge); border-radius: var(--r-xl);
   box-shadow: var(--shadow); padding: 1rem; max-width: 46rem; width: 100%;
 }
 .threads-svg { width: 100%; height: auto; display: block; }
@@ -1152,7 +1162,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   font-size: 0.58rem; letter-spacing: 0.14em; font-weight: 700; fill: var(--muted);
 }
 .th-thread { cursor: pointer; }
-.th-thread circle { fill: var(--panel); stroke: var(--ink); stroke-width: 2; transition: fill 0.2s ease, stroke 0.2s ease; }
+.th-thread circle { fill: var(--panel); stroke: var(--ink); stroke-width: 2; transition: fill var(--dur-fast) var(--ease-out), stroke var(--dur-fast) var(--ease-out); }
 .th-thread text { font-family: var(--mono); font-size: 0.85rem; fill: var(--text); text-anchor: middle; }
 .th-thread:hover circle { stroke-width: 3; }
 .th-thread.th-running circle { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 3; }
@@ -1160,12 +1170,12 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 .th-thread.th-stalled circle { fill: var(--hl-soft); stroke: var(--hl); stroke-width: 2.5; }
 .th-state { font-size: 0.58rem; fill: var(--danger); text-anchor: middle; font-weight: 700; }
 .th-state.ok { fill: var(--ok); }
-.th-kernel rect { fill: var(--panel); stroke: var(--ink); stroke-width: 2; transition: fill 0.2s ease, stroke 0.2s ease; }
+.th-kernel rect { fill: var(--panel); stroke: var(--ink); stroke-width: 2; transition: fill var(--dur-fast) var(--ease-out), stroke var(--dur-fast) var(--ease-out); }
 .th-kernel.blocked rect { fill: var(--danger-soft); stroke: var(--danger); }
 .th-kernel text { font-family: var(--mono); font-size: 0.8rem; fill: var(--text); text-anchor: middle; }
 .th-core rect { fill: var(--text); stroke: var(--text); }
 .th-core text { font-family: var(--mono); font-size: 0.72rem; fill: var(--bg); text-anchor: middle; }
-.th-edge { stroke: var(--faint); stroke-width: 2; transition: stroke 0.2s ease; }
+.th-edge { stroke: var(--faint); stroke-width: 2; transition: stroke var(--dur-fast) var(--ease-out); }
 .th-edge.hot { stroke: var(--ok); stroke-width: 2.5; }
 .th-edge.bad { stroke: var(--danger); stroke-dasharray: 4 3; }
 
@@ -1181,16 +1191,16 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
   display: flex; align-items: flex-start; gap: 0.5rem;
   max-width: min(26rem, calc(100vw - 2.5rem));
   background: var(--panel); color: var(--text);
-  border: 2px solid var(--ink); border-radius: 8px;
+  border: var(--edge); border-radius: var(--r-lg);
   padding: 0.6rem 0.65rem 0.6rem 0.8rem; box-shadow: 4px 4px 0 var(--shadow-color);
   font-size: 0.83rem; line-height: 1.4; font-weight: 500;
-  animation: toast-in 0.22s var(--ease-out);
+  animation: toast-in var(--dur-fast) var(--ease-out);
 }
 .toast svg:first-child { flex: none; margin-top: 0.1rem; }
 .toast-msg { flex: 1; }
 .toast-close {
   flex: none; padding: 0.15rem; border: none; background: none;
-  color: var(--muted); border-radius: 4px; box-shadow: none;
+  color: var(--muted); border-radius: var(--r-sm); box-shadow: none;
 }
 .toast-close:hover:not(:disabled) { background: var(--panel-2); border: none; box-shadow: none; transform: none; color: var(--text); }
 .toast-success { background: var(--ok-soft); }
@@ -1211,7 +1221,7 @@ button.toggled { background: var(--accent-soft); color: var(--text); }
 /* Narrow window: editor stacks above the diagram instead of beside it. */
 @media (max-width: 900px) {
   main { grid-template-columns: 1fr; grid-template-rows: minmax(200px, 38vh) 1fr; }
-  .editor-pane { border-right: none; border-bottom: 2px solid var(--ink); }
+  .editor-pane { border-right: none; border-bottom: var(--edge); }
   .memory-diagram { grid-template-columns: 1fr; padding: 0.9rem 64px 0.9rem 1rem; }
   .tagline { display: none; }
 }
