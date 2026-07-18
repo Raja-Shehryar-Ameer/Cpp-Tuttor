@@ -1,7 +1,7 @@
 # Shinso
 
-Step-by-step code visualizer for **C++, C, and Python** — like
-[pythontutor.com](https://pythontutor.com), but built to go further: real execution
+**The machine shows its work.** Run your **C++, C, or Python** and watch every step —
+like [pythontutor.com](https://pythontutor.com), but built to go further: real execution
 tracing, a `fork()` process-tree visualizer, and interactive data-structure / OS labs
 in one place.
 

@@ -179,7 +179,7 @@ export default function App() {
               </g>
             </svg>
           </span>
-          Shinso <span className="tagline">step-by-step C/C++/Python visualizer</span>
+          Shinso <span className="tagline">the machine shows its work</span>
         </h1>
         <nav className="main-nav" aria-label="mode">
           <button className={mode === "code" ? "active" : ""} onClick={() => setMode("code")}>
