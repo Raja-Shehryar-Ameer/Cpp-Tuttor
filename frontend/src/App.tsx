@@ -15,6 +15,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { fetchSharedTrace, requestTrace, type TracerLanguage } from "./api/client";
 import { Controls } from "./components/Controls";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { LangIcon } from "./components/LangIcon";
 import { StdoutPane } from "./components/StdoutPane";
 import { ToastHost } from "./components/Toast";
 import { MemoryDiagram } from "./components/diagram/MemoryDiagram";
@@ -207,19 +208,19 @@ export default function App() {
                   className={language === "cpp" ? "active" : ""}
                   onClick={() => switchLanguage("cpp")}
                 >
-                  C++
+                  <LangIcon language="cpp" /> C++
                 </button>
                 <button
                   className={language === "c" ? "active" : ""}
                   onClick={() => switchLanguage("c")}
                 >
-                  C
+                  <LangIcon language="c" /> C
                 </button>
                 <button
                   className={language === "python" ? "active" : ""}
                   onClick={() => switchLanguage("python")}
                 >
-                  Py
+                  <LangIcon language="python" /> Py
                 </button>
               </div>
               <select

@@ -178,7 +178,9 @@ header h1 {
 .lang-seg button {
   border: none; border-radius: 0; box-shadow: none; padding: 0.42rem 0.7rem;
   font-size: 0.78rem; font-weight: 700; background: var(--panel); color: var(--muted);
+  display: inline-flex; align-items: center; gap: 0.32rem;
 }
+.lang-seg .lang-icon { flex-shrink: 0; }
 .lang-seg button + button { border-left: var(--edge); }
 .lang-seg button:hover:not(:disabled) { transform: none; box-shadow: none; background: var(--panel-2); color: var(--text); }
 .lang-seg button:active:not(:disabled) { transform: none; }
