@@ -65,13 +65,6 @@ cd ../frontend && npm install && npm run dev
 
 Note: each trace pays ~1s of Docker container start-up.
 
-## Deployment
-
-The frontend is a static Vite build — host it anywhere (Vercel/Netlify/Cloudflare
-Pages); point it at the API with `VITE_API_BASE`. The backend must run on a host with
-a **Docker daemon** (a VPS or free-tier VM — not serverless), since it spawns the
-sandbox container per trace. Put a TLS reverse proxy (e.g. Caddy) in front of uvicorn.
-
 ## Supported language subset
 
 C++/C: primitives, fixed-size arrays, C-strings, pointers/references/`nullptr`,
