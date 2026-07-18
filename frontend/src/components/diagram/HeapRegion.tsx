@@ -1,7 +1,7 @@
 import { Ban, Droplet } from "lucide-react";
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
-import { collectPointers, registerBox } from "../../store/boxRegistry";
-import { useHeapIds } from "../../store/traceStore";
+import { childPath, collectPointers, registerBox } from "../../store/boxRegistry";
+import { useHeapIds, useTraceStore } from "../../store/traceStore";
 import type { HeapObject, Step, Value } from "../../types/trace";
 import { ValueBox } from "./ValueBox";
 
@@ -27,12 +27,17 @@ function HeapBox({
     [object.address],
   );
   const heapId = useHeapIds().get(object.address);
+  const setHover = useTraceStore((s) => s.setHover);
+  // Ring the box while a pointer to it is hovered (or the box itself is).
+  const hoverTarget = useTraceStore((s) => s.hover?.target === object.address);
   return (
     <div
       ref={ref}
       data-addr={object.address}
-      className={`heap-object ${object.freed ? "freed" : ""}`}
+      className={`heap-object ${object.freed ? "freed" : ""}${hoverTarget ? " hover-target" : ""}`}
       style={{ transform: `translate(${x}px, ${y}px)`, opacity: ready ? undefined : 0 }}
+      onMouseEnter={() => setHover({ target: object.address })}
+      onMouseLeave={() => setHover(null)}
     >
       <div className="heap-label">
         {heapId && (
@@ -53,7 +58,7 @@ function HeapBox({
         )}
       </div>
       {object.elements.map((value, i) => (
-        <ValueBox key={`${value.name}-${i}`} value={value} />
+        <ValueBox key={`${value.name}-${i}`} value={value} path={childPath(object.address, i, value.name)} />
       ))}
       {/* Python addresses are synthetic id()s, not allocations — never shown. */}
       {!python && (

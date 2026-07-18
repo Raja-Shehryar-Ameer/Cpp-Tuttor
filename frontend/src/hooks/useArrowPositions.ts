@@ -6,6 +6,10 @@ export type ArrowKind = "forward" | "backward" | "lane" | "laneTop" | "down";
 
 export interface Arrow {
   key: string;
+  /** registry key of the pointer cell — hover matching */
+  source: string;
+  /** target address — hover matching */
+  target: string;
   kind: ArrowKind;
   /** source anchor: right edge of the pointer cell (left edge for "backward") */
   x1: number;
@@ -113,7 +117,6 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     return n === 0 ? address : `${address}#${n}`;
   };
   for (const pointer of collectPointers(step)) {
-    if (!pointer.address) continue;
     const fromEl = getBox(pointer.address);
     if (!fromEl) continue;
     // No box for the target (garbage or out-of-scope address): draw nothing.
@@ -166,7 +169,7 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
     ) {
       const seen = sideSeen.get(pointer.target) ?? 0;
       sideSeen.set(pointer.target, seen + 1);
-      measured.push({ key: keyFor(pointer.address), kind: "forward", x1, y1, x2: toLeft - 2, y2: fanY(seen), gapY: 0, danger, faded });
+      measured.push({ key: keyFor(pointer.address), source: pointer.address, target: pointer.target, kind: "forward", x1, y1, x2: toLeft - 2, y2: fanY(seen), gapY: 0, danger, faded });
     } else if (
       heapToHeap &&
       sameRow &&
@@ -177,7 +180,7 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       // Serpentine right-to-left row: the mirror of "forward".
       const seen = sideSeen.get(pointer.target) ?? 0;
       sideSeen.set(pointer.target, seen + 1);
-      measured.push({ key: keyFor(pointer.address), kind: "backward", x1: x1Left, y1, x2: toRight + 2, y2: fanY(seen), gapY: 0, danger, faded });
+      measured.push({ key: keyFor(pointer.address), source: pointer.address, target: pointer.target, kind: "backward", x1: x1Left, y1, x2: toRight + 2, y2: fanY(seen), gapY: 0, danger, faded });
     } else if (!toEl.closest(".heap-region")) {
       // Stack target. An array/struct CELL has siblings to its right, so a
       // right-edge approach at mid-height would run across them and drop the
@@ -188,12 +191,12 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
         const seen = topSeen.get(pointer.target) ?? 0;
         topSeen.set(pointer.target, seen + 1);
         const entryX = Math.min(toRight - 6, toLeft + to.width / 2 + seen * 10);
-        measured.push({ key: keyFor(pointer.address), kind: "laneTop", x1, y1, x2: entryX, y2: toTop - 2, gapY: toTop - 14 - seen * 7, danger, faded });
+        measured.push({ key: keyFor(pointer.address), source: pointer.address, target: pointer.target, kind: "laneTop", x1, y1, x2: entryX, y2: toTop - 2, gapY: toTop - 14 - seen * 7, danger, faded });
       } else {
         // Fan multiple pointers into one scalar so their heads don't stack.
         const seen = sideSeen.get(pointer.target) ?? 0;
         sideSeen.set(pointer.target, seen + 1);
-        measured.push({ key: keyFor(pointer.address), kind: "lane", x1, y1, x2: toRight + 2, y2: fanY(seen), gapY: 0, danger, faded });
+        measured.push({ key: keyFor(pointer.address), source: pointer.address, target: pointer.target, kind: "lane", x1, y1, x2: toRight + 2, y2: fanY(seen), gapY: 0, danger, faded });
       }
     } else {
       // Top entry: stagger arrows sharing a target so heads don't stack —
@@ -209,7 +212,7 @@ function measure(container: HTMLElement, step: Step): Arrow[] {
       // heap→heap arrows to a higher row need the outer gutter.
       const below = toTop > y1 + 16;
       measured.push({
-        key: keyFor(pointer.address),
+        key: keyFor(pointer.address), source: pointer.address, target: pointer.target,
         kind: stackToHeap || below ? "down" : "laneTop",
         x1,
         y1,

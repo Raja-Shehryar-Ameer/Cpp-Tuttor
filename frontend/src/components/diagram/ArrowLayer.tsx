@@ -1,6 +1,7 @@
 import { TriangleAlert } from "lucide-react";
 import type { RefObject } from "react";
 import { useArrowPositions, type Arrow } from "../../hooks/useArrowPositions";
+import { useTraceStore } from "../../store/traceStore";
 import type { Step } from "../../types/trace";
 
 // "forward": plain bezier into the target's left edge (chain look).
@@ -86,6 +87,9 @@ export function ArrowLayer({
   step: Step | null;
 }) {
   const arrows = useArrowPositions(containerRef, step);
+  // Hovering a pointer cell focuses ITS arrow; hovering a heap object focuses
+  // every arrow into it. All other arrows dim so the connection pops.
+  const hover = useTraceStore((s) => s.hover);
   return (
     <svg className="arrow-layer" aria-hidden="true">
       <defs>
@@ -100,10 +104,14 @@ export function ArrowLayer({
         // Position comes fresh from the per-frame measurement loop, so the
         // path is set directly — no CSS morph, no mid-flight marker flips.
         const warn = warnPos(arrow);
+        const focused =
+          hover !== null &&
+          (hover.source !== undefined ? arrow.source === hover.source : arrow.target === hover.target);
+        const hoverClass = hover === null ? "" : focused ? " focus" : " dim";
         return (
           <g
             key={arrow.key}
-            className={`arrow${arrow.danger ? " danger" : ""}${arrow.faded ? " faded" : ""}`}
+            className={`arrow${arrow.danger ? " danger" : ""}${arrow.faded ? " faded" : ""}${hoverClass}`}
           >
             <path
               d={path(arrow)}

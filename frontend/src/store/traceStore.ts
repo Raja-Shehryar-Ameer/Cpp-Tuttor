@@ -3,6 +3,13 @@ import type { Step, Trace } from "../types/trace";
 // Explicit .ts extension so the plain-node test suites can import this module.
 import { computeHeapIds } from "../utils/heapIds.ts";
 
+/** Hovered reference: a pointer cell (source key + target) or a heap object
+ *  (target only). Arrows to the target focus; every other arrow dims. */
+export interface HoverRef {
+  source?: string;
+  target: string;
+}
+
 interface TraceState {
   trace: Trace | null;
   currentStep: number;
@@ -12,6 +19,7 @@ interface TraceState {
   speedMs: number;
   loading: boolean;
   requestError: string | null;
+  hover: HoverRef | null;
   setTrace: (trace: Trace | null) => void;
   setStep: (step: number) => void;
   stepForward: () => void;
@@ -20,6 +28,7 @@ interface TraceState {
   setSpeedMs: (ms: number) => void;
   setLoading: (loading: boolean) => void;
   setRequestError: (message: string | null) => void;
+  setHover: (hover: HoverRef | null) => void;
 }
 
 const clamp = (value: number, max: number) => Math.max(0, Math.min(value, max));
@@ -32,6 +41,7 @@ export const useTraceStore = create<TraceState>((set) => ({
   speedMs: 800,
   loading: false,
   requestError: null,
+  hover: null,
   setTrace: (trace) =>
     set({
       trace,
@@ -39,17 +49,25 @@ export const useTraceStore = create<TraceState>((set) => ({
       currentStep: 0,
       playing: false,
       requestError: null,
+      hover: null,
     }),
+  // Step changes clear the hover: the hovered cell may not exist on the new
+  // step, and a mouseleave never fires for an unmounted node.
   setStep: (step) =>
-    set((s) => ({ currentStep: clamp(step, (s.trace?.steps.length ?? 1) - 1) })),
+    set((s) => ({ currentStep: clamp(step, (s.trace?.steps.length ?? 1) - 1), hover: null })),
   stepForward: () =>
     set((s) => {
       const last = (s.trace?.steps.length ?? 1) - 1;
       const next = clamp(s.currentStep + 1, last);
-      return { currentStep: next, playing: s.playing && next < last };
+      return { currentStep: next, playing: s.playing && next < last, hover: null };
     }),
-  stepBack: () => set((s) => ({ currentStep: clamp(s.currentStep - 1, (s.trace?.steps.length ?? 1) - 1) })),
+  stepBack: () =>
+    set((s) => ({
+      currentStep: clamp(s.currentStep - 1, (s.trace?.steps.length ?? 1) - 1),
+      hover: null,
+    })),
   setPlaying: (playing) => set({ playing }),
+  setHover: (hover) => set({ hover }),
   setSpeedMs: (speedMs) => set({ speedMs }),
   setLoading: (loading) => set({ loading }),
   setRequestError: (requestError) => set({ requestError }),

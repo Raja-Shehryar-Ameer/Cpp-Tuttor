@@ -37,7 +37,7 @@ export function StackFrame({
         </div>
       )}
       {frame.locals.map((value) => (
-        <ValueBox key={value.name} value={value} />
+        <ValueBox key={value.name} value={value} path={`${frame.frameId}/${value.name}`} />
       ))}
       {frame.locals.length === 0 && <div className="empty-note">no locals</div>}
     </div>

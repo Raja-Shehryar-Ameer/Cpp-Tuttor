@@ -360,6 +360,11 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
     opacity var(--dur-slow) var(--ease-out), border-color var(--dur-slow) var(--ease-out), box-shadow var(--dur-slow) var(--ease-out),
     background-color var(--dur-med) var(--ease-out);
 }
+/* Ringed while a pointer to this object (or the object itself) is hovered. */
+.heap-object.hover-target {
+  border-color: var(--accent);
+  box-shadow: 3px 3px 0 var(--accent-ink);
+}
 .heap-object.freed { opacity: 0.5; border-style: dashed; box-shadow: none; }
 .heap-object.freed .heap-label-text { text-decoration: line-through; }
 .heap-label {
@@ -433,6 +438,13 @@ main { display: grid; grid-template-columns: minmax(320px, 42%) 1fr; flex: 1; mi
   pointer-events: none; overflow: visible;
 }
 .arrow { transition: opacity var(--dur-med) var(--ease-out); animation: arrow-in var(--dur-med) var(--ease-out); }
+/* Hover focus: the hovered pointer's arrow (or all arrows into the hovered
+   object) thickens while the rest recede — pure opacity/width transitions,
+   never a path morph. */
+.arrow path { transition: stroke-width var(--dur-fast) var(--ease-out); }
+.arrow.dim { opacity: 0.12; }
+.arrow.focus, .arrow.focus.faded { opacity: 1; }
+.arrow.focus path { stroke-width: 3; }
 /* No `d` transition: the measurement loop redraws arrows every frame while
    boxes glide, so paths are always exact and markers never flip mid-morph. */
 .arrow path { fill: none; stroke: var(--arrow); stroke-width: 2; }
