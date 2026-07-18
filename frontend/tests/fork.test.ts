@@ -574,6 +574,241 @@ function sim(label: string, src: string): SimResult {
   eq(r.output, "x 0\n", "unknown-calls: rand() yields 0 in the model");
 }
 
+// ============================ functions ======================================
+
+{
+  const r = sim("fn-basic", `
+    int square(int x) { return x * x; }
+    int main() { printf("%d\\n", square(6)); return 0; }`);
+  eq(r.processes.length, 1, "fn-basic: no forks");
+  eq(r.output, "36\n", "fn-basic: call, param, return value");
+}
+
+{
+  // fork inside a recursive helper: each generation forks exactly one child
+  const r = sim("fn-fork-chain", `
+    void spawn_chain(int n) {
+      if (n == 0) { return; }
+      if (fork() == 0) { spawn_chain(n - 1); exit(n); }
+      wait(NULL);
+    }
+    int main() { spawn_chain(3); return 0; }`);
+  eq(r.processes.length, 4, "fn-fork-chain: P0..P3");
+  for (const [parent, kid] of [["P0", 1], ["P1", 2], ["P2", 3]] as const) {
+    eq(byLabel(r, parent).childIds, [kid], `fn-fork-chain: ${parent} → P${kid}`);
+  }
+  eq(r.processes.map((p) => p.exitStatus), [0, 3, 2, 1], "fn-fork-chain: each level exits with its depth");
+  eq(zombies(r), [], "fn-fork-chain: every generation reaps its child");
+}
+
+{
+  const r = sim("fn-prototype", `
+    int helper(int);
+    int helper(int x) { return x + 1; }
+    int main() { printf("%d\\n", helper(4)); return 0; }`);
+  eq(r.output, "5\n", "fn-prototype: forward declaration is skipped, definition wins");
+}
+
+{
+  // runaway recursion kills only that process, SIGSEGV-style
+  const r = sim("fn-stack-overflow", `
+    int boom(int n) { return boom(n + 1); }
+    int main() { boom(0); return 0; }`);
+  ok(r.notes.some((n) => n.includes("stack overflow")), "fn-stack-overflow: note names the crash", r.notes);
+  eq(byLabel(r, "P0").exitStatus, 139, "fn-stack-overflow: 128 + SIGSEGV(11)");
+}
+
+// ============================ extended C subset ==============================
+
+{
+  // ternary: both sides of the fork pick a different branch
+  const r = sim("ternary", `
+    int main() {
+      int pid = fork();
+      printf("%d\\n", pid == 0 ? 111 : 222);
+      if (pid != 0) { wait(NULL); }
+      return 0;
+    }`);
+  eq(r.output, "222\n111\n", "ternary: parent 222 first, child 111 after");
+}
+
+{
+  const r = sim("do-while", `
+    int main() {
+      int i = 0;
+      do { printf("%d", i); i++; } while (i < 3);
+      printf("\\n");
+      return 0;
+    }`);
+  eq(r.output, "012\n", "do-while: body runs before the test");
+}
+
+{
+  const r = sim("switch-fork", `
+    int main() {
+      int pid = fork();
+      switch (pid == 0 ? 1 : 0) {
+        case 0:
+          printf("parent\\n");
+          wait(NULL);
+          break;
+        case 1:
+          printf("child\\n");
+          break;
+        default:
+          printf("never\\n");
+      }
+      return 0;
+    }`);
+  eq(r.output, "parent\nchild\n", "switch-fork: each process takes its own case");
+  eq(zombies(r), [], "switch-fork: reaped");
+}
+
+{
+  const r = sim("switch-fallthrough", `
+    int main() {
+      switch (1) {
+        case 1: printf("one ");
+        case 2: printf("two "); break;
+        case 3: printf("three ");
+      }
+      printf("end\\n");
+      return 0;
+    }`);
+  eq(r.output, "one two end\n", "switch-fallthrough: case 1 falls into case 2, break skips 3");
+}
+
+{
+  // the classic exam pattern: store fork() pids in an array, reap them in order
+  const r = sim("array-pids", `
+    int main() {
+      int pids[3];
+      for (int i = 0; i < 3; i++) {
+        pids[i] = fork();
+        if (pids[i] == 0) { exit(i + 10); }
+      }
+      int s;
+      for (int i = 0; i < 3; i++) {
+        waitpid(pids[i], &s, 0);
+        printf("%d:%d ", i, WEXITSTATUS(s));
+      }
+      printf("\\n");
+      return 0;
+    }`);
+  eq(r.processes.length, 4, "array-pids: 3 children");
+  eq(r.output, "0:10 1:11 2:12 \n", "array-pids: reaped in pid order with the right exit codes");
+  eq(zombies(r), [], "array-pids: all reaped");
+}
+
+{
+  const r = sim("array-oob", `
+    int main() {
+      int a[2];
+      a[5] = 1;
+      printf("unreached\\n");
+      return 0;
+    }`);
+  ok(r.notes.some((n) => n.includes("out of bounds")), "array-oob: note names the crash", r.notes);
+  eq(byLabel(r, "P0").exitStatus, 139, "array-oob: SIGSEGV-style status");
+  eq(r.output, "", "array-oob: execution stops at the crash");
+}
+
+{
+  const r = sim("bit-ops", `
+    int main() {
+      printf("%d %d %d %d %d\\n", 1 << 4, 20 >> 2, 12 & 10, 12 | 3, 12 ^ 10);
+      return 0;
+    }`);
+  eq(r.output, "16 5 8 15 6\n", "bit-ops: shift, and, or, xor with C precedence");
+}
+
+{
+  // the real <sys/wait.h> macros over the packed status word
+  const r = sim("wait-macros", `
+    int main() {
+      if (fork() == 0) { exit(7); }
+      int s;
+      wait(&s);
+      printf("%d %d\\n", WIFEXITED(s), WEXITSTATUS(s));
+      return 0;
+    }`);
+  eq(r.output, "1 7\n", "wait-macros: WIFEXITED true, WEXITSTATUS unpacks the code");
+}
+
+{
+  const r = sim("define-macros", `
+    #define KIDS 3
+    #define GREET "hi %d\\n"
+    int main() {
+      for (int i = 0; i < KIDS; i++) {
+        if (fork() == 0) { printf(GREET, i); exit(0); }
+        wait(NULL);
+      }
+      return 0;
+    }`);
+  eq(r.processes.length, 4, "define-macros: KIDS expanded to 3");
+  eq(r.output, "hi 0\nhi 1\nhi 2\n", "define-macros: a macro can even be the format string");
+}
+
+{
+  // globals are per-process after fork — copy-on-write, not shared memory
+  const r = sim("globals-cow", `
+    int counter = 0;
+    void bump() { counter = counter + 1; }
+    int main() {
+      bump();
+      if (fork() == 0) { bump(); printf("child %d\\n", counter); exit(0); }
+      wait(NULL);
+      printf("parent %d\\n", counter);
+      return 0;
+    }`);
+  eq(r.output, "child 2\nparent 1\n", "globals-cow: the child's write never reaches the parent");
+}
+
+{
+  const r = sim("puts-putchar", `
+    int main() {
+      puts("hello");
+      putchar(65);
+      putchar(10);
+      return 0;
+    }`);
+  eq(r.output, "hello\nA\n", "puts-putchar: newline appended, char code printed");
+}
+
+{
+  // unknown functions still run but say so in the notes
+  const r = sim("unknown-warns", 'int main() { int x = foo(); printf("%d\\n", x); return 0; }');
+  eq(r.output, "0\n", "unknown-warns: unknown call yields 0");
+  ok(r.notes.some((n) => n.includes("unknown function foo()")), "unknown-warns: warning note present", r.notes);
+}
+
+// ============================ targeted error messages ========================
+// Unsupported constructs must fail with a message that names the construct
+// and the line — never a generic "unexpected token".
+
+{
+  const expectError = (label: string, src: string, needle: string) => {
+    const r = simulateFork(src);
+    ok(r.error !== null && r.error.includes(needle), `error(${label}): says "${needle}"`, r.error);
+    eq(r.processes.length, 0, `error(${label}): no half-built tree`);
+  };
+  expectError("struct", "struct point { int x; };\nint main() { return 0; }", "struct isn't supported");
+  expectError("float", "int main() { float f = 1; return 0; }", "float isn't supported");
+  expectError("define-params", "#define MAX(a,b) ((a)>(b)?(a):(b))\nint main() { return 0; }",
+    "#define with parameters");
+  expectError("top-level-junk", "int main() { return 0; }\nxyz;", 'unexpected "xyz" at top level');
+  expectError("deref", "int main() { int x = 0; int y = *x; return 0; }", "pointer dereference");
+  expectError("array-param", "void f(int a[]) { }\nint main() { return 0; }", "array parameters aren't supported");
+  expectError("array-arg", "void f(int x) { }\nint main() { int a[2]; f(a); return 0; }", "arrays can't be passed");
+  expectError("goto", "int main() { goto end; }", "goto isn't supported");
+  expectError("arity", "void f(int a) { }\nint main() { f(); return 0; }", "takes 1 argument");
+  expectError("case-outside", "int main() { case 1: return 0; }", "label outside");
+  expectError("elem-incdec", "int main() { int a[2]; a[0]++; return 0; }", "a[i] = a[i] + 1");
+  expectError("redefined", "int f() { return 1; }\nint f() { return 2; }\nint main() { return 0; }", "defined twice");
+  expectError("array-size", "int main() { int n = 2; int a[n]; return 0; }", "must be a number literal");
+}
+
 // ============================ randomized fuzz ================================
 // Programs assembled from always-terminating fragments: every simulation must
 // satisfy the structural invariants, never error, and never blow the cap.
@@ -599,6 +834,10 @@ const FRAGMENTS: ((r: () => number) => string)[] = [
   () => "while (wait(0) > 0) { }",
   () => 'printf("m %d %d\\n", getpid(), getppid());',
   () => "if (fork() == 0) { exit(3); } int st; waitpid(-1, &st, 0);",
+  () => "int t = fork() == 0 ? 1 : 2; if (t == 1) { exit(0); }",
+  () => "do { sleep(1); } while (0);",
+  () => "switch (fork()) { case 0: exit(1); default: wait(0); }",
+  (r) => `int buf[4]; for (int q = 0; q < 4; q++) { buf[q] = q * ${1 + Math.floor(r() * 3)}; }`,
   (r) => `for (int i = 0; i < ${1 + Math.floor(r() * 2)}; i++) { fork(); }`,
   (r) => `if (fork() ${r() < 0.5 ? "&&" : "||"} fork()) { sleep(1); }`,
 ];
@@ -618,5 +857,5 @@ for (let t = 0; t < 300; t += 1) {
   if (fails > 0) { console.error("offending program:\n" + src); break; }
 }
 
-console.log(fails === 0 ? "ALL PASS (36 scenario groups + invariants over 300 fuzzed programs)" : `${fails} FAILURES`);
+console.log(fails === 0 ? "ALL PASS (52 scenario groups + invariants over 300 fuzzed programs)" : `${fails} FAILURES`);
 process.exit(fails === 0 ? 0 : 1);

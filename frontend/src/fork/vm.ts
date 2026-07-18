@@ -1,15 +1,20 @@
-// Compiles the parsed main() body to a tiny stack bytecode, then runs it under
-// a fork-aware scheduler. Bytecode (not tree-walking) is what makes fork()
+// Compiles the parsed program to a tiny stack bytecode, then runs it under a
+// fork-aware scheduler. Bytecode (not tree-walking) is what makes fork()
 // honest: a child is just a clone of the parent's (instruction pointer, stack,
-// variables), so a fork inside a loop duplicates the loop counter correctly.
+// call frames), so a fork inside a loop or a helper function duplicates the
+// whole execution state correctly. Crashes are modeled like Unix: an
+// out-of-bounds index or runaway recursion kills only that process with a
+// SIGSEGV-style status; the rest of the tree carries on.
 
-import { lex, Parser, type Expr, type Stmt } from "./simulate.ts";
+import { lex, Parser, type Expr, type FuncDef, type Program, type Stmt } from "./simulate.ts";
 
 type Op =
   | "CONST" | "LOAD" | "STORE" | "POP" | "DUP"
   | "ADD" | "SUB" | "MUL" | "DIV" | "MOD"
+  | "SHL" | "SHR" | "BAND" | "BOR" | "BXOR"
   | "LT" | "LE" | "GT" | "GE" | "EQ" | "NE" | "NOT" | "NEG"
   | "JMP" | "JZ" | "JNZ"
+  | "CALL" | "RET" | "ANEW" | "ALOAD" | "ASTORE"
   | "PRINT" | "FORK" | "EXIT" | "WAIT" | "WAITPID" | "GETPID" | "GETPPID" | "SLEEP" | "HALT";
 
 interface Instr {
@@ -18,11 +23,45 @@ interface Instr {
   argc?: number;
 }
 
+interface FuncInfo {
+  addr: number;
+  params: string[];
+}
+
 // ------------------------------ compiler ------------------------------------
+
+/** `&name` in a wait()/waitpid() status position → the variable to fill. */
+function statusVarOf(a: Expr | undefined): string | undefined {
+  return a && a.k === "un" && a.op === "&" && a.a.k === "var" ? a.a.name : undefined;
+}
+
+// Library calls that are common in exam programs but deliberately not modeled;
+// they quietly return 0 without an "unknown function" warning (validation.ts
+// already warns about the interesting ones like exec* and scanf).
+const KNOWN_UNMODELED = new Set([
+  "srand", "rand", "time", "atoi", "abs",
+  "execl", "execlp", "execle", "execv", "execvp", "execvpe", "system",
+  "signal", "kill", "raise", "alarm", "pause", "abort",
+  "pipe", "close", "read", "write", "dup", "dup2",
+  "scanf", "gets", "fgets", "getchar", "fflush", "setbuf", "perror",
+  "malloc", "free", "calloc",
+]);
+
+const BIN_OPS: Record<string, Op> = {
+  "+": "ADD", "-": "SUB", "*": "MUL", "/": "DIV", "%": "MOD",
+  "<<": "SHL", ">>": "SHR", "&": "BAND", "|": "BOR", "^": "BXOR",
+  "<": "LT", "<=": "LE", ">": "GT", ">=": "GE", "==": "EQ", "!=": "NE",
+};
 
 class Compiler {
   code: Instr[] = [];
-  private loops: { breaks: number[]; continues: number[] }[] = [];
+  warnings: string[] = [];
+  private funcs: Record<string, FuncInfo> = {};
+  private userFuncs: Map<string, FuncDef> = new Map();
+  private arrayNames = new Set<string>();
+  // break targets the innermost loop OR switch; continue only loops
+  private breakables: { breaks: number[]; continues: number[] | null }[] = [];
+  private swId = 0;
 
   private emit(op: Op, arg?: number | string, argc?: number): number {
     this.code.push({ op, arg, argc });
@@ -31,21 +70,49 @@ class Compiler {
   private patch(i: number, arg: number) {
     this.code[i].arg = arg;
   }
+  private warn(msg: string) {
+    if (!this.warnings.includes(msg)) this.warnings.push(msg);
+  }
 
-  compileProgram(body: Stmt[]): Instr[] {
-    for (const s of body) this.stmt(s);
+  compileProgram(prog: Program): { code: Instr[]; funcs: Record<string, FuncInfo>; warnings: string[] } {
+    this.userFuncs = prog.functions;
+    // Bootstrap: globals live in the root frame, then main() runs and its
+    // return value becomes the exit status.
+    for (const g of prog.globals) this.stmt(g);
+    this.emit("CALL", "main", 0);
+    this.emit("EXIT");
+    for (const f of prog.functions.values()) {
+      if (f.name === "main" && f.params.length > 0)
+        this.warn("main()'s parameters (argc/argv) aren't modeled — they read as 0.");
+      this.funcs[f.name] = { addr: this.code.length, params: f.params };
+      for (const s of f.body) this.stmt(s);
+      this.emit("CONST", 0); // falling off the end returns 0
+      this.emit("RET");
+    }
     this.emit("HALT");
-    return this.code;
+    return { code: this.code, funcs: this.funcs, warnings: this.warnings };
   }
 
   private stmt(s: Stmt) {
     switch (s.k) {
       case "decl":
         for (const it of s.items) {
-          if (it.e) this.expr(it.e);
-          else this.emit("CONST", 0);
-          this.emit("STORE", it.name);
-          this.emit("POP");
+          if (it.arr) {
+            this.arrayNames.add(it.name);
+            this.emit("CONST", it.arr.size);
+            this.emit("ANEW", it.name);
+            it.arr.init?.forEach((e, idx) => {
+              this.emit("CONST", idx);
+              this.expr(e);
+              this.emit("ASTORE", it.name);
+              this.emit("POP");
+            });
+          } else {
+            if (it.e) this.expr(it.e);
+            else this.emit("CONST", 0);
+            this.emit("STORE", it.name);
+            this.emit("POP");
+          }
         }
         break;
       case "expr":
@@ -58,7 +125,7 @@ class Compiler {
       case "return":
         if (s.e) this.expr(s.e);
         else this.emit("CONST", 0);
-        this.emit("EXIT");
+        this.emit("RET");
         break;
       case "if": {
         this.expr(s.c);
@@ -78,14 +145,27 @@ class Compiler {
         const lcond = this.code.length;
         this.expr(s.c);
         const jz = this.emit("JZ", -1);
-        this.loops.push({ breaks: [], continues: [] });
+        this.breakables.push({ breaks: [], continues: [] });
         this.stmt(s.body);
         this.emit("JMP", lcond);
         const lend = this.code.length;
         this.patch(jz, lend);
-        const frame = this.loops.pop()!;
+        const frame = this.breakables.pop()!;
         frame.breaks.forEach((b) => this.patch(b, lend));
-        frame.continues.forEach((c) => this.patch(c, lcond));
+        frame.continues!.forEach((c) => this.patch(c, lcond));
+        break;
+      }
+      case "dowhile": {
+        const ltop = this.code.length;
+        this.breakables.push({ breaks: [], continues: [] });
+        this.stmt(s.body);
+        const lcond = this.code.length;
+        this.expr(s.c);
+        this.emit("JNZ", ltop);
+        const lend = this.code.length;
+        const frame = this.breakables.pop()!;
+        frame.breaks.forEach((b) => this.patch(b, lend));
+        frame.continues!.forEach((c) => this.patch(c, lcond));
         break;
       }
       case "for": {
@@ -96,7 +176,7 @@ class Compiler {
           this.expr(s.cond);
           jz = this.emit("JZ", -1);
         }
-        this.loops.push({ breaks: [], continues: [] });
+        this.breakables.push({ breaks: [], continues: [] });
         this.stmt(s.body);
         const lpost = this.code.length;
         if (s.post) {
@@ -106,19 +186,53 @@ class Compiler {
         this.emit("JMP", lcond);
         const lend = this.code.length;
         if (jz >= 0) this.patch(jz, lend);
-        const frame = this.loops.pop()!;
+        const frame = this.breakables.pop()!;
         frame.breaks.forEach((b) => this.patch(b, lend));
-        frame.continues.forEach((c) => this.patch(c, lpost));
+        frame.continues!.forEach((c) => this.patch(c, lpost));
+        break;
+      }
+      case "switch": {
+        // dispatch on a hidden temp so the scrutinee is evaluated exactly once
+        const tmp = `__switch${this.swId++}`;
+        this.expr(s.e);
+        this.emit("STORE", tmp);
+        this.emit("POP");
+        const jumps: { at: number; ci: number }[] = [];
+        s.cases.forEach((c, ci) => {
+          if (c.v === null) return;
+          this.emit("LOAD", tmp);
+          this.emit("CONST", c.v);
+          this.emit("EQ");
+          jumps.push({ at: this.emit("JNZ", -1), ci });
+        });
+        const jmpDefault = this.emit("JMP", -1);
+        this.breakables.push({ breaks: [], continues: null });
+        const bodyAddr: number[] = [];
+        s.cases.forEach((c, ci) => {
+          bodyAddr[ci] = this.code.length; // fall-through is the natural layout
+          for (const b of c.body) this.stmt(b);
+        });
+        const lend = this.code.length;
+        jumps.forEach((j) => this.patch(j.at, bodyAddr[j.ci]));
+        const dflt = s.cases.findIndex((c) => c.v === null);
+        this.patch(jmpDefault, dflt >= 0 ? bodyAddr[dflt] : lend);
+        const frame = this.breakables.pop()!;
+        frame.breaks.forEach((b) => this.patch(b, lend));
         break;
       }
       case "break": {
-        const frame = this.loops[this.loops.length - 1];
+        const frame = this.breakables[this.breakables.length - 1];
         if (frame) frame.breaks.push(this.emit("JMP", -1));
         break;
       }
       case "continue": {
-        const frame = this.loops[this.loops.length - 1];
-        if (frame) frame.continues.push(this.emit("JMP", -1));
+        for (let i = this.breakables.length - 1; i >= 0; i--) {
+          const frame = this.breakables[i];
+          if (frame.continues) {
+            frame.continues.push(this.emit("JMP", -1));
+            break;
+          }
+        }
         break;
       }
     }
@@ -145,15 +259,41 @@ class Compiler {
         this.expr(e.a);
         this.emit(e.op === "!" ? "NOT" : "NEG");
         break;
+      case "cond": {
+        this.expr(e.c);
+        const jz = this.emit("JZ", -1);
+        this.expr(e.t);
+        const jmp = this.emit("JMP", -1);
+        this.patch(jz, this.code.length);
+        this.expr(e.f);
+        this.patch(jmp, this.code.length);
+        break;
+      }
       case "assign": {
+        const opFor = (op: string): Op =>
+          op === "+=" ? "ADD" : op === "-=" ? "SUB" : op === "*=" ? "MUL" : "DIV";
+        if (e.target.k === "index") {
+          this.expr(e.target.i);
+          if (e.op === "=") {
+            this.expr(e.e);
+          } else {
+            this.emit("DUP"); // keep the index for the store
+            this.emit("ALOAD", e.target.name);
+            this.expr(e.e);
+            this.emit(opFor(e.op));
+          }
+          this.emit("ASTORE", e.target.name);
+          break;
+        }
+        const name = (e.target as Extract<Expr, { k: "var" }>).name;
         if (e.op === "=") {
           this.expr(e.e);
         } else {
-          this.emit("LOAD", e.name);
+          this.emit("LOAD", name);
           this.expr(e.e);
-          this.emit(e.op === "+=" ? "ADD" : e.op === "-=" ? "SUB" : e.op === "*=" ? "MUL" : "DIV");
+          this.emit(opFor(e.op));
         }
-        this.emit("STORE", e.name);
+        this.emit("STORE", name);
         break;
       }
       case "incdec": {
@@ -173,6 +313,10 @@ class Compiler {
         }
         break;
       }
+      case "index":
+        this.expr(e.i);
+        this.emit("ALOAD", e.name);
+        break;
       case "bin":
         this.binary(e);
         break;
@@ -199,14 +343,14 @@ class Compiler {
     }
     this.expr(e.a);
     this.expr(e.b);
-    const map: Record<string, Op> = {
-      "+": "ADD", "-": "SUB", "*": "MUL", "/": "DIV", "%": "MOD",
-      "<": "LT", "<=": "LE", ">": "GT", ">=": "GE", "==": "EQ", "!=": "NE",
-    };
-    this.emit(map[e.op]);
+    this.emit(BIN_OPS[e.op]);
   }
 
   private call(e: Extract<Expr, { k: "call" }>) {
+    const arg0 = () => {
+      if (e.args[0]) this.expr(e.args[0]);
+      else this.emit("CONST", 0);
+    };
     switch (e.name) {
       case "fork":
         this.emit("FORK");
@@ -229,15 +373,52 @@ class Compiler {
         return;
       case "exit":
       case "_exit":
-        if (e.args[0]) this.expr(e.args[0]);
-        else this.emit("CONST", 0);
+        arg0();
         this.emit("EXIT");
         return;
       case "sleep":
       case "usleep":
-        if (e.args[0]) this.expr(e.args[0]);
-        else this.emit("CONST", 0);
+        arg0();
         this.emit("SLEEP");
+        return;
+      // <sys/wait.h> status macros, modeled on the real bit layout
+      case "WEXITSTATUS": // (s >> 8) & 0xff
+        arg0();
+        this.emit("CONST", 8);
+        this.emit("SHR");
+        this.emit("CONST", 255);
+        this.emit("BAND");
+        return;
+      case "WIFEXITED": // !(s & 0x7f)
+        arg0();
+        this.emit("CONST", 127);
+        this.emit("BAND");
+        this.emit("NOT");
+        return;
+      case "WIFSIGNALED": // (s & 0x7f) != 0
+        arg0();
+        this.emit("CONST", 127);
+        this.emit("BAND");
+        this.emit("CONST", 0);
+        this.emit("NE");
+        return;
+      case "WTERMSIG": // s & 0x7f
+        arg0();
+        this.emit("CONST", 127);
+        this.emit("BAND");
+        return;
+      case "puts": {
+        if (e.args[0]?.k === "str") {
+          this.emit("PRINT", e.args[0].v + "\\n", 0);
+        } else {
+          this.warn(`line ${e.line}: puts() with a non-literal argument isn't supported — it prints nothing.`);
+          this.emit("CONST", 0);
+        }
+        return;
+      }
+      case "putchar":
+        arg0();
+        this.emit("PRINT", "%c", 1);
         return;
       case "printf": {
         const fmt = e.args[0]?.k === "str" ? e.args[0].v : "";
@@ -246,20 +427,30 @@ class Compiler {
         this.emit("PRINT", fmt, valueArgs.length);
         return;
       }
-      default:
-        // unknown call: evaluate args for side effects, discard, yield 0
-        for (const a of e.args) {
-          this.expr(a);
-          this.emit("POP");
-        }
-        this.emit("CONST", 0);
     }
+    const fn = this.userFuncs.get(e.name);
+    if (fn) {
+      if (e.args.length !== fn.params.length)
+        throw new Error(
+          `line ${e.line}: ${e.name}() takes ${fn.params.length} argument${fn.params.length === 1 ? "" : "s"}, got ${e.args.length}`,
+        );
+      for (const a of e.args) {
+        if (a.k === "var" && this.arrayNames.has(a.name))
+          throw new Error(`line ${e.line}: arrays can't be passed to functions yet — pass elements one by one`);
+        this.expr(a);
+      }
+      this.emit("CALL", e.name, e.args.length);
+      return;
+    }
+    // unknown call: evaluate args for side effects, discard, yield 0
+    if (!KNOWN_UNMODELED.has(e.name))
+      this.warn(`line ${e.line}: unknown function ${e.name}() — treated as returning 0.`);
+    for (const a of e.args) {
+      this.expr(a);
+      this.emit("POP");
+    }
+    this.emit("CONST", 0);
   }
-}
-
-/** `&name` in a wait()/waitpid() status position → the variable to fill. */
-function statusVarOf(a: Expr | undefined): string | undefined {
-  return a && a.k === "un" && a.op === "&" && a.a.k === "var" ? a.a.name : undefined;
 }
 
 // ------------------------------ runtime -------------------------------------
@@ -285,10 +476,17 @@ export interface SimResult {
   error: string | null;
 }
 
+interface Frame {
+  vars: Map<string, number>;
+  arrays: Map<string, number[]>;
+  ret: number;
+}
+
 interface Proc extends ProcNode {
   ip: number;
   stack: number[];
-  vars: Map<string, number>;
+  frames: Frame[];
+  statusWord: number | null; // what wait() reads: code << 8, or the signal
   alive: boolean;
   waiting: boolean;
   waitFor: number | null; // pid a blocked waitpid() targets; null = any child
@@ -298,6 +496,7 @@ interface Proc extends ProcNode {
 
 const MAX_PROCS = 100;
 const MAX_STEPS = 500_000;
+const MAX_FRAMES = 200;
 const SYSTEMD_PID = 1;
 const BASE_PID = 1000;
 
@@ -313,6 +512,7 @@ function applyFormat(fmt: string, args: number[]): string {
       const s = fmt[++i];
       if (s === "d" || s === "i" || s === "u" || s === "l") out += String(args[ai++] ?? 0);
       else if (s === "c") out += String.fromCharCode(args[ai++] ?? 0);
+      else if (s === "x") out += (args[ai++] ?? 0).toString(16);
       else if (s === "%") out += "%";
       else out += "%" + (s ?? "");
     } else out += c;
@@ -323,9 +523,13 @@ function applyFormat(fmt: string, args: number[]): string {
 export function simulateFork(source: string): SimResult {
   const notes: string[] = [];
   let code: Instr[];
+  let funcs: Record<string, FuncInfo>;
   try {
-    const body = new Parser(lex(source)).parseMain();
-    code = new Compiler().compileProgram(body);
+    const prog = new Parser(lex(source)).parseProgram();
+    const compiled = new Compiler().compileProgram(prog);
+    code = compiled.code;
+    funcs = compiled.funcs;
+    notes.push(...compiled.warnings);
   } catch (err) {
     return {
       processes: [],
@@ -350,12 +554,19 @@ export function simulateFork(source: string): SimResult {
       ppid: parent ? parent.pid : SYSTEMD_PID,
       output: "",
       exitStatus: null,
+      statusWord: null,
       reparented: false,
       zombie: false,
       childIds: [],
       ip: parent ? parent.ip : 0,
       stack: parent ? parent.stack.slice() : [],
-      vars: parent ? new Map(parent.vars) : new Map(),
+      frames: parent
+        ? parent.frames.map((f) => ({
+            vars: new Map(f.vars),
+            arrays: new Map([...f.arrays].map(([k, v]) => [k, v.slice()])),
+            ret: f.ret,
+          }))
+        : [{ vars: new Map(), arrays: new Map(), ret: -1 }],
       alive: true,
       waiting: false,
       waitFor: null,
@@ -366,6 +577,19 @@ export function simulateFork(source: string): SimResult {
     return p;
   };
 
+  // Variable scope: the current call frame, falling back to the root frame,
+  // which doubles as global scope (fork clones it all, which IS C's copy-on-
+  // write semantics: each process owns its copy of every variable).
+  const topF = (p: Proc) => p.frames[p.frames.length - 1];
+  const getVar = (p: Proc, name: string): number =>
+    topF(p).vars.get(name) ?? p.frames[0].vars.get(name) ?? 0;
+  const setVar = (p: Proc, name: string, v: number) => {
+    const f = topF(p).vars.has(name) ? topF(p) : p.frames[0].vars.has(name) ? p.frames[0] : topF(p);
+    f.vars.set(name, v);
+  };
+  const getArr = (p: Proc, name: string): number[] | undefined =>
+    topF(p).arrays.get(name) ?? p.frames[0].arrays.get(name);
+
   const root = spawn(null);
   root.label = "P0";
 
@@ -374,10 +598,12 @@ export function simulateFork(source: string): SimResult {
   // how the classic "parent sleeps, child exits → zombie" programs behave.
   const queue: Proc[] = [root];
 
-  const terminate = (p: Proc, status: number) => {
+  const terminate = (p: Proc, status: number, sig = 0) => {
     p.alive = false;
-    // Real wait() exposes only the low 8 bits — exit(256) reads back as 0.
-    p.exitStatus = status & 0xff;
+    // Real wait() packs a status word: exit code in the high byte, or the
+    // fatal signal in the low bits. exitStatus mirrors the shell's $?.
+    p.exitStatus = sig ? (128 + sig) & 0xff : status & 0xff;
+    p.statusWord = sig ? sig : (status & 0xff) << 8;
     p.ip = code.length;
     // Orphan any children still running — the kernel reparents them to
     // systemd/init (PID 1). We keep the fork-time parent in the tree and just
@@ -390,23 +616,29 @@ export function simulateFork(source: string): SimResult {
       const par = byId(p.parentId);
       if (par.waiting && (par.waitFor === null || par.waitFor === p.pid)) {
         // Parent was blocked in wait()/waitpid() for us: reaped immediately,
-        // no zombie. A &status pointer receives the packed word (code << 8).
+        // no zombie. A &status pointer receives the packed word.
         const idx = par.unwaited.indexOf(p.id);
         if (idx >= 0) par.unwaited.splice(idx, 1);
-        if (par.waitVar) par.vars.set(par.waitVar, p.exitStatus! << 8);
+        if (par.waitVar) setVar(par, par.waitVar, p.statusWord);
         par.waiting = false;
         par.waitFor = null;
         par.waitVar = null;
         par.stack.push(p.pid);
         queue.push(par);
       } else if (par.alive) {
-        // Parent alive but not waiting: this child is now a ZOMBIE. The flag
-        // is cleared if a later wait() reaps it; if the parent exits without
-        // ever waiting, it sticks (init reaps it, but it *was* a zombie).
+        // Parent alive but not waiting (or waiting for a different child):
+        // this child is now a ZOMBIE. The flag is cleared if a later wait()
+        // reaps it; if the parent exits without ever waiting, it sticks.
         p.zombie = true;
       }
       // Parent already dead: we were reparented; init reaps us silently.
     }
+  };
+
+  // A Unix-flavored crash: only this process dies, with a SIGSEGV status.
+  const crash = (p: Proc, msg: string) => {
+    notes.push(`${p.label} crashed: ${msg} — the process was killed (SIGSEGV-style status 139).`);
+    terminate(p, 0, 11);
   };
 
   let steps = 0;
@@ -427,10 +659,10 @@ export function simulateFork(source: string): SimResult {
       const st = p.stack;
       switch (ins.op) {
         case "CONST": st.push(ins.arg as number); break;
-        case "LOAD": st.push(p.vars.get(ins.arg as string) ?? 0); break;
+        case "LOAD": st.push(getVar(p, ins.arg as string)); break;
         case "STORE": {
           const v = st[st.length - 1];
-          p.vars.set(ins.arg as string, v);
+          setVar(p, ins.arg as string, v);
           break; // leave value on stack (assignment is an expression)
         }
         case "POP": st.pop(); break;
@@ -440,6 +672,11 @@ export function simulateFork(source: string): SimResult {
         case "MUL": { const b = st.pop()!; st.push((st.pop()! * b) | 0); break; }
         case "DIV": { const b = st.pop()!; st.push(b === 0 ? 0 : (st.pop()! / b) | 0); break; }
         case "MOD": { const b = st.pop()!; st.push(b === 0 ? 0 : (st.pop()! % b) | 0); break; }
+        case "SHL": { const b = st.pop()!; st.push(st.pop()! << b); break; }
+        case "SHR": { const b = st.pop()!; st.push(st.pop()! >> b); break; }
+        case "BAND": { const b = st.pop()!; st.push(st.pop()! & b); break; }
+        case "BOR": { const b = st.pop()!; st.push(st.pop()! | b); break; }
+        case "BXOR": { const b = st.pop()!; st.push(st.pop()! ^ b); break; }
         case "LT": { const b = st.pop()!; st.push(st.pop()! < b ? 1 : 0); break; }
         case "LE": { const b = st.pop()!; st.push(st.pop()! <= b ? 1 : 0); break; }
         case "GT": { const b = st.pop()!; st.push(st.pop()! > b ? 1 : 0); break; }
@@ -453,10 +690,71 @@ export function simulateFork(source: string): SimResult {
         case "JNZ": if (st.pop() !== 0) p.ip = ins.arg as number; break;
         case "GETPID": st.push(p.pid); break;
         case "GETPPID": st.push(p.reparented ? SYSTEMD_PID : p.ppid); break;
+        case "CALL": {
+          const fn = funcs[ins.arg as string];
+          if (p.frames.length >= MAX_FRAMES) {
+            crash(p, `stack overflow in ${ins.arg}() — recursion went too deep`);
+            return "ended";
+          }
+          const argc = ins.argc ?? 0;
+          const args = argc ? st.splice(st.length - argc, argc) : [];
+          const vars = new Map<string, number>();
+          fn.params.forEach((nm, ix) => vars.set(nm, args[ix] ?? 0));
+          p.frames.push({ vars, arrays: new Map(), ret: p.ip });
+          p.ip = fn.addr;
+          break;
+        }
+        case "RET": {
+          const v = st.pop() ?? 0;
+          const frame = p.frames.pop()!;
+          p.ip = frame.ret;
+          st.push(v);
+          break;
+        }
+        case "ANEW": {
+          const size = st.pop()!;
+          if (size < 0 || size > 100_000) {
+            crash(p, `array "${ins.arg}" has an impossible size (${size})`);
+            return "ended";
+          }
+          topF(p).arrays.set(ins.arg as string, new Array(size).fill(0));
+          break;
+        }
+        case "ALOAD": {
+          const idx = st.pop()!;
+          const arr = getArr(p, ins.arg as string);
+          if (!arr) {
+            crash(p, `no array named "${ins.arg}" is in scope`);
+            return "ended";
+          }
+          if (idx < 0 || idx >= arr.length) {
+            crash(p, `index ${idx} is out of bounds for ${ins.arg}[${arr.length}]`);
+            return "ended";
+          }
+          st.push(arr[idx]);
+          break;
+        }
+        case "ASTORE": {
+          const v = st.pop()!;
+          const idx = st.pop()!;
+          const arr = getArr(p, ins.arg as string);
+          if (!arr) {
+            crash(p, `no array named "${ins.arg}" is in scope`);
+            return "ended";
+          }
+          if (idx < 0 || idx >= arr.length) {
+            crash(p, `index ${idx} is out of bounds for ${ins.arg}[${arr.length}]`);
+            return "ended";
+          }
+          arr[idx] = v;
+          st.push(v); // assignment is an expression
+          break;
+        }
         case "SLEEP":
           // Yield the CPU: everyone else runs before the sleeper resumes —
           // this is what lets a child exit while its parent naps (zombie).
           st.pop();
+          st.push(0); // sleep() returns 0
           return "slept";
         case "PRINT": {
           const argc = ins.argc ?? 0;
@@ -464,6 +762,7 @@ export function simulateFork(source: string): SimResult {
           const text = applyFormat(ins.arg as string, args);
           p.output += text;
           outputChunks.push(text);
+          st.push(text.length); // printf returns the character count
           break;
         }
         case "FORK": {
@@ -472,7 +771,7 @@ export function simulateFork(source: string): SimResult {
             st.push(-1);
             break;
           }
-          const child = spawn(p); // clones ip, stack, vars from parent
+          const child = spawn(p); // clones ip, stack, frames from parent
           child.stack.push(0); // child sees fork() == 0
           st.push(child.pid); // parent sees the child pid
           p.childIds.push(child.id);
@@ -483,12 +782,12 @@ export function simulateFork(source: string): SimResult {
         case "WAIT":
         case "WAITPID": {
           const sv = ins.arg as string | undefined;
-          // reaping is what un-zombifies a dead child; &status gets code << 8
+          // reaping is what un-zombifies a dead child; &status gets the word
           const reap = (cid: number) => {
             const kid = byId(cid);
             p.unwaited.splice(p.unwaited.indexOf(cid), 1);
             kid.zombie = false;
-            if (sv) p.vars.set(sv, kid.exitStatus! << 8);
+            if (sv) setVar(p, sv, kid.statusWord ?? 0);
             st.push(kid.pid);
           };
           const target = ins.op === "WAITPID" ? st.pop()! : -1;
