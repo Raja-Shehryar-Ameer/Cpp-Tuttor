@@ -352,6 +352,12 @@ class Parser {
       const op = this.next().v;
       return { k: "un", op, a: this.unary() };
     }
+    if (this.is("op", "&")) {
+      // address-of, so wait(&status) / waitpid(pid, &status, 0) parse; the
+      // compiler gives it meaning only in those status-slot positions
+      this.next();
+      return { k: "un", op: "&", a: this.unary() };
+    }
     if (this.is("op", "++") || this.is("op", "--")) {
       const op = this.next().v;
       const name = this.eat("id").v;

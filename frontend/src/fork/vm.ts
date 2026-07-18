@@ -10,7 +10,7 @@ type Op =
   | "ADD" | "SUB" | "MUL" | "DIV" | "MOD"
   | "LT" | "LE" | "GT" | "GE" | "EQ" | "NE" | "NOT" | "NEG"
   | "JMP" | "JZ" | "JNZ"
-  | "PRINT" | "FORK" | "EXIT" | "WAIT" | "GETPID" | "GETPPID" | "SLEEP" | "HALT";
+  | "PRINT" | "FORK" | "EXIT" | "WAIT" | "WAITPID" | "GETPID" | "GETPPID" | "SLEEP" | "HALT";
 
 interface Instr {
   op: Op;
@@ -136,6 +136,12 @@ class Compiler {
         this.emit("LOAD", e.name);
         break;
       case "un":
+        if (e.op === "&") {
+          // address-of only means something as a wait()/waitpid() status slot,
+          // which call() intercepts before compiling args; elsewhere it's 0
+          this.emit("CONST", 0);
+          break;
+        }
         this.expr(e.a);
         this.emit(e.op === "!" ? "NOT" : "NEG");
         break;
@@ -212,8 +218,14 @@ class Compiler {
         this.emit("GETPPID");
         return;
       case "wait":
+        // wait(&s) records the packed status (exit code << 8) into s
+        this.emit("WAIT", statusVarOf(e.args[0]));
+        return;
       case "waitpid":
-        this.emit("WAIT"); // args (status ptr) ignored
+        // first arg picks WHICH child (-1 = any), second may be &status
+        if (e.args[0]) this.expr(e.args[0]);
+        else this.emit("CONST", -1);
+        this.emit("WAITPID", statusVarOf(e.args[1]));
         return;
       case "exit":
       case "_exit":
@@ -245,6 +257,11 @@ class Compiler {
   }
 }
 
+/** `&name` in a wait()/waitpid() status position → the variable to fill. */
+function statusVarOf(a: Expr | undefined): string | undefined {
+  return a && a.k === "un" && a.op === "&" && a.a.k === "var" ? a.a.name : undefined;
+}
+
 // ------------------------------ runtime -------------------------------------
 
 export interface ProcNode {
@@ -274,6 +291,8 @@ interface Proc extends ProcNode {
   vars: Map<string, number>;
   alive: boolean;
   waiting: boolean;
+  waitFor: number | null; // pid a blocked waitpid() targets; null = any child
+  waitVar: string | null; // variable a blocked wait's &status should fill
   unwaited: number[];
 }
 
@@ -339,6 +358,8 @@ export function simulateFork(source: string): SimResult {
       vars: parent ? new Map(parent.vars) : new Map(),
       alive: true,
       waiting: false,
+      waitFor: null,
+      waitVar: null,
       unwaited: [],
     };
     procs.push(p);
@@ -367,11 +388,15 @@ export function simulateFork(source: string): SimResult {
     }
     if (p.parentId !== null) {
       const par = byId(p.parentId);
-      if (par.waiting) {
-        // Parent was blocked in wait(): reaped immediately, no zombie.
+      if (par.waiting && (par.waitFor === null || par.waitFor === p.pid)) {
+        // Parent was blocked in wait()/waitpid() for us: reaped immediately,
+        // no zombie. A &status pointer receives the packed word (code << 8).
         const idx = par.unwaited.indexOf(p.id);
         if (idx >= 0) par.unwaited.splice(idx, 1);
+        if (par.waitVar) par.vars.set(par.waitVar, p.exitStatus! << 8);
         par.waiting = false;
+        par.waitFor = null;
+        par.waitVar = null;
         par.stack.push(p.pid);
         queue.push(par);
       } else if (par.alive) {
@@ -455,14 +480,37 @@ export function simulateFork(source: string): SimResult {
           queue.push(child); // becomes runnable after the parent yields
           break;
         }
-        case "WAIT": {
-          // reap an already-exited child if one is waiting to be collected —
-          // that collection is what un-zombifies it
+        case "WAIT":
+        case "WAITPID": {
+          const sv = ins.arg as string | undefined;
+          // reaping is what un-zombifies a dead child; &status gets code << 8
+          const reap = (cid: number) => {
+            const kid = byId(cid);
+            p.unwaited.splice(p.unwaited.indexOf(cid), 1);
+            kid.zombie = false;
+            if (sv) p.vars.set(sv, kid.exitStatus! << 8);
+            st.push(kid.pid);
+          };
+          const target = ins.op === "WAITPID" ? st.pop()! : -1;
+          if (target !== -1) {
+            // waitpid(pid, …): that exact child — not just any dead one
+            const cid = p.unwaited.find((c) => byId(c).pid === target);
+            if (cid === undefined) {
+              st.push(-1); // not our un-reaped child → ECHILD
+              break;
+            }
+            if (!byId(cid).alive) {
+              reap(cid);
+              break;
+            }
+            p.waiting = true;
+            p.waitFor = target;
+            p.waitVar = sv ?? null;
+            return "ended";
+          }
           const done = p.unwaited.find((cid) => !byId(cid).alive);
           if (done !== undefined) {
-            p.unwaited.splice(p.unwaited.indexOf(done), 1);
-            byId(done).zombie = false;
-            st.push(byId(done).pid);
+            reap(done);
             break;
           }
           if (p.unwaited.length === 0) {
@@ -470,6 +518,8 @@ export function simulateFork(source: string): SimResult {
             break;
           }
           p.waiting = true; // block; a child will unblock us on exit
+          p.waitFor = null;
+          p.waitVar = sv ?? null;
           return "ended";
         }
         case "EXIT": terminate(p, st.pop()! | 0); return "ended";

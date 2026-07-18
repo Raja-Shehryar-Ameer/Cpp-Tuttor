@@ -271,6 +271,151 @@ function sim(label: string, src: string): SimResult {
   eq(byLabel(r, "P1").exitStatus, 9, "waitpid-alias: child status");
 }
 
+// ============================ targeted waitpid & statuses ====================
+
+{
+  // waitpid(pid, &s, 0) waits for THAT child even when another is already dead
+  const r = sim("waitpid-targeted", `
+    int main() {
+      int a = fork();
+      if (a == 0) { exit(5); }
+      int b = fork();
+      if (b == 0) { sleep(1); exit(7); }
+      int s;
+      waitpid(b, &s, 0);
+      printf("first %d\\n", s);
+      wait(&s);
+      printf("second %d\\n", s);
+      return 0;
+    }`);
+  eq(r.output, "first 1792\nsecond 1280\n", "waitpid-targeted: statuses packed as code << 8, right child first");
+  eq(zombies(r), [], "waitpid-targeted: the bypassed child is reaped by the later wait()");
+}
+
+{
+  // the target child already exited → immediate reap, zombie flag cleared
+  const r = sim("waitpid-dead-target", `
+    int main() {
+      int c = fork();
+      if (c == 0) { exit(2); }
+      sleep(1);
+      int s;
+      waitpid(c, &s, 0);
+      printf("code %d\\n", s / 256);
+      return 0;
+    }`);
+  eq(r.output, "code 2\n", "waitpid-dead-target: WEXITSTATUS via s/256");
+  eq(zombies(r), [], "waitpid-dead-target: reaped");
+}
+
+{
+  const r = sim("waitpid-not-a-child", `
+    int main() {
+      int s;
+      int got = waitpid(4242, &s, 0);
+      printf("%d\\n", got);
+      return 0;
+    }`);
+  eq(r.output, "-1\n", "waitpid-not-a-child: returns -1 (ECHILD)");
+}
+
+{
+  // wait(&s) fills the status word: exit(3) → 3 << 8 = 768
+  const r = sim("wait-status", `
+    int main() {
+      if (fork() == 0) { exit(3); }
+      int s;
+      wait(&s);
+      printf("%d %d\\n", s, s / 256);
+      return 0;
+    }`);
+  eq(r.output, "768 3\n", "wait-status: packed word and extracted exit code");
+}
+
+{
+  // & outside a wait status slot degrades to 0 instead of a parse error
+  const r = sim("addrof-elsewhere", 'int main() { int x = 5; int y = &x; printf("%d\\n", y); return 0; }');
+  eq(r.output, "0\n", "addrof-elsewhere: address-of degrades to 0");
+}
+
+// ============================ FAST Sessional-II past paper ===================
+// The full exam program: fork in a short-circuit ||, fork in a short-circuit
+// &&, a child that falls through BOTH branches to return 1 (so waitpid's
+// status reads 1 << 8 = 256), orphans adopted mid-run, and a zombie reaped by
+// a later wait(NULL).
+
+{
+  const r = sim("fast-sessional", `
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <unistd.h>
+    #include <sys/types.h>
+    #include <sys/wait.h>
+
+    int main()
+    {
+        pid_t pid1, pid2, pid3, pid4, pid5;
+
+        pid1 = fork();
+
+        if (pid1 == 0 || (pid2 = fork()) == 0)
+        {
+            printf("A\\n");
+            exit(0);
+        }
+        else
+        {
+            wait(NULL);
+
+            pid3 = fork();
+
+            if (pid3 == 0 && (pid4 = fork()) == 0)
+            {
+                printf("B\\n");
+                exit(0);
+            }
+            else if (pid3 > 0)
+            {
+                int s;
+
+                waitpid(pid3, &s, 0);
+
+                printf("Status of PID3 = %d\\n", s);
+
+                pid5 = fork();
+
+                if (pid5 == 0)
+                {
+                    printf("C\\n");
+                    exit(0);
+                }
+                else
+                {
+                    wait(NULL);
+
+                    printf("D\\n");
+
+                    return 0;
+                }
+            }
+        }
+
+        return 1;
+    }`);
+  eq(r.processes.length, 6, "fast: 6 processes (P0..P5)");
+  eq(byLabel(r, "P0").childIds, [1, 2, 3, 5], "fast: root forks P1 (pid1), P2 (||), P3 (pid3), P5 (pid5)");
+  eq(byLabel(r, "P3").childIds, [4], "fast: P4 comes from the && inside P3");
+  // P3: pid3==0 → && forks P4 but pid4 != 0 → false; else-if pid3>0 false in
+  // the child → falls through to return 1. waitpid packs it: 1 << 8 = 256.
+  eq(byLabel(r, "P3").exitStatus, 1, "fast: P3 falls through to return 1");
+  ok(r.output.includes("Status of PID3 = 256"), "fast: the exam's status is 256, not 0", r.output);
+  eq(r.output, "A\nA\nB\nStatus of PID3 = 256\nD\nC\n", "fast: one valid ordering, deterministic here");
+  eq(zombies(r), [], "fast: P2's zombie phase ends when the last wait(NULL) reaps it");
+  eq(orphans(r), ["P4", "P5"], "fast: P4 outlives P3, P5 outlives P0");
+  eq(byLabel(r, "P1").exitStatus, 0, "fast: P1 exits 0");
+  eq(byLabel(r, "P2").exitStatus, 0, "fast: P2 exits 0");
+}
+
 // ============================ orphans ========================================
 
 {
@@ -453,6 +598,7 @@ const FRAGMENTS: ((r: () => number) => string)[] = [
   () => "wait(0);",
   () => "while (wait(0) > 0) { }",
   () => 'printf("m %d %d\\n", getpid(), getppid());',
+  () => "if (fork() == 0) { exit(3); } int st; waitpid(-1, &st, 0);",
   (r) => `for (int i = 0; i < ${1 + Math.floor(r() * 2)}; i++) { fork(); }`,
   (r) => `if (fork() ${r() < 0.5 ? "&&" : "||"} fork()) { sleep(1); }`,
 ];
@@ -472,5 +618,5 @@ for (let t = 0; t < 300; t += 1) {
   if (fails > 0) { console.error("offending program:\n" + src); break; }
 }
 
-console.log(fails === 0 ? "ALL PASS (30 scenario groups + invariants over 300 fuzzed programs)" : `${fails} FAILURES`);
+console.log(fails === 0 ? "ALL PASS (36 scenario groups + invariants over 300 fuzzed programs)" : `${fails} FAILURES`);
 process.exit(fails === 0 ? 0 : 1);
